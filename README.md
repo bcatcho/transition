@@ -37,6 +37,8 @@ A light-weight state machine language, parser and interpreter built for run-time
     seekTarget 'Base'
     depositResources
     <strong>-&gt;</strong> <em>'Idle'</em>
+  <strong>@exit</strong>
+    log format:'returnedResources %s' param:'resourceAmt'
 </pre>
 
 ### Want to contribute?
