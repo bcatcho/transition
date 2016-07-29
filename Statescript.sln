@@ -1,0 +1,23 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Statescript", "Statescript\Statescript.csproj", "{05473E38-544D-4A95-8D15-41A199A47545}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{100AE44E-6E50-4388-BD8F-42A12E01EBA6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{05473E38-544D-4A95-8D15-41A199A47545}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05473E38-544D-4A95-8D15-41A199A47545}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05473E38-544D-4A95-8D15-41A199A47545}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05473E38-544D-4A95-8D15-41A199A47545}.Release|Any CPU.Build.0 = Release|Any CPU
+		{100AE44E-6E50-4388-BD8F-42A12E01EBA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{100AE44E-6E50-4388-BD8F-42A12E01EBA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{100AE44E-6E50-4388-BD8F-42A12E01EBA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{100AE44E-6E50-4388-BD8F-42A12E01EBA6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
