@@ -39,6 +39,6 @@ A light-weight state machine language, parser and interpreter built for run-time
     <strong>-&gt;</strong> <em>'Idle'</em>
 </pre>
 
-# Want to contribute?
+### Want to contribute?
 
 See design.md for details, guidelines and philosophies. Feel free to open issues for feature requests.
