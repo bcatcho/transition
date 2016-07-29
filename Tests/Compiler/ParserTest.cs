@@ -1,9 +1,9 @@
 ﻿using NUnit.Framework;
 
-namespace Tests
+namespace Tests.Compiler
 {
    [TestFixture]
-   public class Test
+   public class ParserTest
    {
       [Test]
       public void TestCase()
