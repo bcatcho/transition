@@ -1,6 +1,6 @@
 # transition
 
-A light weight c# state machine lang, parser and interpreter built for run-time compilation and execution.
+A light-weight state machine language, parser and interpreter built for run-time compilation and execution. 
 
 <pre class="code">
 <strong>@machine</strong> Worker <strong>-&gt;</strong> <em>'Idle'</em>
