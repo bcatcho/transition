@@ -2,40 +2,41 @@
 
 A light weight c# state machine lang, parser and interpreter built for run-time compilation and execution.
 
-<pre class="code"><span class="pl-k">@machine</span> <span class="pl-en">Worker</span> <span class="pl-k">-&gt;</span> <span class="pl-c1">&#39;Idle&#39;</span>
+<pre class="code">
+<strong>@machine</strong> Worker <strong>-&gt;</strong> <em>'Idle'</em>
 
-<span class="pl-k">@state</span> <span class="pl-en">Idle</span>
-  <span class="pl-s3">@enter</span>
-    setAnim <span class="pl-s1"><span class="pl-pds">&#39;</span>idle<span class="pl-pds">&#39;</span></span>
-  <span class="pl-s3">@on</span>
-    <span class="pl-s1">&#39;HarvestResource&#39;</span> <span class="pl-k">-&gt;</span> <span class="pl-c1">&#39;SeekResource&#39;</span>
+<strong>@state</strong> Idle
+  <strong>@enter</strong>
+    setAnim 'idle'
+  <strong>@on</strong>
+    'HarvestResource': <strong>-&gt;</strong> <em>'SeekResource'</em>
 
-<span class="pl-k">@state</span> <span class="pl-en">SeekResource</span>
-  <span class="pl-s3">@enter</span>
-    setAnim <span class="pl-s1"><span class="pl-pds">&#39;</span>moving<span class="pl-pds">&#39;</span></span>
-    setTarget <span class="pl-s1"><span class="pl-pds">&#39;</span>Resource<span class="pl-pds">&#39;</span></span>
-  <span class="pl-s3">@run</span>
-    seekTarget <span class="pl-s1"><span class="pl-pds">&#39;</span>Resource<span class="pl-pds">&#39;</span></span>
-    <span class="pl-k">-&gt;</span> <span class="pl-c1">&#39;HarvestResource&#39;</span>
+<strong>@state</strong> SeekResource
+  <strong>@enter</strong>
+    setAnim 'moving'
+    setTarget 'Resource'
+  <strong>@run</strong>
+    seekTarget 'Resource'
+    <strong>-&gt;</strong> <em>'HarvestResource'</em>
 
-<span class="pl-k">@state</span> <span class="pl-en">HarvestResource</span>
-  <span class="pl-s3">@enter</span>
+<strong>@state</strong> HarvestResource
+  <strong>@enter</strong>
     claimResource
-    setAnim <span class="pl-s1"><span class="pl-pds">&#39;</span>harvesting<span class="pl-pds">&#39;</span></span>
-  <span class="pl-s3">@run</span>
-    harvest speed<span class="pl-k">:</span><span class="pl-s1"><span class="pl-pds">&#39;</span>3.0<span class="pl-pds">&#39;</span></span>
-    <span class="pl-k">-&gt;</span> <span class="pl-c1">&#39;ReturnResources&#39;</span>
-  <span class="pl-s3">@on</span>
-    <span class="pl-s1">&#39;cancelJob&#39;</span><span class="pl-k">:</span> canDropResources<span class="pl-k">?</span> threshold<span class="pl-k">:</span><span class="pl-s1"><span class="pl-pds">&#39;</span>3<span class="pl-pds">&#39;</span></span> yes<span class="pl-k">-&gt;</span><span class="pl-c1">&#39;Idle&#39;</span>
+    setAnim 'harvesting'
+  <strong>@run</strong>
+    harvest speed:'3.0'
+    <strong>-&gt;</strong> <em>'ReturnResources'</em>
+  <strong>@on</strong>
+    'cancelJob': canDropResources? threshold:'3' yes<strong>-&gt;</strong><em>'Idle'</em>
 
-<span class="pl-k">@state</span> <span class="pl-en">ReturnResources</span>
-  <span class="pl-s3">@enter</span>
-    setAnim <span class="pl-s1"><span class="pl-pds">&#39;</span>moving<span class="pl-pds">&#39;</span></span>
-    setTarget <span class="pl-s1"><span class="pl-pds">&#39;</span>Base<span class="pl-pds">&#39;</span></span>
-  <span class="pl-s3">@run</span>
-    seekTarget <span class="pl-s1"><span class="pl-pds">&#39;</span>Base<span class="pl-pds">&#39;</span></span>
+<strong>@state</strong> ReturnResources
+  <strong>@enter</strong>
+    setAnim 'moving'
+    setTarget 'Base'
+  <strong>@run</strong>
+    seekTarget 'Base'
     depositResources
-    <span class="pl-k">-&gt;</span> <span class="pl-c1">&#39;Idle&#39;</span>
+    <strong>-&gt;</strong> <em>'Idle'</em>
 </pre>
 
 # Want to contribute?
