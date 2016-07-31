@@ -39,7 +39,7 @@ namespace Statescript.Compiler
      public TokenOperator Operator;
    }
 
-   public class Parser
+   public class Tokenizer
    {
       int _lineNumber = 0;
       int _tokenStart = 0;
@@ -99,8 +99,8 @@ namespace Statescript.Compiler
       }
 
       %%{
-        machine Parser;
-        include ParserMachine "ParserMachine.rl";
+        machine Tokenizer;
+        include TokenizerDef "TokenizerDef.rl";
         write data;
       }%%
 
@@ -127,7 +127,7 @@ namespace Statescript.Compiler
 
       public bool Finish()
       {
-         return (cs >= Parser_first_final);
+         return (cs >= Tokenizer_first_final);
       }
    }
 }

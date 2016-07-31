@@ -8,8 +8,8 @@ namespace Tests.Compiler
    [TestFixture]
    public class ParserTest
    {
-      private List<Token> Parse(string input) {
-         var parser = new Parser();
+      private List<Token> Tokenize(string input) {
+         var parser = new Tokenizer();
          parser.Init();
          var tokens = parser.Tokenize(input.ToCharArray(), input.Length);
          parser.Finish();
@@ -26,7 +26,7 @@ namespace Tests.Compiler
       {
          var testInput = @"@machine blah -> 'yar'";
 
-         var tokens = Parse(testInput);
+         var tokens = Tokenize(testInput);
 
          Assert.AreEqual(TokenType.Identifier, tokens[1].TokenType);
          AssertTokenValue("blah", tokens[1], testInput); 
@@ -37,7 +37,7 @@ namespace Tests.Compiler
       {
          var testInput = @"@machine blah -> 'b'";
 
-         var tokens = Parse(testInput);
+         var tokens = Tokenize(testInput);
 
          Assert.AreEqual(4, tokens.Count);
       }
@@ -47,7 +47,7 @@ namespace Tests.Compiler
       {
          var testInput = @"@machine blah->'b'";
 
-         var tokens = Parse(testInput);
+         var tokens = Tokenize(testInput);
 
          Assert.AreEqual(4, tokens.Count);
          Assert.AreEqual(TokenType.Keyword, tokens[0].TokenType);
@@ -61,7 +61,7 @@ namespace Tests.Compiler
       {
          var testInput = @"@machine blah -> 'yar'";
 
-         var tokens = Parse(testInput);
+         var tokens = Tokenize(testInput);
 
          Assert.AreEqual(TokenType.TransitionValue, tokens[3].TokenType);
          AssertTokenValue("yar", tokens[3], testInput); 
@@ -73,7 +73,7 @@ namespace Tests.Compiler
          var testInput = @"@machine blah -> 'yar'
 ";
 
-         var tokens = Parse(testInput);
+         var tokens = Tokenize(testInput);
 
          Assert.AreEqual(TokenType.NewLine, tokens[4].TokenType);
       }

@@ -1,5 +1,5 @@
 %%{
-  machine ParserMachine;
+  machine TokenizerDef;
 
   action emitNewLine { _lineNumber++; log("newline"); EmitNewLine(); }
   action startKeyword { log("startKeyword"); StartToken(); }

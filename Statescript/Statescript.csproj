@@ -31,7 +31,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Compiler\Parser.cs" />
     <Compile Include="Compiler\AstNodes\AstNode.cs" />
     <Compile Include="Compiler\AstNodes\ActionAstNode.cs" />
     <Compile Include="Compiler\AstNodes\MachineAstNode.cs" />
@@ -39,6 +38,7 @@
     <Compile Include="Compiler\AstNodes\ParamOperation.cs" />
     <Compile Include="Compiler\AstNodes\SectionAstNode.cs" />
     <Compile Include="Compiler\AstNodes\StateAstNode.cs" />
+    <Compile Include="Compiler\Tokenizer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
