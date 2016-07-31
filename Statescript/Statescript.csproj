@@ -32,6 +32,13 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Compiler\Parser.cs" />
+    <Compile Include="Compiler\AstNode.cs" />
+    <Compile Include="Compiler\MachineAstNode.cs" />
+    <Compile Include="Compiler\StateAstNode.cs" />
+    <Compile Include="Compiler\SectionAstNode.cs" />
+    <Compile Include="Compiler\ActionAstNode.cs" />
+    <Compile Include="Compiler\ParamAstNode.cs" />
+    <Compile Include="Compiler\ParamOperation.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

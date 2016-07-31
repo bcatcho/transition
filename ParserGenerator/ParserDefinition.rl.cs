@@ -12,47 +12,90 @@ namespace Statescript.Compiler
    using System;
    using System.Collections.Generic;
 
-   public class AstNode
+   public enum TokenType
    {
-      public int LineNumber { get; set; }
-
-      public string Id { get; set; }
-
-      public List<AstParam> Params = new List<AstParam>();
-      public AstNode Parent;
-      public List<AstNode> Children = new List<AstNode>();
+     Keyword,
+     Identifier,
+     Value,
+     TransitionValue,
+     MessageValue,
+     Operator,
+     NewLine
    }
 
-   public class AstParam
+   public enum TokenOperator
    {
-      public string Name { get; set; }
-
-      public string Val { get; set; }
+     Set,
+     Transition
    }
 
-   public class StatescriptParser
+   public struct Token
+   {
+     public string Value;
+     public int StartIndex;
+     public int Length;
+     public int LineNumber;
+     public TokenType TokenType;
+     public TokenOperator Operator;
+   }
+
+   public class Parser
    {
       int _lineNumber = 0;
-      int _indent = 0;
-      int _prevIndent = 0;
       int _tokenStart = 0;
-      bool _isInCommentLine;
-      AstNode _currentRoot;
-      AstNode _currentNode;
-      AstNode _currentParent;
-      AstParam _currentParam;
-      Stack<int> _indentationStack = new Stack<int>();
-      List<AstNode> _trees;
+      private List<Token> _tokens;
       char[] _data;
+      // ragel properties
+      private int cs;
+      int p;
 
-      private void StartToken(int charIndex)
+      private void StartToken()
       {
-         _tokenStart = charIndex;
+        _tokenStart = p;
       }
 
-      private string EndToken(int charIndex)
-      {
-         return new String(_data, _tokenStart, charIndex - _tokenStart);
+      private void log(string msg) {
+        Console.WriteLine(string.Format("{0} {1}", p, msg));
+      }
+
+      private void logEnd(string msg) {
+        var token = new String(_data, _tokenStart, p - _tokenStart);
+        Console.WriteLine(string.Format("{0} {1}: {2}", p, msg, token));
+      }
+
+      private void EmitOperator(TokenOperator tokenOperator) {
+        _tokens.Add(new Token {
+          LineNumber = _lineNumber,
+          Operator = tokenOperator,
+          TokenType = TokenType.Operator
+        });
+      }
+
+      private void EmitToken(TokenType tokenType) {
+        var token = new Token {
+          LineNumber = _lineNumber,
+          StartIndex = _tokenStart,
+          Length = p - _tokenStart,
+          Value = new String(_data, _tokenStart, p - _tokenStart),
+          TokenType = tokenType
+        };
+
+        if (tokenType == TokenType.TransitionValue
+            || tokenType == TokenType.Value
+            || tokenType == TokenType.MessageValue) {
+          // remove quotes
+          token.StartIndex = token.StartIndex + 1;
+          token.Length = token.Length - 2;
+        }
+
+        _tokens.Add(token);
+      }
+
+      private void EmitNewLine() {
+        _tokens.Add(new Token {
+          LineNumber = _lineNumber,
+          TokenType = TokenType.NewLine
+        });
       }
 
       %%{
@@ -61,27 +104,25 @@ namespace Statescript.Compiler
         write data;
       }%%
 
-      private int cs;
-
       public void Init()
       {
          %% write init;
       }
 
-      public IList<AstNode> Exec(char[] data, int len)
+      public List<Token> Tokenize(char[] data, int len)
       {
-         if (_trees == null) {
-            _trees = new List<AstNode>();
+         if (_tokens == null) {
+           _tokens = new List<Token>(128);
          }
-         _trees.Clear();
+         _tokens.Clear();
          _lineNumber = 1; // start at line 1 like most text editors
          _data = data;
          _tokenStart = 0;
-         int p = 0;
+         p = 0;
          int pe = len;
          int eof = len;
          %% write exec;
-         return _trees;
+         return _tokens;
       }
 
       public bool Finish()

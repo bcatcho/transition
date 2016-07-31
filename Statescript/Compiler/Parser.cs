@@ -14,214 +14,213 @@ namespace Statescript.Compiler
    using System;
    using System.Collections.Generic;
 
-   public class AstNode
+   public enum TokenType
    {
-      public int LineNumber { get; set; }
-
-      public string Id { get; set; }
-
-      public List<AstParam> Params = new List<AstParam>();
-      public AstNode Parent;
-      public List<AstNode> Children = new List<AstNode>();
+     Keyword,
+     Identifier,
+     Value,
+     TransitionValue,
+     MessageValue,
+     Operator,
+     NewLine
    }
 
-   public class AstParam
+   public enum TokenOperator
    {
-      public string Name { get; set; }
-
-      public string Val { get; set; }
+     Set,
+     Transition
    }
 
-   public class StatescriptParser
+   public struct Token
+   {
+     public string Value;
+     public int StartIndex;
+     public int Length;
+     public int LineNumber;
+     public TokenType TokenType;
+     public TokenOperator Operator;
+   }
+
+   public class Parser
    {
       int _lineNumber = 0;
-      int _indent = 0;
-      int _prevIndent = 0;
       int _tokenStart = 0;
-      bool _isInCommentLine;
-      AstNode _currentRoot;
-      AstNode _currentNode;
-      AstNode _currentParent;
-      AstParam _currentParam;
-      Stack<int> _indentationStack = new Stack<int>();
-      List<AstNode> _trees;
+      private List<Token> _tokens;
       char[] _data;
+      // ragel properties
+      private int cs;
+      int p;
 
-      private void StartToken(int charIndex)
+      private void StartToken()
       {
-         _tokenStart = charIndex;
+        _tokenStart = p;
       }
 
-      private string EndToken(int charIndex)
-      {
-         return new String(_data, _tokenStart, charIndex - _tokenStart);
+      private void log(string msg) {
+        Console.WriteLine(string.Format("{0} {1}", p, msg));
+      }
+
+      private void logEnd(string msg) {
+        var token = new String(_data, _tokenStart, p - _tokenStart);
+        Console.WriteLine(string.Format("{0} {1}: {2}", p, msg, token));
+      }
+
+      private void EmitOperator(TokenOperator tokenOperator) {
+        _tokens.Add(new Token {
+          LineNumber = _lineNumber,
+          Operator = tokenOperator,
+          TokenType = TokenType.Operator
+        });
+      }
+
+      private void EmitToken(TokenType tokenType) {
+        var token = new Token {
+          LineNumber = _lineNumber,
+          StartIndex = _tokenStart,
+          Length = p - _tokenStart,
+          Value = new String(_data, _tokenStart, p - _tokenStart),
+          TokenType = tokenType
+        };
+
+        if (tokenType == TokenType.TransitionValue
+            || tokenType == TokenType.Value
+            || tokenType == TokenType.MessageValue) {
+          // remove quotes
+          token.StartIndex = token.StartIndex + 1;
+          token.Length = token.Length - 2;
+        }
+
+        _tokens.Add(token);
+      }
+
+      private void EmitNewLine() {
+        _tokens.Add(new Token {
+          LineNumber = _lineNumber,
+          TokenType = TokenType.NewLine
+        });
       }
 
       
-#line 62 "tmp/Parser.cs"
+#line 105 "tmp/Parser.cs"
 static readonly sbyte[] _Parser_actions =  new sbyte [] {
-	0, 1, 2, 1, 3, 1, 4, 1, 
-	5, 1, 6, 1, 7, 1, 8, 1, 
-	11, 2, 0, 1, 2, 3, 7, 2, 
-	4, 11, 2, 10, 3, 3, 0, 1, 
-	2, 3, 0, 1, 9, 3, 11, 10, 
-	3, 4, 0, 1, 9, 2, 4, 0, 
-	1, 10, 3, 5, 0, 1, 9, 10, 
-	3
+	0, 1, 0, 1, 1, 1, 2, 1, 
+	3, 1, 4, 1, 5, 1, 6, 1, 
+	7, 2, 2, 1, 2, 5, 6, 2, 
+	7, 0
 };
 
-static readonly byte[] _Parser_key_offsets =  new byte [] {
-	0, 0, 16, 17, 19, 21, 23, 23, 
-	25, 27, 27, 35, 37, 39, 41, 41, 
-	43, 45, 45, 46, 62, 78, 94, 110, 
-	130, 146, 148, 164
+static readonly sbyte[] _Parser_key_offsets =  new sbyte [] {
+	0, 0, 4, 13, 22, 30, 41, 45, 
+	46, 51, 56, 61, 69, 70, 75, 83, 
+	85
 };
 
 static readonly char[] _Parser_trans_keys =  new char [] {
-	'\u0009', '\u000a', '\u000d', '\u0020', '\u0023', '\u0024', '\u002a', '\u002d', 
-	'\u005f', '\u007e', '\u0030', '\u0039', '\u003e', '\u005a', '\u0061', '\u007a', 
-	'\u000a', '\u000a', '\u000d', '\u0022', '\u005c', '\u0022', '\u005c', '\u0027', 
-	'\u005c', '\u0027', '\u005c', '\u003a', '\u005f', '\u0030', '\u0039', '\u0041', 
-	'\u005a', '\u0061', '\u007a', '\u0022', '\u0027', '\u0022', '\u005c', '\u0022', 
-	'\u005c', '\u0027', '\u005c', '\u0027', '\u005c', '\u000a', '\u0009', '\u000a', 
-	'\u000d', '\u0020', '\u0023', '\u0024', '\u002a', '\u002d', '\u005f', '\u007e', 
-	'\u0030', '\u0039', '\u003e', '\u005a', '\u0061', '\u007a', '\u0009', '\u000a', 
-	'\u000d', '\u0020', '\u0023', '\u0024', '\u002a', '\u002d', '\u005f', '\u007e', 
-	'\u0030', '\u0039', '\u003e', '\u005a', '\u0061', '\u007a', '\u0009', '\u000a', 
-	'\u000d', '\u0020', '\u0023', '\u0024', '\u002a', '\u002d', '\u005f', '\u007e', 
-	'\u0030', '\u0039', '\u003e', '\u005a', '\u0061', '\u007a', '\u0009', '\u000a', 
-	'\u000d', '\u0020', '\u0023', '\u0024', '\u002a', '\u002d', '\u005f', '\u007e', 
-	'\u0030', '\u0039', '\u003e', '\u005a', '\u0061', '\u007a', '\u0009', '\u000a', 
-	'\u000d', '\u0020', '\u0022', '\u0023', '\u0024', '\u0027', '\u002a', '\u002d', 
-	'\u005f', '\u007e', '\u0030', '\u0039', '\u003e', '\u0040', '\u0041', '\u005a', 
-	'\u0061', '\u007a', '\u0009', '\u000a', '\u000d', '\u0020', '\u0023', '\u0024', 
-	'\u002a', '\u002d', '\u005f', '\u007e', '\u0030', '\u0039', '\u003e', '\u005a', 
-	'\u0061', '\u007a', '\u000a', '\u000d', '\u0009', '\u000a', '\u000d', '\u0020', 
-	'\u0023', '\u0024', '\u002a', '\u002d', '\u005f', '\u007e', '\u0030', '\u0039', 
-	'\u003e', '\u005a', '\u0061', '\u007a', '\u0009', '\u000a', '\u000d', '\u0020', 
-	'\u0023', '\u0024', '\u002a', '\u002d', '\u005f', '\u007e', '\u0030', '\u0039', 
-	'\u003e', '\u0040', '\u0041', '\u005a', '\u0061', '\u007a', (char) 0
+	'\u0020', '\u0040', '\u0009', '\u000d', '\u0020', '\u0040', '\u005f', '\u0009', 
+	'\u000d', '\u0041', '\u005a', '\u0061', '\u007a', '\u0020', '\u0040', '\u005f', 
+	'\u0009', '\u000d', '\u0041', '\u005a', '\u0061', '\u007a', '\u0020', '\u005f', 
+	'\u0009', '\u000d', '\u0041', '\u005a', '\u0061', '\u007a', '\u0020', '\u002d', 
+	'\u005f', '\u0009', '\u000d', '\u0030', '\u0039', '\u0041', '\u005a', '\u0061', 
+	'\u007a', '\u0020', '\u002d', '\u0009', '\u000d', '\u003e', '\u0020', '\u0022', 
+	'\u0027', '\u0009', '\u000d', '\u0020', '\u0022', '\u0027', '\u0009', '\u000d', 
+	'\u005f', '\u0041', '\u005a', '\u0061', '\u007a', '\u0022', '\u005f', '\u0030', 
+	'\u0039', '\u0041', '\u005a', '\u0061', '\u007a', '\u000a', '\u005f', '\u0041', 
+	'\u005a', '\u0061', '\u007a', '\u0027', '\u005f', '\u0030', '\u0039', '\u0041', 
+	'\u005a', '\u0061', '\u007a', '\u000a', '\u000d', (char) 0
 };
 
 static readonly sbyte[] _Parser_single_lengths =  new sbyte [] {
-	0, 10, 1, 2, 2, 2, 0, 2, 
-	2, 0, 2, 2, 2, 2, 0, 2, 
-	2, 0, 1, 10, 10, 10, 10, 12, 
-	10, 2, 10, 10
+	0, 2, 3, 3, 2, 3, 2, 1, 
+	3, 3, 1, 2, 1, 1, 2, 2, 
+	0
 };
 
 static readonly sbyte[] _Parser_range_lengths =  new sbyte [] {
-	0, 3, 0, 0, 0, 0, 0, 0, 
-	0, 0, 3, 0, 0, 0, 0, 0, 
-	0, 0, 0, 3, 3, 3, 3, 4, 
-	3, 0, 3, 4
+	0, 1, 3, 3, 3, 4, 1, 0, 
+	1, 1, 2, 3, 0, 2, 3, 0, 
+	0
 };
 
-static readonly byte[] _Parser_index_offsets =  new byte [] {
-	0, 0, 14, 16, 19, 22, 25, 26, 
-	29, 32, 33, 39, 42, 45, 48, 49, 
-	52, 55, 56, 58, 72, 86, 100, 114, 
-	131, 145, 148, 162
+static readonly sbyte[] _Parser_index_offsets =  new sbyte [] {
+	0, 0, 4, 11, 18, 24, 32, 36, 
+	38, 43, 48, 52, 58, 60, 64, 70, 
+	73
 };
 
 static readonly sbyte[] _Parser_indicies =  new sbyte [] {
-	0, 2, 3, 0, 4, 5, 5, 5, 
-	5, 5, 5, 5, 5, 1, 2, 1, 
-	6, 7, 4, 9, 10, 8, 12, 13, 
-	11, 11, 9, 15, 14, 12, 17, 16, 
-	16, 19, 18, 18, 18, 18, 1, 20, 
-	21, 1, 23, 24, 22, 26, 27, 25, 
-	25, 23, 29, 28, 26, 31, 30, 30, 
-	32, 1, 0, 2, 3, 0, 4, 5, 
-	5, 5, 5, 5, 5, 5, 5, 1, 
-	33, 34, 35, 33, 36, 37, 37, 37, 
-	37, 37, 37, 37, 37, 1, 38, 39, 
-	40, 38, 41, 42, 42, 42, 42, 42, 
-	42, 42, 42, 1, 43, 44, 45, 43, 
-	46, 47, 47, 47, 47, 47, 47, 47, 
-	47, 1, 48, 49, 50, 48, 51, 52, 
-	53, 54, 53, 53, 55, 53, 53, 53, 
-	55, 55, 1, 56, 49, 50, 56, 52, 
-	53, 53, 53, 53, 53, 53, 53, 53, 
-	1, 2, 3, 57, 58, 49, 50, 58, 
-	52, 53, 53, 53, 53, 53, 53, 53, 
-	53, 1, 58, 49, 50, 58, 52, 53, 
-	53, 53, 55, 53, 53, 53, 55, 55, 
-	1, 0
+	0, 2, 0, 1, 0, 2, 3, 0, 
+	3, 3, 1, 4, 5, 6, 4, 6, 
+	6, 1, 7, 3, 7, 3, 3, 1, 
+	8, 9, 10, 8, 10, 10, 10, 1, 
+	11, 12, 11, 1, 13, 1, 14, 15, 
+	16, 14, 1, 17, 18, 19, 17, 1, 
+	20, 20, 20, 1, 21, 20, 20, 20, 
+	20, 1, 22, 1, 23, 23, 23, 1, 
+	21, 23, 23, 23, 23, 1, 24, 25, 
+	1, 1, 0
 };
 
 static readonly sbyte[] _Parser_trans_targs =  new sbyte [] {
-	1, 0, 20, 2, 3, 22, 21, 18, 
-	5, 24, 6, 5, 24, 6, 8, 9, 
-	8, 9, 10, 11, 12, 15, 13, 26, 
-	14, 13, 26, 14, 16, 17, 16, 17, 
-	21, 1, 20, 2, 3, 22, 1, 20, 
-	2, 3, 22, 23, 20, 2, 25, 22, 
-	23, 20, 2, 4, 25, 22, 7, 10, 
-	24, 25, 27
+	2, 0, 3, 5, 4, 3, 3, 4, 
+	6, 7, 5, 6, 7, 8, 9, 10, 
+	13, 9, 10, 13, 11, 15, 16, 14, 
+	16, 12
 };
 
 static readonly sbyte[] _Parser_trans_actions =  new sbyte [] {
-	1, 0, 0, 0, 0, 26, 13, 13, 
-	3, 20, 3, 0, 11, 0, 3, 3, 
-	0, 0, 0, 9, 0, 0, 3, 20, 
-	3, 0, 11, 0, 3, 3, 0, 0, 
-	0, 29, 17, 17, 17, 46, 41, 33, 
-	33, 33, 51, 5, 23, 23, 23, 0, 
-	0, 15, 15, 7, 15, 37, 7, 3, 
-	0, 0, 0
+	0, 0, 3, 7, 5, 17, 0, 0, 
+	9, 9, 0, 0, 0, 0, 11, 20, 
+	20, 0, 13, 13, 0, 0, 1, 0, 
+	23, 15
 };
 
 static readonly sbyte[] _Parser_eof_actions =  new sbyte [] {
 	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 17, 33, 23, 15, 
-	15, 0, 15, 15
+	0, 0, 0, 0, 0, 0, 0, 15, 
+	0
 };
 
-const int Parser_start = 19;
-const int Parser_first_final = 19;
+const int Parser_start = 1;
+const int Parser_first_final = 15;
 const int Parser_error = 0;
 
-const int Parser_en_main = 19;
+const int Parser_en_main = 1;
 
 
-#line 62 "ParserDefinition.rl.cs"
+#line 105 "ParserDefinition.rl.cs"
 
-
-      private int cs;
 
       public void Init()
       {
          
-#line 198 "tmp/Parser.cs"
+#line 197 "tmp/Parser.cs"
 	{
 	cs = Parser_start;
 	}
 
-#line 69 "ParserDefinition.rl.cs"
+#line 110 "ParserDefinition.rl.cs"
       }
 
-      public IList<AstNode> Exec(char[] data, int len)
+      public List<Token> Tokenize(char[] data, int len)
       {
-         if (_trees == null) {
-            _trees = new List<AstNode>();
+         if (_tokens == null) {
+           _tokens = new List<Token>(128);
          }
-         _trees.Clear();
+         _tokens.Clear();
          _lineNumber = 1; // start at line 1 like most text editors
          _data = data;
          _tokenStart = 0;
-         int p = 0;
+         p = 0;
          int pe = len;
          int eof = len;
          
-#line 219 "tmp/Parser.cs"
+#line 218 "tmp/Parser.cs"
 	{
 	sbyte _klen;
-	byte _trans;
+	sbyte _trans;
 	int _acts;
 	int _nacts;
-	byte _keys;
+	sbyte _keys;
 
 	if ( p == pe )
 		goto _test_eof;
@@ -229,55 +228,55 @@ const int Parser_en_main = 19;
 		goto _out;
 _resume:
 	_keys = _Parser_key_offsets[cs];
-	_trans = (byte)_Parser_index_offsets[cs];
+	_trans = (sbyte)_Parser_index_offsets[cs];
 
 	_klen = _Parser_single_lengths[cs];
 	if ( _klen > 0 ) {
-		short _lower = _keys;
-		short _mid;
-		short _upper = (short) (_keys + _klen - 1);
+		sbyte _lower = _keys;
+		sbyte _mid;
+		sbyte _upper = (sbyte) (_keys + _klen - 1);
 		while (true) {
 			if ( _upper < _lower )
 				break;
 
-			_mid = (short) (_lower + ((_upper-_lower) >> 1));
+			_mid = (sbyte) (_lower + ((_upper-_lower) >> 1));
 			if ( data[p] < _Parser_trans_keys[_mid] )
-				_upper = (short) (_mid - 1);
+				_upper = (sbyte) (_mid - 1);
 			else if ( data[p] > _Parser_trans_keys[_mid] )
-				_lower = (short) (_mid + 1);
+				_lower = (sbyte) (_mid + 1);
 			else {
-				_trans += (byte) (_mid - _keys);
+				_trans += (sbyte) (_mid - _keys);
 				goto _match;
 			}
 		}
-		_keys += (byte) _klen;
-		_trans += (byte) _klen;
+		_keys += (sbyte) _klen;
+		_trans += (sbyte) _klen;
 	}
 
 	_klen = _Parser_range_lengths[cs];
 	if ( _klen > 0 ) {
-		short _lower = _keys;
-		short _mid;
-		short _upper = (short) (_keys + (_klen<<1) - 2);
+		sbyte _lower = _keys;
+		sbyte _mid;
+		sbyte _upper = (sbyte) (_keys + (_klen<<1) - 2);
 		while (true) {
 			if ( _upper < _lower )
 				break;
 
-			_mid = (short) (_lower + (((_upper-_lower) >> 1) & ~1));
+			_mid = (sbyte) (_lower + (((_upper-_lower) >> 1) & ~1));
 			if ( data[p] < _Parser_trans_keys[_mid] )
-				_upper = (short) (_mid - 2);
+				_upper = (sbyte) (_mid - 2);
 			else if ( data[p] > _Parser_trans_keys[_mid+1] )
-				_lower = (short) (_mid + 2);
+				_lower = (sbyte) (_mid + 2);
 			else {
-				_trans += (byte)((_mid - _keys)>>1);
+				_trans += (sbyte)((_mid - _keys)>>1);
 				goto _match;
 			}
 		}
-		_trans += (byte) _klen;
+		_trans += (sbyte) _klen;
 	}
 
 _match:
-	_trans = (byte)_Parser_indicies[_trans];
+	_trans = (sbyte)_Parser_indicies[_trans];
 	cs = _Parser_trans_targs[_trans];
 
 	if ( _Parser_trans_actions[_trans] == 0 )
@@ -291,115 +290,37 @@ _match:
 		{
 	case 0:
 #line 4 "ParserMachine.rl"
-	{
-    if (!_isInCommentLine) {
-      _prevIndent = _indent;
-    }
-
-    _indent = 0;
-  }
+	{ _lineNumber++; log("newline"); EmitNewLine(); }
 	break;
 	case 1:
-#line 12 "ParserMachine.rl"
-	{
-    _lineNumber++;
-  }
+#line 5 "ParserMachine.rl"
+	{ log("startKeyword"); StartToken(); }
 	break;
 	case 2:
-#line 16 "ParserMachine.rl"
-	{
-    _indent++;
-  }
+#line 6 "ParserMachine.rl"
+	{ logEnd("endKeyword"); EmitToken(TokenType.Keyword); }
 	break;
 	case 3:
-#line 20 "ParserMachine.rl"
-	{
-    StartToken(p);
-  }
+#line 7 "ParserMachine.rl"
+	{ log("startId"); StartToken(); }
 	break;
 	case 4:
-#line 24 "ParserMachine.rl"
-	{
-    _currentNode.Id = EndToken(p);
-  }
+#line 8 "ParserMachine.rl"
+	{ logEnd("endId"); EmitToken(TokenType.Identifier); }
 	break;
 	case 5:
-#line 28 "ParserMachine.rl"
-	{
-    _currentParam = new AstParam {
-      Name = "@default"
-    };
-  }
+#line 9 "ParserMachine.rl"
+	{ log("emit tx op"); EmitOperator(TokenOperator.Transition); }
 	break;
 	case 6:
-#line 34 "ParserMachine.rl"
-	{
-    _currentParam = new AstParam {
-      Name = EndToken(p)
-    };
-  }
+#line 10 "ParserMachine.rl"
+	{ log("startTransitionValue"); StartToken(); }
 	break;
 	case 7:
-#line 40 "ParserMachine.rl"
-	{
-    _currentParam.Val = EndToken(p);
-    _currentNode.Params.Add(_currentParam);
-  }
+#line 11 "ParserMachine.rl"
+	{ logEnd("endTransitionValue"); EmitToken(TokenType.TransitionValue); }
 	break;
-	case 8:
-#line 45 "ParserMachine.rl"
-	{
-    _isInCommentLine = true;
-  }
-	break;
-	case 9:
-#line 49 "ParserMachine.rl"
-	{
-    _isInCommentLine = false;
-  }
-	break;
-	case 10:
-#line 53 "ParserMachine.rl"
-	{
-    if (_indent == 0) {
-      _currentParent = null; // start a new root node
-    } else if (_indent > _prevIndent) {
-      _indentationStack.Push(_prevIndent);
-      _currentParent = _currentNode; // save the parent
-    } else if (_indent < _prevIndent) {
-      int stackIndent;
-      while (_indentationStack.Count > 0) {
-        _currentParent = _currentParent.Parent;
-        stackIndent = _indentationStack.Pop();;
-        if (_indent == stackIndent) {
-          break;
-        } else if (_indent > stackIndent) {
-          throw new System.Exception("Parser Error: Bad Indentation on line " + _lineNumber + " cannot determine parent");
-        }
-      }
-    }
-
-    _currentNode = new AstNode {
-      LineNumber = _lineNumber,
-    };
-
-    // not in guard, assign parent
-    if (_currentParent != null) {
-      _currentNode.Parent = _currentParent;
-      _currentParent.Children.Add(_currentNode);
-    }
-  }
-	break;
-	case 11:
-#line 83 "ParserMachine.rl"
-	{
-    if (_currentRoot == null || _indent == 0) {
-      _currentRoot = _currentNode;
-      _trees.Add(_currentRoot);
-    }
-  }
-	break;
-#line 403 "tmp/Parser.cs"
+#line 324 "tmp/Parser.cs"
 		default: break;
 		}
 	}
@@ -416,44 +337,11 @@ _again:
 	int __nacts = _Parser_actions[__acts++];
 	while ( __nacts-- > 0 ) {
 		switch ( _Parser_actions[__acts++] ) {
-	case 0:
-#line 4 "ParserMachine.rl"
-	{
-    if (!_isInCommentLine) {
-      _prevIndent = _indent;
-    }
-
-    _indent = 0;
-  }
+	case 7:
+#line 11 "ParserMachine.rl"
+	{ logEnd("endTransitionValue"); EmitToken(TokenType.TransitionValue); }
 	break;
-	case 1:
-#line 12 "ParserMachine.rl"
-	{
-    _lineNumber++;
-  }
-	break;
-	case 4:
-#line 24 "ParserMachine.rl"
-	{
-    _currentNode.Id = EndToken(p);
-  }
-	break;
-	case 9:
-#line 49 "ParserMachine.rl"
-	{
-    _isInCommentLine = false;
-  }
-	break;
-	case 11:
-#line 83 "ParserMachine.rl"
-	{
-    if (_currentRoot == null || _indent == 0) {
-      _currentRoot = _currentNode;
-      _trees.Add(_currentRoot);
-    }
-  }
-	break;
-#line 457 "tmp/Parser.cs"
+#line 345 "tmp/Parser.cs"
 		default: break;
 		}
 	}
@@ -462,8 +350,8 @@ _again:
 	_out: {}
 	}
 
-#line 84 "ParserDefinition.rl.cs"
-         return _trees;
+#line 125 "ParserDefinition.rl.cs"
+         return _tokens;
       }
 
       public bool Finish()
