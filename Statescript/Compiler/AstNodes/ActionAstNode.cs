@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Statescript.Compiler
+namespace Statescript.Compiler.AstNode
 {
    public class ActionAstNode : AstNode
    {
