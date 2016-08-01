@@ -7,6 +7,7 @@ namespace Statescript.Compiler
    /// </summary>
    public enum TokenKeyword
    {
+      None,
       Enter,
       On,
       Exit,
