@@ -6,7 +6,7 @@ using System;
 namespace Tests.Compiler
 {
    [TestFixture]
-   public class ParserTest
+   public class TokenizerTests
    {
       private List<Token> Tokenize(string input) {
          var parser = new Tokenizer();
