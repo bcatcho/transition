@@ -1,4 +1,4 @@
-namespace Statescript.Compiler
+namespace Statescript.Compiler.Tokens
 {
    /// <summary>
    /// A product of lexical analysis on a string of input. Emitted by the Tokenizer

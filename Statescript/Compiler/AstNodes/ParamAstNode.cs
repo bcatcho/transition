@@ -1,6 +1,6 @@
 namespace Statescript.Compiler.AstNode
 {
-   public class ParamAstNode
+   public class ParamAstNode : AstNode
    {
       public string Name { get; set; }
       public ParamOperation Op { get; set; }

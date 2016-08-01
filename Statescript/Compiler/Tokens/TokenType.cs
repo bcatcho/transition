@@ -1,4 +1,4 @@
-namespace Statescript.Compiler
+namespace Statescript.Compiler.Tokens
 {
    /// <summary>
    /// The type of token found when tokenizing.

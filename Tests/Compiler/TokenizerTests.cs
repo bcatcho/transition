@@ -2,6 +2,7 @@
 using Statescript.Compiler;
 using System.Collections.Generic;
 using System;
+using Statescript.Compiler.Tokens;
 
 namespace Tests.Compiler
 {

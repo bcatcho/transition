@@ -1,4 +1,4 @@
-namespace Statescript.Compiler
+namespace Statescript.Compiler.Tokens
 {
    /// <summary>
    /// Represents the type of operator found when tokenizing

@@ -3,6 +3,7 @@
 // http://www.colm.net/open-source/ragel/
 using System;
 using System.Collections.Generic;
+using Statescript.Compiler.Tokens;
 
 namespace Statescript.Compiler
 {
@@ -21,7 +22,7 @@ namespace Statescript.Compiler
       // ragel properties
       private int cs;
       int p;
-      
+
       private void StartToken(TokenType tokenType)
       {
         #if PARSER_LOGGING

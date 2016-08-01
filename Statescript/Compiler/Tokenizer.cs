@@ -5,6 +5,7 @@
 // http://www.colm.net/open-source/ragel/
 using System;
 using System.Collections.Generic;
+using Statescript.Compiler.Tokens;
 
 namespace Statescript.Compiler
 {
@@ -23,7 +24,7 @@ namespace Statescript.Compiler
       // ragel properties
       private int cs;
       int p;
-      
+
       private void StartToken(TokenType tokenType)
       {
         #if PARSER_LOGGING
@@ -86,7 +87,7 @@ namespace Statescript.Compiler
       }
 
       
-#line 90 "tmp/Tokenizer.cs"
+#line 91 "tmp/Tokenizer.cs"
 static readonly sbyte[] _Tokenizer_actions =  new sbyte [] {
 	0, 1, 0, 1, 1, 1, 2, 1, 
 	3, 1, 4, 1, 5, 1, 6, 1, 
@@ -279,7 +280,7 @@ const int Tokenizer_error = 0;
 const int Tokenizer_en_main = 60;
 
 
-#line 90 "Tokenizer.rl.cs"
+#line 91 "Tokenizer.rl.cs"
 
 
       ///<summary>
@@ -292,12 +293,12 @@ const int Tokenizer_en_main = 60;
       public List<Token> Tokenize(char[] data, int len)
       {
          
-#line 296 "tmp/Tokenizer.cs"
+#line 297 "tmp/Tokenizer.cs"
 	{
 	cs = Tokenizer_start;
 	}
 
-#line 102 "Tokenizer.rl.cs"
+#line 103 "Tokenizer.rl.cs"
          if (_tokens == null) {
            _tokens = new List<Token>(128);
          }
@@ -307,7 +308,7 @@ const int Tokenizer_en_main = 60;
          int pe = len;
          // int eof = len;
          
-#line 311 "tmp/Tokenizer.cs"
+#line 312 "tmp/Tokenizer.cs"
 	{
 	sbyte _klen;
 	short _trans;
@@ -433,7 +434,7 @@ _match:
 #line 32 "TokenizerDef.rl"
 	{ SetKeyword(TokenKeyword.Run); }
 	break;
-#line 437 "tmp/Tokenizer.cs"
+#line 438 "tmp/Tokenizer.cs"
 		default: break;
 		}
 	}
@@ -447,7 +448,7 @@ _again:
 	_out: {}
 	}
 
-#line 111 "Tokenizer.rl.cs"
+#line 112 "Tokenizer.rl.cs"
          CommitLastToken();
          return _tokens;
       }

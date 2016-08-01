@@ -40,15 +40,17 @@
     <Compile Include="Compiler\AstNodes\StateAstNode.cs" />
     <Compile Include="Compiler\Tokenizer.cs" />
     <Compile Include="Compiler\Parser.cs" />
-    <Compile Include="Compiler\TokenType.cs" />
-    <Compile Include="Compiler\TokenOperator.cs" />
-    <Compile Include="Compiler\Token.cs" />
-    <Compile Include="Compiler\TokenKeyword.cs" />
+    <Compile Include="Compiler\ParserConstants.cs" />
+    <Compile Include="Compiler\Tokens\Token.cs" />
+    <Compile Include="Compiler\Tokens\TokenKeyword.cs" />
+    <Compile Include="Compiler\Tokens\TokenOperator.cs" />
+    <Compile Include="Compiler\Tokens\TokenType.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="Compiler\" />
     <Folder Include="Compiler\AstNodes\" />
+    <Folder Include="Compiler\Tokens\" />
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>
