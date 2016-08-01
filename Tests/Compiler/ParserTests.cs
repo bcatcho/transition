@@ -10,6 +10,13 @@ namespace Tests.Compiler
    [TestFixture]
    public class ParserTests
    {
+      private Token NewLineToken(int lineNumber) {
+         return new Token {
+            TokenType = TokenType.NewLine,
+            LineNumber = lineNumber
+         };
+      }
+
       private Token KeywordToken(TokenKeyword keyword, int lineNumber)
       {
          return new Token
@@ -77,6 +84,9 @@ namespace Tests.Compiler
          var input = "\n\n\r\n@machine machinename -> 'blah'";
          var tokens = new List<Token>
          {
+            NewLineToken(1),
+            NewLineToken(1),
+            NewLineToken(1),
             KeywordToken(TokenKeyword.Machine, 1),
             IdentifierToken(13, "machinename".Length, 1),
             OpToken(TokenOperator.Transition, 1),
@@ -107,6 +117,28 @@ namespace Tests.Compiler
 
          Assert.AreEqual(ParamOperation.Transition, param.Op);
          Assert.AreEqual("State1", param.Val);
+      }
+
+      [Test]
+      public void Parse_OneState_OneStateMade()
+      {
+         var input = "@machine m -> 's'\n@state s";
+         var tokens = new List<Token>
+         {
+            KeywordToken(TokenKeyword.Machine, 1),
+            IdentifierToken(13, 1, 1),
+            OpToken(TokenOperator.Transition, 1),
+            ValToken(19, 1, 1),
+            NewLineToken(1),
+            KeywordToken(TokenKeyword.State, 2),
+            IdentifierToken(25, 1, 1)
+         };
+         var parser = new Parser();
+
+         var ast = parser.Parse(tokens, input);
+         var state = ast.States[0];
+
+         Assert.AreEqual("s", state.Name);
       }
    }
 }

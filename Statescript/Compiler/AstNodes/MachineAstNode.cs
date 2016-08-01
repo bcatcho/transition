@@ -6,6 +6,6 @@ namespace Statescript.Compiler.AstNode
    {
       public string Name { get; set; }
       public ActionAstNode Action;
-      public List<StateAstNode> States;
+      public List<StateAstNode> States = new List<StateAstNode>();
    }
 }

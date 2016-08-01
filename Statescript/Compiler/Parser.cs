@@ -14,6 +14,8 @@ namespace Statescript.Compiler
       private MachineAstNode _machine;
       private bool _exitEarly;
       private int _index;
+      private IList<Token> _tokens;
+      private string _data;
 
       public Parser()
       {
@@ -31,48 +33,100 @@ namespace Statescript.Compiler
          _machine = null;
          _index = 0;
          _exitEarly = false;
+         _data = data;
+         _tokens = tokens;
          int count = tokens.Count;
          Token t = tokens[_index];
 
-         while (_index < count && t.TokenType == TokenType.NewLine) {
-            _index++;
-         } 
+         ParseBlanklines();
 
-         LookForMachine(tokens, data);
+         ParseMachine();
 
+         StateAstNode state;
+         do {
+            state = ParseState();
+            if (state != null) {
+               _machine.States.Add(state);
+            }
+         } while (state != null && !_exitEarly && _index < _tokens.Count);
+
+         _tokens = null;
+         _data = null;
          return _machine;
       }
 
-      private void LookForMachine(IList<Token> tokens, string data)
+      private void ParseBlanklines()
       {
-         var t = tokens[_index];
+         Token t;
+         var tokenAvailable = Current(out t);
+         while (tokenAvailable && t.TokenType == TokenType.NewLine) {
+            tokenAvailable = Next(out t);
+         }
+      }
+
+      private StateAstNode ParseState()
+      {
+         ParseBlanklines();
+         Token t;
+         if (!Current(out t)) {
+            return null;
+         }
+
+         if (t.TokenType != TokenType.Keyword || t.Keyword != TokenKeyword.State) {
+            HandleError("Expected @state found ", t);
+            return null;
+         }
+
+         var state = new StateAstNode
+         {
+            LineNumber = t.LineNumber,
+         };
+
+         if (!Next(out t)) {
+            HandleError("Expected @state identifier, reached end of input.", t);
+            return null;
+         } else if (t.TokenType != TokenType.Identifier) {
+            HandleError("Expected @state identifier found ", t);
+            return null;
+         }
+
+         state.Name = GetDataSubstring(t);
+         Advance();
+
+         return state;
+      }
+
+      private void ParseMachine()
+      {
+         var t = _tokens[_index];
          if (t.TokenType == TokenType.Keyword && t.Keyword == TokenKeyword.Machine) {
             _machine = new MachineAstNode();
 
-            _index++;
-            t = tokens[_index];
+            Next(out t);
             if (t.TokenType == TokenType.Identifier) {
-               _machine.Name = data.Substring(t.StartIndex, t.Length);
+               _machine.Name = GetDataSubstring(t);
             } else {
                HandleError("@machine missing name", t);
                return;
             }
 
             // build action for initial transition
-            _index++;
-            var action = BuildAction(tokens, data);
+            Advance();
+            var action = ParseAction();
             if (action == null) {
-               HandleError("@machine missing default transition", tokens[_index]);
+               HandleError("@machine missing default transition", _tokens[_index]);
                return;
             }
 
             _machine.Action = action;
+            Advance();
          }
       }
 
-      private ActionAstNode BuildAction(IList<Token> tokens, string data)
+      private ActionAstNode ParseAction()
       {
-         var t = tokens[_index];
+         Token t;
+         Current(out t);
          // transition operator found. This is syntatic sugar. handle first.
          if (t.TokenType == TokenType.Operator && t.Operator == TokenOperator.Transition) {
             var action = new ActionAstNode
@@ -81,18 +135,18 @@ namespace Statescript.Compiler
                LineNumber = t.LineNumber,
             };
 
-            var param = new ParamAstNode {
+            var param = new ParamAstNode
+            {
                LineNumber = t.LineNumber,
                Op = ParamOperation.Transition
             };
             // aquire the value
-            _index++;
-            t = tokens[_index];
+            Next(out t);
             if (t.TokenType != TokenType.Value) {
-               HandleError("transition missing value", tokens[_index - 1]);
+               HandleError("transition missing value", _tokens[_index - 1]);
                return null;
             }
-            param.Val = data.Substring(t.StartIndex, t.Length);
+            param.Val = GetDataSubstring(t);
             action.Params.Add(param);
 
             return action;
@@ -100,6 +154,40 @@ namespace Statescript.Compiler
          
 
          return null;
+      }
+
+      private string GetDataSubstring(Token t)
+      {
+         return _data.Substring(t.StartIndex, t.Length);
+      }
+
+      private bool Current(out Token t)
+      {
+         if (_index >= _tokens.Count) {
+            t = new Token();
+            return false;
+         }
+         
+         t = _tokens[_index];
+         return true;
+      }
+
+      private bool Next(out Token t)
+      {
+         _index++;
+         if (_index >= _tokens.Count) {
+            t = new Token();
+            return false;
+         }
+
+         t = _tokens[_index];
+         return true;
+      }
+
+      private bool Advance()
+      {
+         _index++;
+         return _index < _tokens.Count;
       }
 
       private void HandleError(string message, Token error)
