@@ -25,15 +25,13 @@
 
   keyword = (('\@' >startKeyword) ('machine'|'state'|'on'|'enter'|'exit'|'run')) %emitToken;
   identifier = (([a-zA-Z_] >startId) ([a-zA-Z_0-9]**)) %emitToken;
-  name = ([a-zA-Z_] [a-zA-Z_0-9]**);
   quotedValue = (((dquote %startVal) paramDquoteValue (dquote >emitToken))
-                | ((squote %startVal) paramDquoteValue (squote >emitToken)));
+                | ((squote %startVal) paramSquoteValue (squote >emitToken)));
 
+  comment = ('#' (any - (empty|'\n'|'\n\r'))*);
   keywordLine = keyword (space+ identifier (space* transOp space* quotedValue)?)?;
-
-  comment = ('#' (^(empty|'\n'|'\r\n'))*);
   param = identifier space* (transOp | assignOp) space* quotedValue;
   taskLine = ((transOp space* quotedValue) | (identifier (space+ param)*));
 
-  main := (space* (comment | keywordLine | taskLine) space* nl+)*;
+  main := (space* (comment | keywordLine | taskLine) comment? space* nl+)*;
 }%%

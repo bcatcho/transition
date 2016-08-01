@@ -13,9 +13,7 @@ namespace Tests.Compiler
    {
       private List<Token> Tokenize(string input) {
          var parser = new Tokenizer();
-         parser.Init();
          var tokens = parser.Tokenize(input.ToCharArray(), input.Length);
-         parser.Finish();
          return tokens;
       }
 
@@ -191,6 +189,40 @@ namespace Tests.Compiler
       }
 
       [Test]
+      public void Tokenize_TaskAndCommentInSameLine_OneTaskProduced()
+      {
+         var input = "task#Comment";
+
+         var tokens = Tokenize(input);
+
+         Assert.AreEqual(1, tokens.Count);
+         Assert.AreEqual(TokenType.Identifier, tokens[0].TokenType);
+      }
+
+      [Test]
+      public void Tokenize_TaskAndCommentNewLineTask_TwoTasksProduced()
+      {
+         var input = "task#comment\ntask2";
+
+         var tokens = Tokenize(input);
+
+         Assert.AreEqual(3, tokens.Count);
+         Assert.AreEqual(TokenType.Identifier, tokens[0].TokenType);
+         Assert.AreEqual(TokenType.NewLine, tokens[1].TokenType);
+         Assert.AreEqual(TokenType.Identifier, tokens[2].TokenType);
+      }
+
+      [Test]
+      public void Tokenize_CommentOnly_NoTaskProduced()
+      {
+         var input = "#hello";
+
+         var tokens = Tokenize(input);
+
+         Assert.AreEqual(0, tokens.Count);
+      }
+
+      [Test]
       public void Tokenize_EmtpyLineThenTask_TaskIsProduced()
       {
          var input = "\ntask";
@@ -221,16 +253,6 @@ namespace Tests.Compiler
 
          Assert.AreEqual(2, tokens.Count);
          Assert.AreEqual(TokenType.Identifier, tokens[1].TokenType);
-      }
-
-      [Test]
-      public void Tokenize_CommentOnly_NoTaskProduced()
-      {
-         var input = "#hello";
-
-         var tokens = Tokenize(input);
-
-         Assert.AreEqual(0, tokens.Count);
       }
    }
 }

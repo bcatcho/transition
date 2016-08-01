@@ -39,6 +39,10 @@
     <Compile Include="Compiler\AstNodes\SectionAstNode.cs" />
     <Compile Include="Compiler\AstNodes\StateAstNode.cs" />
     <Compile Include="Compiler\Tokenizer.cs" />
+    <Compile Include="Compiler\Parser.cs" />
+    <Compile Include="Compiler\TokenType.cs" />
+    <Compile Include="Compiler\TokenOperator.cs" />
+    <Compile Include="Compiler\Token.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

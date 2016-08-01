@@ -6,30 +6,10 @@ using System.Collections.Generic;
 
 namespace Statescript.Compiler
 {
-   public enum TokenType
-   {
-     Keyword,
-     Identifier,
-     Value,
-     Operator,
-     NewLine
-   }
-
-   public enum TokenOperator
-   {
-     Assign,
-     Transition
-   }
-
-   public struct Token
-   {
-     public int StartIndex;
-     public int Length;
-     public int LineNumber;
-     public TokenType TokenType;
-     public TokenOperator Operator;
-   }
-
+   /// <summary>
+   /// Tokenizer performs lexical analysis on a string of characters using the
+   /// and emits a string of tokens for the Parser to analyze.
+   /// </summary>
    public class Tokenizer
    {
       int _lineNumber = 0;
@@ -100,13 +80,16 @@ namespace Statescript.Compiler
         write data;
       }%%
 
-      public void Init()
-      {
-         %% write init;
-      }
-
+      ///<summary>
+      /// This method will perform lexical analysis on the character sequence input
+      //  and will return a sequence of tokens for the Parser to analyze.
+      ///</summary>
+      ///<returns>
+      /// A sequence of tokens that the Parser can use to Analyze.
+      ///</returns>
       public List<Token> Tokenize(char[] data, int len)
       {
+         %% write init;
          if (_tokens == null) {
            _tokens = new List<Token>(128);
          }
@@ -121,7 +104,14 @@ namespace Statescript.Compiler
          return _tokens;
       }
 
-      public bool Finish()
+      ///<summary>
+      /// Call this method after Tokenize to know if the parser exited prematurely
+      /// due to an error.
+      ///</summary>
+      ///<returns>
+      /// A boolean indicating if the tokenizer made it to the end of the input or not.
+      ///</returns>
+      public bool DidReachEndOfInput()
       {
          return (cs >= Tokenizer_first_final);
       }
