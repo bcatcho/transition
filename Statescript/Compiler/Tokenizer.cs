@@ -411,27 +411,27 @@ _match:
 	{ StartToken(TokenType.Value); }
 	break;
 	case 7:
-#line 27 "TokenizerDef.rl"
+#line 29 "TokenizerDef.rl"
 	{ SetKeyword(TokenKeyword.Machine); }
 	break;
 	case 8:
-#line 28 "TokenizerDef.rl"
+#line 30 "TokenizerDef.rl"
 	{ SetKeyword(TokenKeyword.State); }
 	break;
 	case 9:
-#line 29 "TokenizerDef.rl"
+#line 31 "TokenizerDef.rl"
 	{ SetKeyword(TokenKeyword.On); }
 	break;
 	case 10:
-#line 30 "TokenizerDef.rl"
+#line 32 "TokenizerDef.rl"
 	{ SetKeyword(TokenKeyword.Enter); }
 	break;
 	case 11:
-#line 31 "TokenizerDef.rl"
+#line 33 "TokenizerDef.rl"
 	{ SetKeyword(TokenKeyword.Exit); }
 	break;
 	case 12:
-#line 32 "TokenizerDef.rl"
+#line 34 "TokenizerDef.rl"
 	{ SetKeyword(TokenKeyword.Run); }
 	break;
 #line 438 "tmp/Tokenizer.cs"
