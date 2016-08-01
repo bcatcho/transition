@@ -33,7 +33,6 @@ namespace Statescript.Compiler
 
    public struct Token
    {
-     public string Value;
      public int StartIndex;
      public int Length;
      public int LineNumber;
@@ -44,7 +43,9 @@ namespace Statescript.Compiler
    public class Tokenizer
    {
       int _lineNumber = 0;
-      int _tokenStart = 0;
+      bool _tokenUncommitted;
+      int _tokenStart { get { return _token.StartIndex; } }
+      Token _token;
       private List<Token> _tokens;
       char[] _data;
       // ragel properties
@@ -53,7 +54,21 @@ namespace Statescript.Compiler
 
       private void StartToken()
       {
-        _tokenStart = p;
+        _token = new Token {
+            LineNumber = _lineNumber,
+            StartIndex = p
+        };
+        _tokenUncommitted = true;
+      }
+
+      private void StartToken(TokenType tokenType)
+      {
+        _token = new Token {
+            LineNumber = _lineNumber,
+            StartIndex = p,
+            TokenType = tokenType
+        };
+        _tokenUncommitted = true;
       }
 
       private void log(string msg) {
@@ -66,139 +81,131 @@ namespace Statescript.Compiler
       }
 
       private void EmitOperator(TokenOperator tokenOperator) {
-        _tokens.Add(new Token {
-          LineNumber = _lineNumber,
-          Operator = tokenOperator,
-          TokenType = TokenType.Operator
-        });
+        _token.Operator = tokenOperator;
+        _token.TokenType = TokenType.Operator;
+        _tokens.Add(_token);
+        _tokenUncommitted = false;
       }
 
-      private void EmitToken(TokenType tokenType) {
-        var token = new Token {
-          LineNumber = _lineNumber,
-          StartIndex = _tokenStart,
-          Length = p - _tokenStart,
-          Value = new String(_data, _tokenStart, p - _tokenStart),
-          TokenType = tokenType
-        };
-
-        if (tokenType == TokenType.TransitionValue
-            || tokenType == TokenType.Value
-            || tokenType == TokenType.MessageValue) {
-          // remove quotes
-          token.StartIndex = token.StartIndex + 1;
-          token.Length = token.Length - 2;
-        }
-
-        _tokens.Add(token);
+      private void EmitToken() {
+        _token.Length = p - _tokenStart;
+        _tokens.Add(_token);
+        _tokenUncommitted = false;
       }
 
       private void EmitNewLine() {
-        _tokens.Add(new Token {
-          LineNumber = _lineNumber,
-          TokenType = TokenType.NewLine
-        });
+        _token.TokenType = TokenType.NewLine;
+        _tokens.Add(_token);
+        _tokenUncommitted = false;
+      }
+
+      private void CommitLastToken() {
+        if (_tokenUncommitted) {
+          // update length in case the file ended early
+          _token.Length = p -_token.StartIndex;
+          _tokens.Add(_token);
+          _tokenUncommitted = false;
+        }
       }
 
       
-#line 105 "tmp/Tokenizer.cs"
+#line 113 "tmp/Tokenizer.cs"
 static readonly sbyte[] _Tokenizer_actions =  new sbyte [] {
 	0, 1, 0, 1, 1, 1, 2, 1, 
 	3, 1, 4, 1, 5, 1, 6, 1, 
-	7, 2, 2, 1, 2, 5, 6, 2, 
-	7, 0
+	7, 2, 2, 1, 2, 4, 0
 };
 
 static readonly sbyte[] _Tokenizer_key_offsets =  new sbyte [] {
-	0, 0, 4, 13, 22, 30, 41, 45, 
-	46, 51, 56, 61, 69, 70, 75, 83, 
-	85
+	0, 0, 4, 13, 22, 30, 43, 47, 
+	48, 53, 58, 63, 71, 73, 74, 79, 
+	87, 92, 94
 };
 
 static readonly char[] _Tokenizer_trans_keys =  new char [] {
 	'\u0020', '\u0040', '\u0009', '\u000d', '\u0020', '\u0040', '\u005f', '\u0009', 
 	'\u000d', '\u0041', '\u005a', '\u0061', '\u007a', '\u0020', '\u0040', '\u005f', 
 	'\u0009', '\u000d', '\u0041', '\u005a', '\u0061', '\u007a', '\u0020', '\u005f', 
-	'\u0009', '\u000d', '\u0041', '\u005a', '\u0061', '\u007a', '\u0020', '\u002d', 
-	'\u005f', '\u0009', '\u000d', '\u0030', '\u0039', '\u0041', '\u005a', '\u0061', 
-	'\u007a', '\u0020', '\u002d', '\u0009', '\u000d', '\u003e', '\u0020', '\u0022', 
-	'\u0027', '\u0009', '\u000d', '\u0020', '\u0022', '\u0027', '\u0009', '\u000d', 
-	'\u005f', '\u0041', '\u005a', '\u0061', '\u007a', '\u0022', '\u005f', '\u0030', 
-	'\u0039', '\u0041', '\u005a', '\u0061', '\u007a', '\u000a', '\u005f', '\u0041', 
-	'\u005a', '\u0061', '\u007a', '\u0027', '\u005f', '\u0030', '\u0039', '\u0041', 
-	'\u005a', '\u0061', '\u007a', '\u000a', '\u000d', (char) 0
+	'\u0009', '\u000d', '\u0041', '\u005a', '\u0061', '\u007a', '\u000a', '\u000d', 
+	'\u0020', '\u002d', '\u005f', '\u0009', '\u000c', '\u0030', '\u0039', '\u0041', 
+	'\u005a', '\u0061', '\u007a', '\u0020', '\u002d', '\u0009', '\u000d', '\u003e', 
+	'\u0020', '\u0022', '\u0027', '\u0009', '\u000d', '\u0020', '\u0022', '\u0027', 
+	'\u0009', '\u000d', '\u005f', '\u0041', '\u005a', '\u0061', '\u007a', '\u0022', 
+	'\u005f', '\u0030', '\u0039', '\u0041', '\u005a', '\u0061', '\u007a', '\u000a', 
+	'\u000d', '\u000a', '\u005f', '\u0041', '\u005a', '\u0061', '\u007a', '\u0027', 
+	'\u005f', '\u0030', '\u0039', '\u0041', '\u005a', '\u0061', '\u007a', '\u000a', 
+	'\u0020', '\u002d', '\u0009', '\u000d', '\u000a', '\u000d', '\u000a', '\u000d', 
+	'\u0020', '\u002d', '\u0009', '\u000c', (char) 0
 };
 
 static readonly sbyte[] _Tokenizer_single_lengths =  new sbyte [] {
-	0, 2, 3, 3, 2, 3, 2, 1, 
-	3, 3, 1, 2, 1, 1, 2, 2, 
-	0
+	0, 2, 3, 3, 2, 5, 2, 1, 
+	3, 3, 1, 2, 2, 1, 1, 2, 
+	3, 2, 4
 };
 
 static readonly sbyte[] _Tokenizer_range_lengths =  new sbyte [] {
 	0, 1, 3, 3, 3, 4, 1, 0, 
-	1, 1, 2, 3, 0, 2, 3, 0, 
-	0
+	1, 1, 2, 3, 0, 0, 2, 3, 
+	1, 0, 1
 };
 
 static readonly sbyte[] _Tokenizer_index_offsets =  new sbyte [] {
-	0, 0, 4, 11, 18, 24, 32, 36, 
-	38, 43, 48, 52, 58, 60, 64, 70, 
-	73
+	0, 0, 4, 11, 18, 24, 34, 38, 
+	40, 45, 50, 54, 60, 63, 65, 69, 
+	75, 80, 83
 };
 
 static readonly sbyte[] _Tokenizer_indicies =  new sbyte [] {
 	0, 2, 0, 1, 0, 2, 3, 0, 
 	3, 3, 1, 4, 5, 6, 4, 6, 
 	6, 1, 7, 3, 7, 3, 3, 1, 
-	8, 9, 10, 8, 10, 10, 10, 1, 
-	11, 12, 11, 1, 13, 1, 14, 15, 
-	16, 14, 1, 17, 18, 19, 17, 1, 
-	20, 20, 20, 1, 21, 20, 20, 20, 
-	20, 1, 22, 1, 23, 23, 23, 1, 
-	21, 23, 23, 23, 23, 1, 24, 25, 
-	1, 1, 0
+	9, 10, 8, 11, 12, 8, 12, 12, 
+	12, 1, 13, 14, 13, 1, 15, 1, 
+	16, 17, 18, 16, 1, 19, 20, 21, 
+	19, 1, 22, 22, 22, 1, 23, 24, 
+	24, 24, 24, 1, 25, 26, 1, 27, 
+	1, 28, 28, 28, 1, 23, 29, 29, 
+	29, 29, 1, 30, 13, 14, 13, 1, 
+	25, 26, 1, 31, 32, 13, 14, 13, 
+	1, 0
 };
 
 static readonly sbyte[] _Tokenizer_trans_targs =  new sbyte [] {
 	2, 0, 3, 5, 4, 3, 3, 4, 
-	6, 7, 5, 6, 7, 8, 9, 10, 
-	13, 9, 10, 13, 11, 15, 16, 14, 
-	16, 12
+	6, 18, 16, 7, 5, 6, 7, 8, 
+	9, 10, 14, 9, 10, 14, 11, 12, 
+	11, 17, 13, 17, 15, 15, 18, 18, 
+	16
 };
 
 static readonly sbyte[] _Tokenizer_trans_actions =  new sbyte [] {
 	0, 0, 3, 7, 5, 17, 0, 0, 
-	9, 9, 0, 0, 0, 0, 11, 20, 
-	20, 0, 13, 13, 0, 0, 1, 0, 
-	23, 15
-};
-
-static readonly sbyte[] _Tokenizer_eof_actions =  new sbyte [] {
-	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0, 15, 
-	0
+	9, 20, 20, 9, 0, 0, 0, 0, 
+	11, 11, 11, 0, 0, 0, 13, 15, 
+	0, 1, 1, 0, 13, 0, 0, 1, 
+	1
 };
 
 const int Tokenizer_start = 1;
-const int Tokenizer_first_final = 15;
+const int Tokenizer_first_final = 17;
 const int Tokenizer_error = 0;
 
 const int Tokenizer_en_main = 1;
 
 
-#line 105 "Tokenizer.rl.cs"
+#line 113 "Tokenizer.rl.cs"
 
 
       public void Init()
       {
          
-#line 197 "tmp/Tokenizer.cs"
+#line 204 "tmp/Tokenizer.cs"
 	{
 	cs = Tokenizer_start;
 	}
 
-#line 110 "Tokenizer.rl.cs"
+#line 118 "Tokenizer.rl.cs"
       }
 
       public List<Token> Tokenize(char[] data, int len)
@@ -209,12 +216,11 @@ const int Tokenizer_en_main = 1;
          _tokens.Clear();
          _lineNumber = 1; // start at line 1 like most text editors
          _data = data;
-         _tokenStart = 0;
          p = 0;
          int pe = len;
          int eof = len;
          
-#line 218 "tmp/Tokenizer.cs"
+#line 224 "tmp/Tokenizer.cs"
 	{
 	sbyte _klen;
 	sbyte _trans;
@@ -294,19 +300,19 @@ _match:
 	break;
 	case 1:
 #line 5 "TokenizerDef.rl"
-	{ log("startKeyword"); StartToken(); }
+	{ log("startKeyword"); StartToken(TokenType.Keyword); }
 	break;
 	case 2:
 #line 6 "TokenizerDef.rl"
-	{ logEnd("endKeyword"); EmitToken(TokenType.Keyword); }
+	{ logEnd("endKeyword"); EmitToken(); }
 	break;
 	case 3:
 #line 7 "TokenizerDef.rl"
-	{ log("startId"); StartToken(); }
+	{ log("startId"); StartToken(TokenType.Identifier); }
 	break;
 	case 4:
 #line 8 "TokenizerDef.rl"
-	{ logEnd("endId"); EmitToken(TokenType.Identifier); }
+	{ logEnd("endId"); EmitToken(); }
 	break;
 	case 5:
 #line 9 "TokenizerDef.rl"
@@ -314,13 +320,13 @@ _match:
 	break;
 	case 6:
 #line 10 "TokenizerDef.rl"
-	{ log("startTransitionValue"); StartToken(); }
+	{ log("startTransVal"); StartToken(TokenType.TransitionValue); }
 	break;
 	case 7:
 #line 11 "TokenizerDef.rl"
-	{ logEnd("endTransitionValue"); EmitToken(TokenType.TransitionValue); }
+	{ logEnd("endTransVal"); EmitToken(); }
 	break;
-#line 324 "tmp/Tokenizer.cs"
+#line 330 "tmp/Tokenizer.cs"
 		default: break;
 		}
 	}
@@ -331,26 +337,11 @@ _again:
 	if ( ++p != pe )
 		goto _resume;
 	_test_eof: {}
-	if ( p == eof )
-	{
-	int __acts = _Tokenizer_eof_actions[cs];
-	int __nacts = _Tokenizer_actions[__acts++];
-	while ( __nacts-- > 0 ) {
-		switch ( _Tokenizer_actions[__acts++] ) {
-	case 7:
-#line 11 "TokenizerDef.rl"
-	{ logEnd("endTransitionValue"); EmitToken(TokenType.TransitionValue); }
-	break;
-#line 345 "tmp/Tokenizer.cs"
-		default: break;
-		}
-	}
-	}
-
 	_out: {}
 	}
 
-#line 125 "Tokenizer.rl.cs"
+#line 132 "Tokenizer.rl.cs"
+         CommitLastToken();
          return _tokens;
       }
 

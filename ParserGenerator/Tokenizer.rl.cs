@@ -31,7 +31,6 @@ namespace Statescript.Compiler
 
    public struct Token
    {
-     public string Value;
      public int StartIndex;
      public int Length;
      public int LineNumber;
@@ -42,7 +41,9 @@ namespace Statescript.Compiler
    public class Tokenizer
    {
       int _lineNumber = 0;
-      int _tokenStart = 0;
+      bool _tokenUncommitted;
+      int _tokenStart { get { return _token.StartIndex; } }
+      Token _token;
       private List<Token> _tokens;
       char[] _data;
       // ragel properties
@@ -51,7 +52,21 @@ namespace Statescript.Compiler
 
       private void StartToken()
       {
-        _tokenStart = p;
+        _token = new Token {
+            LineNumber = _lineNumber,
+            StartIndex = p
+        };
+        _tokenUncommitted = true;
+      }
+
+      private void StartToken(TokenType tokenType)
+      {
+        _token = new Token {
+            LineNumber = _lineNumber,
+            StartIndex = p,
+            TokenType = tokenType
+        };
+        _tokenUncommitted = true;
       }
 
       private void log(string msg) {
@@ -64,38 +79,31 @@ namespace Statescript.Compiler
       }
 
       private void EmitOperator(TokenOperator tokenOperator) {
-        _tokens.Add(new Token {
-          LineNumber = _lineNumber,
-          Operator = tokenOperator,
-          TokenType = TokenType.Operator
-        });
+        _token.Operator = tokenOperator;
+        _token.TokenType = TokenType.Operator;
+        _tokens.Add(_token);
+        _tokenUncommitted = false;
       }
 
-      private void EmitToken(TokenType tokenType) {
-        var token = new Token {
-          LineNumber = _lineNumber,
-          StartIndex = _tokenStart,
-          Length = p - _tokenStart,
-          Value = new String(_data, _tokenStart, p - _tokenStart),
-          TokenType = tokenType
-        };
-
-        if (tokenType == TokenType.TransitionValue
-            || tokenType == TokenType.Value
-            || tokenType == TokenType.MessageValue) {
-          // remove quotes
-          token.StartIndex = token.StartIndex + 1;
-          token.Length = token.Length - 2;
-        }
-
-        _tokens.Add(token);
+      private void EmitToken() {
+        _token.Length = p - _tokenStart;
+        _tokens.Add(_token);
+        _tokenUncommitted = false;
       }
 
       private void EmitNewLine() {
-        _tokens.Add(new Token {
-          LineNumber = _lineNumber,
-          TokenType = TokenType.NewLine
-        });
+        _token.TokenType = TokenType.NewLine;
+        _tokens.Add(_token);
+        _tokenUncommitted = false;
+      }
+
+      private void CommitLastToken() {
+        if (_tokenUncommitted) {
+          // update length in case the file ended early
+          _token.Length = p -_token.StartIndex;
+          _tokens.Add(_token);
+          _tokenUncommitted = false;
+        }
       }
 
       %%{
@@ -117,11 +125,11 @@ namespace Statescript.Compiler
          _tokens.Clear();
          _lineNumber = 1; // start at line 1 like most text editors
          _data = data;
-         _tokenStart = 0;
          p = 0;
          int pe = len;
          int eof = len;
          %% write exec;
+         CommitLastToken();
          return _tokens;
       }
 

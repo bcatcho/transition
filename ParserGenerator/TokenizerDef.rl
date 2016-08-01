@@ -2,13 +2,14 @@
   machine TokenizerDef;
 
   action emitNewLine { _lineNumber++; log("newline"); EmitNewLine(); }
-  action startKeyword { log("startKeyword"); StartToken(); }
-  action endKeyword { logEnd("endKeyword"); EmitToken(TokenType.Keyword); }
-  action startId { log("startId"); StartToken(); }
-  action endId { logEnd("endId"); EmitToken(TokenType.Identifier); }
+  action startKeyword { log("startKeyword"); StartToken(TokenType.Keyword); }
+  action endKeyword { logEnd("endKeyword"); EmitToken(); }
+  action startId { log("startId"); StartToken(TokenType.Identifier); }
+  action endId { logEnd("endId"); EmitToken(); }
   action emitTransitionOp { log("emit tx op"); EmitOperator(TokenOperator.Transition); }
-  action startTransitionValue { log("startTransitionValue"); StartToken(); }
-  action endTransitionValue { logEnd("endTransitionValue"); EmitToken(TokenType.TransitionValue); }
+  action startTransVal { log("startTransVal"); StartToken(TokenType.TransitionValue); }
+  action endTransVal { logEnd("endTransVal"); EmitToken(); }
+  action commitLastToken { CommitLastToken(); }
 
   squote = "'";
   dquote = '"';
@@ -17,7 +18,7 @@
   escapedAny = /\\./;
   ws = [\t ];
   wss = ws**;
-  nl = ('\n' | '\r\n') @emitNewLine;
+  nl = ('\n' | '\r\n') >emitNewLine;
   transitionOperator = '->' %emitTransitionOp;
   assignmentOperator = ':';
   comment = ('#' !nl*);
@@ -32,12 +33,15 @@
   keyword = (('@' >startKeyword) [a-zA-Z_]**) %endKeyword;
   identifier = (([a-zA-Z_] >startId) ([a-zA-Z_0-9]**)) %endId;
   name = ([a-zA-Z_] [a-zA-Z_0-9]**) ;
-  transitionValue = ((dquote name dquote)|(squote name squote)) >startTransitionValue %endTransitionValue;
+  transitionValue = (((dquote %startTransVal) name (dquote @endTransVal))
+                    | ((squote %startTransVal) name (squote @endTransVal)));
 
   emptyLine = nl;
   commentLine = comment nl;
-
   machineLine = space* keyword* space+ identifier space* transitionOperator space* transitionValue;
 
-  main := machineLine nl?;
+  keywordWithIdLine = space* keyword* space+ identifier;
+
+  main := ((machineLine nl+)
+          | (keywordWithIdLine nl+));
 }%%
