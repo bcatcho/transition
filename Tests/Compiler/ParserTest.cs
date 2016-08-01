@@ -22,6 +22,15 @@ namespace Tests.Compiler
       }
 
       [Test]
+      public void Tokenize_Blank_NoTokensProduced()
+      {
+         var input = "";
+         var tokens = Tokenize(input);
+
+         Assert.AreEqual(0, tokens.Count); // two keywords and newline
+      }
+
+      [Test]
       public void Tokenize_Machine_MachineHasCorrectName()
       {
          var input = @"@machine blah -> 'yar'";
@@ -99,6 +108,43 @@ namespace Tests.Compiler
          Assert.AreEqual(TokenType.Keyword, tokens[0].TokenType);
          Assert.AreEqual(TokenType.Identifier, tokens[1].TokenType);
          AssertTokenValue("StateIdentifier", tokens[1], input);
+      }
+
+      [Test]
+      public void Tokenize_MultipleKeywordWithIds_TwoKeywordWithIdsProduced()
+      {
+         var input = "@state stateId1\n@state stateId2";
+
+         var tokens = Tokenize(input);
+
+         Assert.AreEqual(5, tokens.Count);
+         Assert.AreEqual(TokenType.Keyword, tokens[0].TokenType);
+         Assert.AreEqual(TokenType.Identifier, tokens[1].TokenType);
+         AssertTokenValue("stateId1", tokens[1], input);
+         AssertTokenValue("stateId2", tokens[4], input);
+      }
+
+      [Test]
+      public void Tokenize_KeywordLine_KeywordTokenProduced()
+      {
+         var input = "@on";
+
+         var tokens = Tokenize(input);
+
+         Assert.AreEqual(1, tokens.Count);
+         Assert.AreEqual(TokenType.Keyword, tokens[0].TokenType);
+      }
+
+      [Test]
+      public void Tokenize_TwoKeywordLines_TwoKeywordTokenProduced()
+      {
+         var input = "@on\n@exit";
+
+         var tokens = Tokenize(input);
+
+         Assert.AreEqual(3, tokens.Count); // two keywords and newline
+         Assert.AreEqual(TokenType.Keyword, tokens[0].TokenType);
+         Assert.AreEqual(TokenType.Keyword, tokens[2].TokenType);
       }
    }
 }

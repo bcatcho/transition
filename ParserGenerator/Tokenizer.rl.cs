@@ -50,21 +50,23 @@ namespace Statescript.Compiler
       private int cs;
       int p;
 
-      private void StartToken()
-      {
-        _token = new Token {
-            LineNumber = _lineNumber,
-            StartIndex = p
-        };
-        _tokenUncommitted = true;
-      }
-
       private void StartToken(TokenType tokenType)
       {
         _token = new Token {
             LineNumber = _lineNumber,
             StartIndex = p,
             TokenType = tokenType
+        };
+        _tokenUncommitted = true;
+      }
+
+      private void StartOperatorToken(TokenOperator tokenOperator)
+      {
+        _token = new Token {
+            LineNumber = _lineNumber,
+            StartIndex = p,
+            Operator = tokenOperator,
+            TokenType = TokenType.Operator,
         };
         _tokenUncommitted = true;
       }
@@ -76,13 +78,6 @@ namespace Statescript.Compiler
       private void logEnd(string msg) {
         var token = new String(_data, _tokenStart, p - _tokenStart);
         Console.WriteLine(string.Format("{0} {1}: {2}", p, msg, token));
-      }
-
-      private void EmitOperator(TokenOperator tokenOperator) {
-        _token.Operator = tokenOperator;
-        _token.TokenType = TokenType.Operator;
-        _tokens.Add(_token);
-        _tokenUncommitted = false;
       }
 
       private void EmitToken() {
@@ -127,7 +122,7 @@ namespace Statescript.Compiler
          _data = data;
          p = 0;
          int pe = len;
-         int eof = len;
+         //int eof = len;
          %% write exec;
          CommitLastToken();
          return _tokens;
