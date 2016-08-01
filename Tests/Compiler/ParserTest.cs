@@ -62,7 +62,7 @@ namespace Tests.Compiler
          Assert.AreEqual(TokenType.Keyword, tokens[0].TokenType);
          Assert.AreEqual(TokenType.Identifier, tokens[1].TokenType);
          Assert.AreEqual(TokenType.Operator, tokens[2].TokenType);
-         Assert.AreEqual(TokenType.TransitionValue, tokens[3].TokenType);
+         Assert.AreEqual(TokenType.Value, tokens[3].TokenType);
       }
 
       [Test]
@@ -72,7 +72,7 @@ namespace Tests.Compiler
 
          var tokens = Tokenize(input);
 
-         Assert.AreEqual(TokenType.TransitionValue, tokens[3].TokenType);
+         Assert.AreEqual(TokenType.Value, tokens[3].TokenType);
          AssertTokenValue("yar", tokens[3], input); 
       }
 
@@ -145,6 +145,58 @@ namespace Tests.Compiler
          Assert.AreEqual(3, tokens.Count); // two keywords and newline
          Assert.AreEqual(TokenType.Keyword, tokens[0].TokenType);
          Assert.AreEqual(TokenType.Keyword, tokens[2].TokenType);
+      }
+
+      [Test]
+      public void Tokenize_TaskWithNoParams_OneIdentifierProduced()
+      {
+         var input = "dothing";
+
+         var tokens = Tokenize(input);
+
+         Assert.AreEqual(1, tokens.Count); // two keywords and newline
+         Assert.AreEqual(TokenType.Identifier, tokens[0].TokenType);
+         AssertTokenValue("dothing", tokens[0], input);
+      }
+
+      [Test]
+      public void Tokenize_TaskWithOneAssignParam_OneAssignParamProduced()
+      {
+         var input = "task set:'12341 asdf b'";
+
+         var tokens = Tokenize(input);
+
+         Assert.AreEqual(4, tokens.Count);
+         Assert.AreEqual(TokenType.Identifier, tokens[0].TokenType);
+         Assert.AreEqual(TokenType.Identifier, tokens[1].TokenType);
+         Assert.AreEqual(TokenType.Operator, tokens[2].TokenType);
+         Assert.AreEqual(TokenType.Value, tokens[3].TokenType);
+      }
+
+      [Test]
+      public void Tokenize_TaskCommentTask_TwoTasksProduced()
+      {
+         var input = "task#comment\ntask";
+
+         var tokens = Tokenize(input);
+
+         Assert.AreEqual(3, tokens.Count);
+         Assert.AreEqual(TokenType.Identifier, tokens[0].TokenType);
+         Assert.AreEqual(TokenType.NewLine, tokens[1].TokenType);
+         Assert.AreEqual(TokenType.Identifier, tokens[2].TokenType);
+      }
+
+      [Test]
+      public void Tokenize_TaskSpaceCommentTask_TwoTasksProduced()
+      {
+         var input = "task #comment\ntask";
+
+         var tokens = Tokenize(input);
+
+         Assert.AreEqual(3, tokens.Count);
+         Assert.AreEqual(TokenType.Identifier, tokens[0].TokenType);
+         Assert.AreEqual(TokenType.NewLine, tokens[1].TokenType);
+         Assert.AreEqual(TokenType.Identifier, tokens[2].TokenType);
       }
    }
 }

@@ -11,15 +11,13 @@ namespace Statescript.Compiler
      Keyword,
      Identifier,
      Value,
-     TransitionValue,
-     MessageValue,
      Operator,
      NewLine
    }
 
    public enum TokenOperator
    {
-     Set,
+     Assign,
      Transition
    }
 
@@ -46,6 +44,7 @@ namespace Statescript.Compiler
 
       private void StartToken(TokenType tokenType)
       {
+        log(string.Format("start {0}", tokenType));
         _token = new Token {
             LineNumber = _lineNumber,
             StartIndex = p,
@@ -56,6 +55,7 @@ namespace Statescript.Compiler
 
       private void StartOperatorToken(TokenOperator tokenOperator)
       {
+        log(string.Format("start {0}", tokenOperator));
         _token = new Token {
             LineNumber = _lineNumber,
             StartIndex = p,
@@ -75,6 +75,7 @@ namespace Statescript.Compiler
       }
 
       private void EmitToken() {
+        log(string.Format("emit {0}", _token.TokenType));
         _token.Length = p - _tokenStart;
         _tokens.Add(_token);
         _tokenUncommitted = false;
@@ -82,16 +83,14 @@ namespace Statescript.Compiler
 
       private void EmitNewLine() {
         _token.TokenType = TokenType.NewLine;
+        log(string.Format("emit {0}", _token.TokenType));
         _tokens.Add(_token);
         _tokenUncommitted = false;
       }
 
       private void CommitLastToken() {
         if (_tokenUncommitted) {
-          // update length in case the file ended early
-          _token.Length = p -_token.StartIndex;
-          _tokens.Add(_token);
-          _tokenUncommitted = false;
+          EmitToken();
         }
       }
 

@@ -1,43 +1,39 @@
 %%{
   machine TokenizerDef;
 
-  action emitNewLine { _lineNumber++; log("newline"); EmitNewLine(); }
+  action emitNewLine { _lineNumber++; EmitNewLine(); }
   action emitToken { EmitToken(); }
-  action startTransOp { log("emit tx op"); StartOperatorToken(TokenOperator.Transition); }
-  action startKeyword { log("startKeyword"); StartToken(TokenType.Keyword); }
-  action startId { log("startId"); StartToken(TokenType.Identifier); }
-  action startTransVal { log("startTransVal"); StartToken(TokenType.TransitionValue); }
+  action startTransOp { StartOperatorToken(TokenOperator.Transition); }
+  action startAssignOp { StartOperatorToken(TokenOperator.Assign); }
+  action startKeyword { StartToken(TokenType.Keyword); }
+  action startId { StartToken(TokenType.Identifier); }
+  action startVal { StartToken(TokenType.Value); }
+  action startTransVal { StartToken(TokenType.TransitionValue); }
+  action startMessageVal { StartToken(TokenType.MessageValue); }
 
   squote = "'";
   dquote = '"';
   notSquoteOrEscape = [^'\\];
   notDquoteOrEscape = [^"\\];
   escapedAny = /\\./;
-  ws = [\t ];
-  wss = ws**;
   nl = ('\n' | '\r\n') >emitNewLine;
-  transitionOperator = '->' >startTransOp @emitToken;
-  assignmentOperator = ':';
-  comment = ('#' !nl*);
+  transOp = '->' >startTransOp %emitToken;
+  assignOp = ':' >startAssignOp %emitToken;
 
-  #paramOperator = (transitionOperator | assignmentOperator);
-  #paramSquoteValue = (notSquoteOrEscape | escapedAny)*; #>startToken %endParam;
-  #paramDquoteValue = (notDquoteOrEscape | escapedAny)*;# >startToken %endParam;
-  #paramValue = ((dquote paramDquoteValue dquote)|(squote paramSquoteValue squote));
-  #param = (paramName? paramOperator paramValue);
-  #defaultParam = ws+ (paramValue) >startDefaultParam;
+  paramSquoteValue = (notSquoteOrEscape | escapedAny)*;
+  paramDquoteValue = (notDquoteOrEscape | escapedAny)*;
 
-  keyword = (('@' >startKeyword) [a-zA-Z_]**) %emitToken;
+  keyword = (('\@' >startKeyword) ('machine'|'state'|'on'|'enter'|'exit'|'run')) %emitToken;
   identifier = (([a-zA-Z_] >startId) ([a-zA-Z_0-9]**)) %emitToken;
-  name = ([a-zA-Z_] [a-zA-Z_0-9]**) ;
-  transitionValue = (((dquote %startTransVal) name (dquote @emitToken))
-                    | ((squote %startTransVal) name (squote @emitToken)));
+  name = ([a-zA-Z_] [a-zA-Z_0-9]**);
+  quotedValue = (((dquote %startVal) paramDquoteValue (dquote >emitToken))
+                | ((squote %startVal) paramDquoteValue (squote >emitToken)));
 
-  emptyLine = nl;
-  commentLine = comment nl;
-  machineLine = space* keyword* space+ identifier space* transitionOperator space* transitionValue;
-  keywordLine = space* keyword*;
-  keywordWithIdLine = space* keyword* space+ identifier;
+  keywordLine = keyword (space+ identifier (space* transOp space* quotedValue)?)?;
 
-  main := ((machineLine | keywordLine | keywordWithIdLine) nl)*;
+  comment = ('#' (^(empty|'\n'|'\r\n'))*);
+  param = identifier space* (transOp | assignOp) space* quotedValue;
+  taskLine = ((transOp space* quotedValue) | (identifier (space+ param)*));
+
+  main := (space* (keywordLine | taskLine) space* comment? nl+)*;
 }%%
