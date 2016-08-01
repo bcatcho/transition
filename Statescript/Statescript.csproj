@@ -43,6 +43,7 @@
     <Compile Include="Compiler\TokenType.cs" />
     <Compile Include="Compiler\TokenOperator.cs" />
     <Compile Include="Compiler\Token.cs" />
+    <Compile Include="Compiler\TokenKeyword.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

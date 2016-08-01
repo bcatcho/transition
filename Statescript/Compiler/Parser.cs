@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Statescript.Compiler.AstNode;
 
 namespace Statescript.Compiler
@@ -22,7 +21,8 @@ namespace Statescript.Compiler
       /// A MachineAstNode that is ready for compilation
       /// </returns>
       /// <param name="tokens">Tokens.</param>
-      public MachineAstNode Parse(IList<Token> tokens) {
+      public MachineAstNode Parse(IList<Token> tokens)
+      {
          return null;
       }
    }

@@ -34,5 +34,14 @@ namespace Statescript.Compiler
       /// The type of operator (if this token is an operator)
       /// </summary>
       public TokenOperator Operator;
+
+      /// <summary>
+      /// If this Token represents a keyword, this property indicates which keyword is found.
+      /// </summary>
+      /// <remarks>
+      /// This identified during lexical analysis as an optimization. Identifying this after the 
+      /// token has been created would require us to read the value of the token which is costly.
+      /// </remarks>
+      public TokenKeyword Keyword;
    }
 }

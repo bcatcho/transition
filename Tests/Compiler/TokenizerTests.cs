@@ -143,9 +143,25 @@ namespace Tests.Compiler
 
          var tokens = Tokenize(input);
 
-         Assert.AreEqual(3, tokens.Count); // two keywords and newline
+         Assert.AreEqual(3, tokens.Count); 
          Assert.AreEqual(TokenType.Keyword, tokens[0].TokenType);
          Assert.AreEqual(TokenType.Keyword, tokens[2].TokenType);
+      }
+
+      [Test]
+      public void Tokenize_AllKeywords_KeywordsCorrectlyIdentified()
+      {
+         var input = "@machine\n@state\n@enter\n@exit\n@run\n@on";
+
+         var tokens = Tokenize(input);
+
+         Assert.AreEqual(11, tokens.Count);
+         Assert.AreEqual(TokenKeyword.Machine, tokens[0].Keyword);
+         Assert.AreEqual(TokenKeyword.State, tokens[2].Keyword);
+         Assert.AreEqual(TokenKeyword.Enter, tokens[4].Keyword);
+         Assert.AreEqual(TokenKeyword.Exit, tokens[6].Keyword);
+         Assert.AreEqual(TokenKeyword.Run, tokens[8].Keyword);
+         Assert.AreEqual(TokenKeyword.On, tokens[10].Keyword);
       }
 
       [Test]
@@ -155,7 +171,7 @@ namespace Tests.Compiler
 
          var tokens = Tokenize(input);
 
-         Assert.AreEqual(1, tokens.Count); // two keywords and newline
+         Assert.AreEqual(1, tokens.Count); 
          Assert.AreEqual(TokenType.Identifier, tokens[0].TokenType);
          AssertTokenValue("dothing", tokens[0], input);
       }

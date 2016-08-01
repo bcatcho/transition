@@ -23,7 +23,14 @@
   paramSquoteValue = (notSquoteOrEscape | escapedAny)*;
   paramDquoteValue = (notDquoteOrEscape | escapedAny)*;
 
-  keyword = (('\@' >startKeyword) ('machine'|'state'|'on'|'enter'|'exit'|'run')) %emitToken;
+  keyword = (('\@' >startKeyword)
+            (('machine' @{ SetKeyword(TokenKeyword.Machine); })
+             | ('state' @{ SetKeyword(TokenKeyword.State); })
+             | ('on' @{ SetKeyword(TokenKeyword.On); })
+             | ('enter' @{ SetKeyword(TokenKeyword.Enter); })
+             | ('exit' @{ SetKeyword(TokenKeyword.Exit); })
+             | ('run' @{ SetKeyword(TokenKeyword.Run); })
+            )) %emitToken;
   identifier = (([a-zA-Z_] >startId) ([a-zA-Z_0-9]**)) %emitToken;
   quotedValue = (((dquote %startVal) paramDquoteValue (dquote >emitToken))
                 | ((squote %startVal) paramSquoteValue (squote >emitToken)));

@@ -17,14 +17,16 @@ namespace Statescript.Compiler
       int _tokenStart { get { return _token.StartIndex; } }
       Token _token;
       private List<Token> _tokens;
-      char[] _data;
+
       // ragel properties
       private int cs;
       int p;
-
+      
       private void StartToken(TokenType tokenType)
       {
-        log(string.Format("start {0}", tokenType));
+        #if PARSER_LOGGING
+        Log(string.Format("start {0}", tokenType));
+        #endif
         _token = new Token {
             LineNumber = _lineNumber,
             StartIndex = p,
@@ -35,7 +37,9 @@ namespace Statescript.Compiler
 
       private void StartOperatorToken(TokenOperator tokenOperator)
       {
-        log(string.Format("start {0}", tokenOperator));
+        #if PARSER_LOGGING
+        Log(string.Format("start {0}", tokenOperator));
+        #endif
         _token = new Token {
             LineNumber = _lineNumber,
             StartIndex = p,
@@ -45,17 +49,16 @@ namespace Statescript.Compiler
         _tokenUncommitted = true;
       }
 
-      private void log(string msg) {
+      #if PARSER_LOGGING
+      private void Log(string msg) {
         Console.WriteLine(string.Format("{0} {1}", p, msg));
       }
-
-      private void logEnd(string msg) {
-        var token = new String(_data, _tokenStart, p - _tokenStart);
-        Console.WriteLine(string.Format("{0} {1}: {2}", p, msg, token));
-      }
+      #endif
 
       private void EmitToken() {
-        log(string.Format("emit {0}", _token.TokenType));
+        #if PARSER_LOGGING
+        Log(string.Format("emit {0}", _token.TokenType));
+        #endif
         _token.Length = p - _tokenStart;
         _tokens.Add(_token);
         _tokenUncommitted = false;
@@ -63,9 +66,15 @@ namespace Statescript.Compiler
 
       private void EmitNewLine() {
         _token.TokenType = TokenType.NewLine;
-        log(string.Format("emit {0}", _token.TokenType));
+        #if PARSER_LOGGING
+        Log(string.Format("emit {0}", _token.TokenType));
+        #endif
         _tokens.Add(_token);
         _tokenUncommitted = false;
+      }
+
+      private void SetKeyword(TokenKeyword tokenKeyword) {
+        _token.Keyword = tokenKeyword;
       }
 
       private void CommitLastToken() {
@@ -95,10 +104,9 @@ namespace Statescript.Compiler
          }
          _tokens.Clear();
          _lineNumber = 1; // start at line 1 like most text editors
-         _data = data;
          p = 0;
          int pe = len;
-         int eof = len;
+         // int eof = len;
          %% write exec;
          CommitLastToken();
          return _tokens;
