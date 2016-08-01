@@ -115,7 +115,7 @@ namespace Statescript.Compiler
          _data = data;
          p = 0;
          int pe = len;
-         //int eof = len;
+         int eof = len;
          %% write exec;
          CommitLastToken();
          return _tokens;

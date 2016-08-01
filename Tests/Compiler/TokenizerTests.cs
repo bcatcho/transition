@@ -5,6 +5,9 @@ using System;
 
 namespace Tests.Compiler
 {
+   /// <summary>
+   /// Because the tokenizer is built using ragel we can only test at a functional level.
+   /// </summary>
    [TestFixture]
    public class TokenizerTests
    {
@@ -176,27 +179,58 @@ namespace Tests.Compiler
       [Test]
       public void Tokenize_TaskCommentTask_TwoTasksProduced()
       {
-         var input = "task#comment\ntask";
+         var input = "task\n#task\ntask";
 
          var tokens = Tokenize(input);
 
-         Assert.AreEqual(3, tokens.Count);
+         Assert.AreEqual(4, tokens.Count);
          Assert.AreEqual(TokenType.Identifier, tokens[0].TokenType);
          Assert.AreEqual(TokenType.NewLine, tokens[1].TokenType);
-         Assert.AreEqual(TokenType.Identifier, tokens[2].TokenType);
+         Assert.AreEqual(TokenType.NewLine, tokens[2].TokenType);
+         Assert.AreEqual(TokenType.Identifier, tokens[3].TokenType);
       }
 
       [Test]
-      public void Tokenize_TaskSpaceCommentTask_TwoTasksProduced()
+      public void Tokenize_EmtpyLineThenTask_TaskIsProduced()
       {
-         var input = "task #comment\ntask";
+         var input = "\ntask";
 
          var tokens = Tokenize(input);
 
-         Assert.AreEqual(3, tokens.Count);
+         Assert.AreEqual(1, tokens.Count);
          Assert.AreEqual(TokenType.Identifier, tokens[0].TokenType);
-         Assert.AreEqual(TokenType.NewLine, tokens[1].TokenType);
-         Assert.AreEqual(TokenType.Identifier, tokens[2].TokenType);
+      }
+
+      [Test]
+      public void Tokenize_BlankLineThenTask_TaskIsProduced()
+      {
+         var input = "\t \ntask";
+
+         var tokens = Tokenize(input);
+
+         Assert.AreEqual(1, tokens.Count);
+         Assert.AreEqual(TokenType.Identifier, tokens[0].TokenType);
+      }
+
+      [Test]
+      public void Tokenize_CommentLineThenTask_TaskIsProduced()
+      {
+         var input = "#hello\ntask";
+
+         var tokens = Tokenize(input);
+
+         Assert.AreEqual(2, tokens.Count);
+         Assert.AreEqual(TokenType.Identifier, tokens[1].TokenType);
+      }
+
+      [Test]
+      public void Tokenize_CommentOnly_NoTaskProduced()
+      {
+         var input = "#hello";
+
+         var tokens = Tokenize(input);
+
+         Assert.AreEqual(0, tokens.Count);
       }
    }
 }
