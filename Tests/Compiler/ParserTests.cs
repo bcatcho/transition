@@ -12,7 +12,8 @@ namespace Tests.Compiler
    {
       private Token KeywordToken(TokenKeyword keyword, int lineNumber)
       {
-         return new Token {
+         return new Token
+         {
             Keyword = keyword,
             TokenType = TokenType.Keyword,
             LineNumber = lineNumber
@@ -21,7 +22,8 @@ namespace Tests.Compiler
 
       private Token OpToken(TokenOperator op, int lineNumber)
       {
-         return new Token {
+         return new Token
+         {
             Operator = op,
             TokenType = TokenType.Operator,
             LineNumber = lineNumber
@@ -30,7 +32,8 @@ namespace Tests.Compiler
 
       private Token ValToken(int start, int length, int lineNumber)
       {
-         return new Token {
+         return new Token
+         {
             StartIndex = start,
             Length = length,
             TokenType = TokenType.Value,
@@ -40,7 +43,8 @@ namespace Tests.Compiler
 
       private Token IdentifierToken(int start, int length, int lineNumber)
       {
-         return new Token {
+         return new Token
+         {
             StartIndex = start,
             Length = length,
             TokenType = TokenType.Identifier,
@@ -51,10 +55,13 @@ namespace Tests.Compiler
       [Test]
       public void Parse_MachineLine_MachineHasName()
       {
-         var input = "@machine machinename";
-         var tokens = new List<Token> {
+         var input = "@machine machinename -> 'blah'";
+         var tokens = new List<Token>
+         {
             KeywordToken(TokenKeyword.Machine, 1),
-            IdentifierToken(9, "machinename".Length, 1)
+            IdentifierToken(9, "machinename".Length, 1),
+            OpToken(TokenOperator.Transition, 1),
+            ValToken(26, 4, 1)
          };
          var parser = new Parser();
 
@@ -67,10 +74,13 @@ namespace Tests.Compiler
       [Test]
       public void Parse_NewLinesThenMachineLine_MachineHasName()
       {
-         var input = "\n\n\r\n@machine machinename";
-         var tokens = new List<Token> {
+         var input = "\n\n\r\n@machine machinename -> 'blah'";
+         var tokens = new List<Token>
+         {
             KeywordToken(TokenKeyword.Machine, 1),
-            IdentifierToken(13, "machinename".Length, 1)
+            IdentifierToken(13, "machinename".Length, 1),
+            OpToken(TokenOperator.Transition, 1),
+            ValToken(30, 4, 1)
          };
          var parser = new Parser();
 
@@ -83,11 +93,12 @@ namespace Tests.Compiler
       public void Parse_NewLinesThenMachineLine_HasTransition()
       {
          var input = "@machine mach -> 'State1'";
-         var tokens = new List<Token> {
+         var tokens = new List<Token>
+         {
             KeywordToken(TokenKeyword.Machine, 1),
             IdentifierToken(13, "machinename".Length, 1),
             OpToken(TokenOperator.Transition, 1),
-            ValToken(17,6,1)
+            ValToken(18, 6, 1)
          };
          var parser = new Parser();
 
