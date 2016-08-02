@@ -12,9 +12,10 @@ namespace Tests.Compiler
    [TestFixture]
    public class TokenizerTests
    {
-      private List<Token> Tokenize(string input) {
-         var parser = new Tokenizer();
-         var tokens = parser.Tokenize(input.ToCharArray(), input.Length);
+      private List<Token> Tokenize(string input)
+      {
+         var tokenizer = new Tokenizer();
+         var tokens = tokenizer.Tokenize(input.ToCharArray(), input.Length);
          return tokens;
       }
 
@@ -270,6 +271,28 @@ namespace Tests.Compiler
 
          Assert.AreEqual(2, tokens.Count);
          Assert.AreEqual(TokenType.Identifier, tokens[1].TokenType);
+      }
+
+      [Test]
+      public void DidReachEndOfOutput_ValidInput_ReturnsTrue()
+      {
+         var input = "@machine mach";
+         var tokenizer = new Tokenizer();
+         
+         tokenizer.Tokenize(input.ToCharArray(), input.Length);
+
+         Assert.IsTrue(tokenizer.DidReachEndOfInput());
+      }
+
+      [Test]
+      public void DidReachEndOfOutput_InvalidInput_ReturnsFalse()
+      {
+         var input = "@ma ch ine blah";
+         var tokenizer = new Tokenizer();
+         
+         tokenizer.Tokenize(input.ToCharArray(), input.Length);
+
+         Assert.IsFalse(tokenizer.DidReachEndOfInput());
       }
    }
 }

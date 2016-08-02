@@ -23,7 +23,7 @@ namespace Statescript.Compiler
 
       // ragel properties
       private int cs;
-      int p;
+      int p, eof;
 
       private void StartToken(TokenType tokenType)
       {
@@ -306,7 +306,7 @@ const int Tokenizer_en_main = 60;
          _lineNumber = 1; // start at line 1 like most text editors
          p = 0;
          int pe = len;
-         // int eof = len;
+         eof = len;
          
 #line 312 "tmp/Tokenizer.cs"
 	{
@@ -462,7 +462,7 @@ _again:
       ///</returns>
       public bool DidReachEndOfInput()
       {
-         return (cs >= Tokenizer_first_final);
+         return (p >= eof);
       }
    }
 }
