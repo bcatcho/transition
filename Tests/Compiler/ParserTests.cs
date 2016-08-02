@@ -10,14 +10,16 @@ namespace Tests.Compiler
    [TestFixture]
    public class ParserTests
    {
-      private Token NewLineToken(int lineNumber) {
-         return new Token {
+      private Token NLTkn(int lineNumber)
+      {
+         return new Token
+         {
             TokenType = TokenType.NewLine,
             LineNumber = lineNumber
          };
       }
 
-      private Token KeywordToken(TokenKeyword keyword, int lineNumber)
+      private Token KeyTkn(TokenKeyword keyword, int lineNumber)
       {
          return new Token
          {
@@ -27,7 +29,7 @@ namespace Tests.Compiler
          };
       }
 
-      private Token OpToken(TokenOperator op, int lineNumber)
+      private Token OpTkn(TokenOperator op, int lineNumber)
       {
          return new Token
          {
@@ -37,7 +39,7 @@ namespace Tests.Compiler
          };
       }
 
-      private Token ValToken(int start, int length, int lineNumber)
+      private Token ValTkn(int start, int length, int lineNumber)
       {
          return new Token
          {
@@ -48,7 +50,7 @@ namespace Tests.Compiler
          };
       }
 
-      private Token IdentifierToken(int start, int length, int lineNumber)
+      private Token IdTkn(int start, int length, int lineNumber)
       {
          return new Token
          {
@@ -65,10 +67,7 @@ namespace Tests.Compiler
          var input = "@machine machinename -> 'blah'";
          var tokens = new List<Token>
          {
-            KeywordToken(TokenKeyword.Machine, 1),
-            IdentifierToken(9, "machinename".Length, 1),
-            OpToken(TokenOperator.Transition, 1),
-            ValToken(26, 4, 1)
+            KeyTkn(TokenKeyword.Machine, 1), IdTkn(9, 11, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(26, 4, 1)
          };
          var parser = new Parser();
 
@@ -84,13 +83,10 @@ namespace Tests.Compiler
          var input = "\n\n\r\n@machine machinename -> 'blah'";
          var tokens = new List<Token>
          {
-            NewLineToken(1),
-            NewLineToken(1),
-            NewLineToken(1),
-            KeywordToken(TokenKeyword.Machine, 1),
-            IdentifierToken(13, "machinename".Length, 1),
-            OpToken(TokenOperator.Transition, 1),
-            ValToken(30, 4, 1)
+            NLTkn(1),
+            NLTkn(1),
+            NLTkn(1),
+            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 11, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(30, 4, 1)
          };
          var parser = new Parser();
 
@@ -105,10 +101,7 @@ namespace Tests.Compiler
          var input = "@machine mach -> 'State1'";
          var tokens = new List<Token>
          {
-            KeywordToken(TokenKeyword.Machine, 1),
-            IdentifierToken(13, "machinename".Length, 1),
-            OpToken(TokenOperator.Transition, 1),
-            ValToken(18, 6, 1)
+            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 4, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(18, 6, 1)
          };
          var parser = new Parser();
 
@@ -122,23 +115,83 @@ namespace Tests.Compiler
       [Test]
       public void Parse_OneState_OneStateMade()
       {
-         var input = "@machine m -> 's'\n@state s";
+         var input = "@machine m -> 's'\n@state state1";
          var tokens = new List<Token>
          {
-            KeywordToken(TokenKeyword.Machine, 1),
-            IdentifierToken(13, 1, 1),
-            OpToken(TokenOperator.Transition, 1),
-            ValToken(19, 1, 1),
-            NewLineToken(1),
-            KeywordToken(TokenKeyword.State, 2),
-            IdentifierToken(25, 1, 1)
+            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(19, 1, 1), NLTkn(1),
+            KeyTkn(TokenKeyword.State, 2), IdTkn(25, 6, 1)
          };
          var parser = new Parser();
 
          var ast = parser.Parse(tokens, input);
          var state = ast.States[0];
 
-         Assert.AreEqual("s", state.Name);
+         Assert.AreEqual("state1", state.Name);
+      }
+
+      [Test]
+      public void Parse_TwoStatesNoSections_TwoStatesMade()
+      {
+         var input = "@machine m -> 's'\n@state state1\n@state state2";
+         var tokens = new List<Token>
+         {
+            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(19, 1, 1), NLTkn(1),
+            KeyTkn(TokenKeyword.State, 2), IdTkn(25, 6, 2), NLTkn(2),
+            KeyTkn(TokenKeyword.State, 3), IdTkn(39, 6, 3)
+         };
+         var parser = new Parser();
+
+         var ast = parser.Parse(tokens, input);
+
+         Assert.AreEqual("state1", ast.States[0].Name);
+         Assert.AreEqual("state2", ast.States[1].Name);
+      }
+
+      [Test]
+      [TestCase(TokenKeyword.On)]
+      [TestCase(TokenKeyword.Enter)]
+      [TestCase(TokenKeyword.Exit)]
+      [TestCase(TokenKeyword.Run)]
+      public void Parse_StateWithOneSection_StateHasSection(TokenKeyword sectionKeyword)
+      {
+         // the "section" doesn't matter as the input is not used in the asserts
+         var input = "@machine m -> 's'\n@state state1\n\tsection";
+         var tokens = new List<Token>
+         {
+            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(19, 1, 1), NLTkn(1),
+            KeyTkn(TokenKeyword.State, 2), IdTkn(25, 6, 2), NLTkn(2),
+            KeyTkn(sectionKeyword, 3)
+         };
+         var parser = new Parser();
+
+         var ast = parser.Parse(tokens, input);
+         var state = ast.States[0];
+
+         if (sectionKeyword == TokenKeyword.Enter)
+            Assert.NotNull(state.Enter);
+         else if (sectionKeyword == TokenKeyword.On)
+            Assert.NotNull(state.On);
+         else if (sectionKeyword == TokenKeyword.Exit)
+            Assert.NotNull(state.Exit);
+         else if (sectionKeyword == TokenKeyword.Run)
+            Assert.NotNull(state.Run);
+      }
+
+      [Test]
+      public void Parse_StateSectionWithOneAction_StateSectionHasOneAction()
+      {
+         var input = "@machine m -> 's'\n@state state1\n\trun";
+         var tokens = new List<Token>
+         {
+            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(19, 1, 1), NLTkn(1),
+            KeyTkn(TokenKeyword.State, 2), IdTkn(25, 6, 2), NLTkn(2),
+            KeyTkn(TokenKeyword.Run, 3)
+         };
+         var parser = new Parser();
+
+         var ast = parser.Parse(tokens, input);
+         var state = ast.States[0];
+         Assert.NotNull(state.Run);
       }
    }
 }

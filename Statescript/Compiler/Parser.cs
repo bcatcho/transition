@@ -64,38 +64,6 @@ namespace Statescript.Compiler
          }
       }
 
-      private StateAstNode ParseState()
-      {
-         ParseBlanklines();
-         Token t;
-         if (!Current(out t)) {
-            return null;
-         }
-
-         if (t.TokenType != TokenType.Keyword || t.Keyword != TokenKeyword.State) {
-            HandleError("Expected @state found ", t);
-            return null;
-         }
-
-         var state = new StateAstNode
-         {
-            LineNumber = t.LineNumber,
-         };
-
-         if (!Next(out t)) {
-            HandleError("Expected @state identifier, reached end of input.", t);
-            return null;
-         } else if (t.TokenType != TokenType.Identifier) {
-            HandleError("Expected @state identifier found ", t);
-            return null;
-         }
-
-         state.Name = GetDataSubstring(t);
-         Advance();
-
-         return state;
-      }
-
       private void ParseMachine()
       {
          var t = _tokens[_index];
@@ -121,6 +89,79 @@ namespace Statescript.Compiler
             _machine.Action = action;
             Advance();
          }
+      }
+
+      private StateAstNode ParseState()
+      {
+         ParseBlanklines();
+         Token t;
+         if (!Current(out t)) {
+            return null;
+         }
+
+         if (t.TokenType != TokenType.Keyword || t.Keyword != TokenKeyword.State) {
+            HandleError("Expected @state but found ", t);
+            return null;
+         }
+
+         var state = new StateAstNode
+         {
+            LineNumber = t.LineNumber,
+         };
+
+         if (!Next(out t)) {
+            HandleError("Expected @state identifier, reached end of input.", t);
+            return null;
+         } else if (t.TokenType != TokenType.Identifier) {
+            HandleError("Expected @state identifier found ", t);
+            return null;
+         }
+
+         state.Name = GetDataSubstring(t);
+         Advance(); // move past identifier
+
+         while (TryParseStateSection(state) && !_exitEarly && _index < _tokens.Count) {
+            // loop until no more sections
+         }
+
+         return state;
+      }
+
+      private bool TryParseStateSection(StateAstNode state)
+      {
+         ParseBlanklines();
+         Token t;
+         if (!Current(out t)) {
+            return false;
+         } else if (t.TokenType != TokenType.Keyword) {
+            HandleError("Expected keyword but found", t);
+            return false;
+         } else if (t.Keyword == TokenKeyword.Enter || t.Keyword == TokenKeyword.Exit ||
+                    t.Keyword == TokenKeyword.Run || t.Keyword == TokenKeyword.On) {
+            var section = new SectionAstNode
+            {
+               LineNumber = t.LineNumber,
+            };
+            switch (t.Keyword) {
+               case TokenKeyword.Enter:
+                  state.Enter = section;
+                  break;
+               case TokenKeyword.Run:
+                  state.Run = section;
+                  break;
+               case TokenKeyword.Exit:
+                  state.Exit = section;
+                  break;
+               case TokenKeyword.On:
+                  state.On = section;
+                  break;
+            }
+            // move past keyword
+            Advance();
+            return true;
+         }
+
+         return false;
       }
 
       private ActionAstNode ParseAction()
