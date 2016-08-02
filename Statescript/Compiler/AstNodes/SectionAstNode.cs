@@ -4,6 +4,6 @@ namespace Statescript.Compiler.AstNode
 {
    public class SectionAstNode : AstNode
    {
-      public List<ActionAstNode> Actions;
+      public List<ActionAstNode> Actions = new List<ActionAstNode>();
    }
 }

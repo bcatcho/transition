@@ -180,18 +180,20 @@ namespace Tests.Compiler
       [Test]
       public void Parse_StateSectionWithOneAction_StateSectionHasOneAction()
       {
-         var input = "@machine m -> 's'\n@state state1\n\trun";
+         var input = "@machine m -> 's'\n@state state1\n\trun\n\tdoThing";
          var tokens = new List<Token>
          {
             KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(19, 1, 1), NLTkn(1),
             KeyTkn(TokenKeyword.State, 2), IdTkn(25, 6, 2), NLTkn(2),
-            KeyTkn(TokenKeyword.Run, 3)
+            KeyTkn(TokenKeyword.Run, 3), NLTkn(3),
+            IdTkn(38, 7, 4)
          };
          var parser = new Parser();
 
          var ast = parser.Parse(tokens, input);
          var state = ast.States[0];
-         Assert.NotNull(state.Run);
+
+         Assert.AreEqual("doThing", state.Run.Actions[0].Name);
       }
    }
 }

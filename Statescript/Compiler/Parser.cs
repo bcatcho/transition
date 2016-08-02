@@ -48,7 +48,7 @@ namespace Statescript.Compiler
             if (state != null) {
                _machine.States.Add(state);
             }
-         } while (state != null && !_exitEarly && _index < _tokens.Count);
+         } while (state != null && ShouldContinueParsing());
 
          _tokens = null;
          _data = null;
@@ -87,7 +87,6 @@ namespace Statescript.Compiler
             }
 
             _machine.Action = action;
-            Advance();
          }
       }
 
@@ -120,7 +119,7 @@ namespace Statescript.Compiler
          state.Name = GetDataSubstring(t);
          Advance(); // move past identifier
 
-         while (TryParseStateSection(state) && !_exitEarly && _index < _tokens.Count) {
+         while (TryParseStateSection(state) && ShouldContinueParsing()) {
             // loop until no more sections
          }
 
@@ -158,6 +157,11 @@ namespace Statescript.Compiler
             }
             // move past keyword
             Advance();
+            ActionAstNode actionNode;
+            do {
+               actionNode = ParseAction();
+               section.Actions.Add(actionNode);
+            } while (actionNode != null  && ShouldContinueParsing());
             return true;
          }
 
@@ -166,6 +170,7 @@ namespace Statescript.Compiler
 
       private ActionAstNode ParseAction()
       {
+         ParseBlanklines();
          Token t;
          Current(out t);
          // transition operator found. This is syntatic sugar. handle first.
@@ -190,11 +195,26 @@ namespace Statescript.Compiler
             param.Val = GetDataSubstring(t);
             action.Params.Add(param);
 
+            Advance();
+            return action;
+         } else if (t.TokenType == TokenType.Identifier) {
+            var action = new ActionAstNode
+            {
+               Name = GetDataSubstring(t),
+               LineNumber = t.LineNumber,
+            };
+
+            Advance();
             return action;
          }
          
 
          return null;
+      }
+
+      private bool ShouldContinueParsing()
+      {
+         return !(_exitEarly || _index >= _tokens.Count);
       }
 
       private string GetDataSubstring(Token t)
