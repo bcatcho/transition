@@ -1,6 +1,9 @@
 # transition
 
-A light-weight state machine language, parser and interpreter built for run-time compilation and execution. 
+A light-weight state machine language, parser and interpreter built for run-time compilation and execution.
+
+
+<a href="https://travis-ci.org/bcatcho/transition"><img src="https://travis-ci.org/bcatcho/transition.svg?branch=master" alt="Build Status"></a>
 
 <pre class="code">
 <strong>@machine</strong> Worker <strong>-&gt;</strong> <em>'Idle'</em>
