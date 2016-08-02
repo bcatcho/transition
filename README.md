@@ -4,6 +4,7 @@ A light-weight state machine language, parser and interpreter built for run-time
 
 
 <a href="https://travis-ci.org/bcatcho/transition"><img src="https://travis-ci.org/bcatcho/transition.svg?branch=master" alt="Build Status"></a>
+<a href="https://twitter.com/catchco"><img src="https://img.shields.io/badge/twitter-follow%20%40catchco-blue.svg" alt="Twitter Follow Me"></a>
 
 <pre class="code">
 <strong>@machine</strong> Worker <strong>-&gt;</strong> <em>'Idle'</em>
