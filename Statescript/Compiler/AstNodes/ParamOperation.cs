@@ -5,7 +5,7 @@
    /// </summary>
    public enum ParamOperation
    {
-      Assign,
-      Transition
+      Assign, // :
+      Transition // ->
    }
 }
