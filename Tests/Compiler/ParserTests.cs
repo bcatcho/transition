@@ -178,23 +178,85 @@ namespace Tests.Compiler
       }
 
       [Test]
-      public void Parse_StateSectionWithOneAction_StateSectionHasOneAction()
+      public void Parse_OneAction_HasOneAction()
       {
-         var input = "@machine m -> 's'\n@state state1\n\trun\n\tdoThing";
+         var input = "@machine m -> 's'\n@state state1\n\trun\n\tact1";
          var tokens = new List<Token>
          {
             KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(19, 1, 1), NLTkn(1),
             KeyTkn(TokenKeyword.State, 2), IdTkn(25, 6, 2), NLTkn(2),
             KeyTkn(TokenKeyword.Run, 3), NLTkn(3),
-            IdTkn(38, 7, 4)
+            IdTkn(38, 4, 4)
          };
          var parser = new Parser();
 
          var ast = parser.Parse(tokens, input);
          var state = ast.States[0];
 
-         Assert.AreEqual("doThing", state.Run.Actions[0].Name);
+         Assert.AreEqual("act1", state.Run.Actions[0].Name);
+      }
+
+      [Test]
+      public void Parse_TwoActions_HasTwoActionsInCorrectOrder()
+      {
+         var input = "@machine m -> 's'\n@state state1\n\trun\n\tact1\n\tact2";
+         var tokens = new List<Token>
+         {
+            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(19, 1, 1), NLTkn(1),
+            KeyTkn(TokenKeyword.State, 2), IdTkn(25, 6, 2), NLTkn(2),
+            KeyTkn(TokenKeyword.Run, 3), NLTkn(3),
+            IdTkn(38, 4, 4), NLTkn(4),
+            IdTkn(44, 4, 5)
+         };
+         var parser = new Parser();
+
+         var ast = parser.Parse(tokens, input);
+         var state = ast.States[0];
+
+         Assert.AreEqual("act1", state.Run.Actions[0].Name);
+         Assert.AreEqual("act2", state.Run.Actions[1].Name);
+      }
+
+      [Test]
+      public void Parse_ActionWithAssignParam_ActionHasAssignParam()
+      {
+         var input = "@machine m -> 's'\n@state state1\n\trun\n\tact1 param:'val'";
+         var tokens = new List<Token>
+         {
+            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(19, 1, 1), NLTkn(1),
+            KeyTkn(TokenKeyword.State, 2), IdTkn(25, 6, 2), NLTkn(2),
+            KeyTkn(TokenKeyword.Run, 3), NLTkn(3),
+            IdTkn(38, 4, 4), IdTkn(43, 5,4), OpTkn(TokenOperator.Assign, 5), ValTkn(50,3,5)
+         };
+         var parser = new Parser();
+
+         var ast = parser.Parse(tokens, input);
+         var param = ast.States[0].Run.Actions[0].Params[0];
+
+         Assert.AreEqual("param", param.Name);
+         Assert.AreEqual(ParamOperation.Assign, param.Op);
+         Assert.AreEqual("val", param.Val);
+      }
+
+      [Test]
+      public void Parse_ActionWithTwoAssignParams_ActionHasTwoAssignParams()
+      {
+         var input = "@machine m -> 's'\n@state state1\n\trun\n\tact1 param:'val' p2:'v2'";
+         var tokens = new List<Token>
+         {
+            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(19, 1, 1), NLTkn(1),
+            KeyTkn(TokenKeyword.State, 2), IdTkn(25, 6, 2), NLTkn(2),
+            KeyTkn(TokenKeyword.Run, 3), NLTkn(3),
+            IdTkn(38, 4, 4), IdTkn(43, 5,4), OpTkn(TokenOperator.Assign, 5), ValTkn(50,3,5), IdTkn(55, 2,4), OpTkn(TokenOperator.Assign, 5), ValTkn(59,2,5)
+         };
+         var parser = new Parser();
+
+         var ast = parser.Parse(tokens, input);
+         var param = ast.States[0].Run.Actions[0].Params[1];
+
+         Assert.AreEqual("p2", param.Name);
+         Assert.AreEqual(ParamOperation.Assign, param.Op);
+         Assert.AreEqual("v2", param.Val);
       }
    }
 }
-

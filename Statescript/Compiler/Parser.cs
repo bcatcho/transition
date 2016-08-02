@@ -158,10 +158,12 @@ namespace Statescript.Compiler
             // move past keyword
             Advance();
             ActionAstNode actionNode;
-            do {
+            while (ShouldContinueParsing()) {
                actionNode = ParseAction();
+               if (actionNode == null)
+                  break;
                section.Actions.Add(actionNode);
-            } while (actionNode != null  && ShouldContinueParsing());
+            }
             return true;
          }
 
@@ -205,11 +207,65 @@ namespace Statescript.Compiler
             };
 
             Advance();
+            ParamAstNode paramNode;
+            while (ShouldContinueParsing()) {
+               paramNode = ParseParam();
+               if (paramNode == null)
+                  break;
+               action.Params.Add(paramNode);
+            }
+
             return action;
          }
-         
 
          return null;
+      }
+
+      private ParamAstNode ParseParam()
+      {
+         Token t;
+         // look for identifier
+         if (!Current(out t)) {
+            return null;
+         } else if (t.TokenType == TokenType.NewLine) {
+            return null;
+         } else if (t.TokenType != TokenType.Identifier) {
+            HandleError("Parameter missing identifier. Found ", t);
+            return null;
+         }
+
+         var param = new ParamAstNode
+         {
+            LineNumber = t.LineNumber,
+            Name = GetDataSubstring(t)
+         };
+
+         // look for operator
+         if (!Next(out t)) {
+            HandleError("Parameter missing operator and value. Reached end of input.", _tokens[_index - 1]);
+            return param;
+         } else if (t.TokenType != TokenType.Operator) {
+            HandleError("Parameter missing operator and value. Found ", t);
+            return param;
+         }
+
+         param.Op = t.Operator == TokenOperator.Assign ? ParamOperation.Assign : ParamOperation.Transition;
+
+         // look for value
+         if (!Next(out t)) {
+            HandleError("Parameter missing value. Reached end of input.", _tokens[_index - 1]);
+            return param;
+         } else if (t.TokenType != TokenType.Value) {
+            HandleError("Parameter missing value. Found ", t);
+            return param;
+         }
+
+         param.Val = GetDataSubstring(t);
+
+         // move off val token
+         Advance();
+          
+         return param;
       }
 
       private bool ShouldContinueParsing()
