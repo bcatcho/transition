@@ -80,7 +80,7 @@ namespace Statescript.Compiler
 
             // build action for initial transition
             Advance();
-            var action = ParseAction();
+            var action = ParseAction(false);
             if (action == null) {
                HandleError("@machine missing default transition", _tokens[_index]);
                return;
@@ -159,7 +159,7 @@ namespace Statescript.Compiler
             Advance();
             ActionAstNode actionNode;
             while (ShouldContinueParsing()) {
-               actionNode = ParseAction();
+               actionNode = ParseAction(t.Keyword == TokenKeyword.On);
                if (actionNode == null)
                   break;
                section.Actions.Add(actionNode);
@@ -170,11 +170,14 @@ namespace Statescript.Compiler
          return false;
       }
 
-      private ActionAstNode ParseAction()
+      private ActionAstNode ParseAction(bool lookForMessage)
       {
          ParseBlanklines();
          Token t;
-         Current(out t);
+         if (!Current(out t)) {
+            return null;
+         }
+
          // transition operator found. This is syntatic sugar. handle first.
          if (t.TokenType == TokenType.Operator && t.Operator == TokenOperator.Transition) {
             var action = new ActionAstNode
@@ -199,23 +202,55 @@ namespace Statescript.Compiler
 
             Advance();
             return action;
-         } else if (t.TokenType == TokenType.Identifier) {
-            var action = new ActionAstNode
-            {
-               Name = GetDataSubstring(t),
-               LineNumber = t.LineNumber,
-            };
+         } else {
+            
+            ActionAstNode action = null;
 
-            Advance();
-            ParamAstNode paramNode;
-            while (ShouldContinueParsing()) {
-               paramNode = ParseParam();
-               if (paramNode == null)
-                  break;
-               action.Params.Add(paramNode);
+            if (lookForMessage) {
+               if (t.TokenType != TokenType.Value) {
+                  HandleError("Action missing message. Found ", t);
+                  return null;
+               }
+
+               action = new ActionAstNode
+               {
+                  LineNumber = t.LineNumber,
+                  Message = GetDataSubstring(t)
+               };
+               // advance past assign operator after message
+               if (!Advance()) {
+                  HandleError("Unexpected end of input in action. Expected [:]", t);
+                  return action;
+               }
+               // advance to identifier
+               if (!Next(out t)) {
+                  HandleError("Unexpected end of input in action. Expected action identifier", t);
+                  return action;
+               }
             }
 
-            return action;
+            if (t.TokenType == TokenType.Identifier) {
+               if (action == null) {
+                  action = new ActionAstNode
+                  {
+                     LineNumber = t.LineNumber,
+                  };
+               }
+               action.Name = GetDataSubstring(t);
+
+               // advance to params
+               Advance();
+
+               ParamAstNode paramNode;
+               while (ShouldContinueParsing()) {
+                  paramNode = ParseParam();
+                  if (paramNode == null)
+                     break;
+                  action.Params.Add(paramNode);
+               }
+
+               return action;
+            }
          }
 
          return null;

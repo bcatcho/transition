@@ -226,7 +226,7 @@ namespace Tests.Compiler
             KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(19, 1, 1), NLTkn(1),
             KeyTkn(TokenKeyword.State, 2), IdTkn(25, 6, 2), NLTkn(2),
             KeyTkn(TokenKeyword.Run, 3), NLTkn(3),
-            IdTkn(38, 4, 4), IdTkn(43, 5,4), OpTkn(TokenOperator.Assign, 5), ValTkn(50,3,5)
+            IdTkn(38, 4, 4), IdTkn(43, 5, 4), OpTkn(TokenOperator.Assign, 5), ValTkn(50, 3, 5)
          };
          var parser = new Parser();
 
@@ -247,7 +247,7 @@ namespace Tests.Compiler
             KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(19, 1, 1), NLTkn(1),
             KeyTkn(TokenKeyword.State, 2), IdTkn(25, 6, 2), NLTkn(2),
             KeyTkn(TokenKeyword.Run, 3), NLTkn(3),
-            IdTkn(38, 4, 4), IdTkn(43, 5,4), OpTkn(TokenOperator.Transition, 5), ValTkn(51,3,5)
+            IdTkn(38, 4, 4), IdTkn(43, 5, 4), OpTkn(TokenOperator.Transition, 5), ValTkn(51, 3, 5)
          };
          var parser = new Parser();
 
@@ -268,7 +268,7 @@ namespace Tests.Compiler
             KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(19, 1, 1), NLTkn(1),
             KeyTkn(TokenKeyword.State, 2), IdTkn(25, 6, 2), NLTkn(2),
             KeyTkn(TokenKeyword.Run, 3), NLTkn(3),
-            IdTkn(38, 4, 4), IdTkn(43, 5,4), OpTkn(TokenOperator.Assign, 5), ValTkn(50,3,5), IdTkn(55, 2,4), OpTkn(TokenOperator.Assign, 5), ValTkn(59,2,5)
+            IdTkn(38, 4, 4), IdTkn(43, 5, 4), OpTkn(TokenOperator.Assign, 5), ValTkn(50, 3, 5), IdTkn(55, 2, 4), OpTkn(TokenOperator.Assign, 5), ValTkn(59, 2, 5)
          };
          var parser = new Parser();
 
@@ -289,7 +289,7 @@ namespace Tests.Compiler
             KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(19, 1, 1), NLTkn(1),
             KeyTkn(TokenKeyword.State, 2), IdTkn(25, 6, 2), NLTkn(2),
             KeyTkn(TokenKeyword.Run, 3), NLTkn(3),
-            OpTkn(TokenOperator.Transition, 4), ValTkn(41,4,4)
+            OpTkn(TokenOperator.Transition, 4), ValTkn(41, 4, 4)
          };
          var parser = new Parser();
 
@@ -310,7 +310,7 @@ namespace Tests.Compiler
             KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(19, 1, 1), NLTkn(1),
             KeyTkn(TokenKeyword.State, 2), IdTkn(25, 6, 2), NLTkn(2),
             KeyTkn(TokenKeyword.Run, 3), NLTkn(3),
-            OpTkn(TokenOperator.Transition, 4), ValTkn(41,4,4),NLTkn(4),
+            OpTkn(TokenOperator.Transition, 4), ValTkn(41, 4, 4), NLTkn(4),
             NLTkn(5),
             KeyTkn(TokenKeyword.State, 6), IdTkn(55, 6, 6)
          };
@@ -320,6 +320,26 @@ namespace Tests.Compiler
          var state2 = ast.States[1];
 
          Assert.AreEqual("state2", state2.Name);
+      }
+
+      [Test]
+      public void Parse_ActionWithMessageInOnSection_ActionHasMessage()
+      {
+         var input = "@machine m -> 's'\n@state state1\n\ton\n\t'msg': act";
+         var tokens = new List<Token>
+         {
+            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(19, 1, 1), NLTkn(1),
+            KeyTkn(TokenKeyword.State, 2), IdTkn(25, 6, 2), NLTkn(2),
+            KeyTkn(TokenKeyword.On, 3), NLTkn(3),
+            ValTkn(38, 3, 4), OpTkn(TokenOperator.Assign, 4), IdTkn(44, 3, 4)
+         };
+         var parser = new Parser();
+
+         var ast = parser.Parse(tokens, input);
+         var act = ast.States[0].On.Actions[0];
+
+         Assert.AreEqual("act", act.Name);
+         Assert.AreEqual("msg", act.Message);
       }
    }
 }
