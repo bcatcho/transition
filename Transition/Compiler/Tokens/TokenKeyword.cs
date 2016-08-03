@@ -1,4 +1,4 @@
-namespace Statescript.Compiler.Tokens
+namespace Transition.Compiler.Tokens
 {
 
    /// <summary>

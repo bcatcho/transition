@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using Statescript.Compiler.AstNode;
-using Statescript.Compiler.Tokens;
+using Transition.Compiler.AstNode;
+using Transition.Compiler.Tokens;
 
-namespace Statescript.Compiler
+namespace Transition.Compiler
 {
    /// <summary>
    /// Parser analyzes a list of tokens produced by the tokenizer and builds a 

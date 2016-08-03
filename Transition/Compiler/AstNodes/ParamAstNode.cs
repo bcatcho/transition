@@ -1,4 +1,4 @@
-namespace Statescript.Compiler.AstNode
+namespace Transition.Compiler.AstNode
 {
    /// <summary>
    /// The Parameter node represents a name value pair that may be found in actions.

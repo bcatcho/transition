@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Statescript.Compiler.AstNode
+namespace Transition.Compiler.AstNode
 {
    /// <summary>
    /// The Machine node is the root node for the Abstract Syntax Tree.

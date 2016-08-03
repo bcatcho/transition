@@ -1,4 +1,4 @@
-namespace Statescript.Compiler.AstNode
+namespace Transition.Compiler.AstNode
 {
    /// <summary>
    /// Base class for all Abstract Syntax Tree Nodes

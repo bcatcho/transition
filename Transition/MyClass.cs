@@ -1,5 +1,5 @@
 ﻿using System;
-namespace Statescript
+namespace Transition
 {
    public class MyClass
    {

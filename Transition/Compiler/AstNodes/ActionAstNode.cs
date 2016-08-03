@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Statescript.Compiler.AstNode
+namespace Transition.Compiler.AstNode
 {
    /// <summary>
    /// ActionAst node represents an action in a Section. It may or may not have params.

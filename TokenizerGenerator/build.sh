@@ -5,4 +5,4 @@ if [ ! -d "tmp" ]; then
 fi
 
 ./ragel -T0 -o tmp/Tokenizer.cs -A Tokenizer.rl.cs
-cp tmp/Tokenizer.cs ../Statescript/Compiler/
+cp tmp/Tokenizer.cs ../Transition/Compiler/

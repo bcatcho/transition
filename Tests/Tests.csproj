@@ -44,9 +44,9 @@
     <Folder Include="Compiler\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Statescript\Statescript.csproj">
+    <ProjectReference Include="..\Transition\Transition.csproj">
       <Project>{05473E38-544D-4A95-8D15-41A199A47545}</Project>
-      <Name>Statescript</Name>
+      <Name>Transition</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

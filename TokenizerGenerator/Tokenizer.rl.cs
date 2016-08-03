@@ -3,9 +3,9 @@
 // http://www.colm.net/open-source/ragel/
 using System;
 using System.Collections.Generic;
-using Statescript.Compiler.Tokens;
+using Transition.Compiler.Tokens;
 
-namespace Statescript.Compiler
+namespace Transition.Compiler
 {
    /// <summary>
    /// Tokenizer performs lexical analysis on a string of characters using the

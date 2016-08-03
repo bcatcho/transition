@@ -1,8 +1,8 @@
 ﻿using NUnit.Framework;
-using Statescript.Compiler;
+using Transition.Compiler;
 using System.Collections.Generic;
 using System;
-using Statescript.Compiler.Tokens;
+using Transition.Compiler.Tokens;
 
 namespace Tests.Compiler
 {

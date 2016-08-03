@@ -1,4 +1,4 @@
-﻿namespace Statescript.Compiler.AstNode
+﻿namespace Transition.Compiler.AstNode
 {
    /// <summary>
    /// The type of operation for a parameter.

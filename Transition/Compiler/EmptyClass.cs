@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Statescript.Compiler
+namespace Transition.Compiler
 {
    public class EmptyClass
    {

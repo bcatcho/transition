@@ -1,4 +1,4 @@
-namespace Statescript.Compiler.AstNode
+namespace Transition.Compiler.AstNode
 {
    /// <summary>
    /// State nodes encapsulate a number of sections. They must have a unique name within a machine.

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PolicySet name="statescript.mdpolicy">
+<PolicySet name="Transition.mdpolicy">
   <TextStylePolicy inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/plain">
     <FileWidth>120</FileWidth>
     <TabWidth>3</TabWidth>

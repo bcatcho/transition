@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Statescript", "Statescript\Statescript.csproj", "{05473E38-544D-4A95-8D15-41A199A47545}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Transition", "Transition\Transition.csproj", "{05473E38-544D-4A95-8D15-41A199A47545}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{100AE44E-6E50-4388-BD8F-42A12E01EBA6}"
 EndProject
@@ -60,7 +60,7 @@ Global
 		$4.DirectoryNamespaceAssociation = PrefixedHierarchical
 		$4.ResourceNamePolicy = MSBuild
 		$0.StandardHeader = $5
-		$5.Text = 
+		$5.Text =
 		$5.IncludeInNewFiles = True
 		$0.NameConventionPolicy = $6
 		$6.Rules = $7

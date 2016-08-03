@@ -1,4 +1,4 @@
-namespace Statescript.Compiler
+namespace Transition.Compiler
 {
    /// <summary>
    /// A collection of keywords used in parsing and compiling

@@ -4,5 +4,5 @@ install:
   - sudo apt-get install nunit-console
 
 script:
-  - xbuild /p:Configuration=Debug Statescript.sln
+  - xbuild /p:Configuration=Debug Transition.sln
   - nunit-console Tests/bin/Debug/Tests.dll
