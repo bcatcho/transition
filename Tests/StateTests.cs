@@ -66,7 +66,7 @@ namespace Tests
          bool actionWasRun = false;
          var state = new State();
          state.AddRunAction(new TestAction(TickResult.Yield()));
-         state.AddRunAction(new TestAction(TickResult.Done(), () => actionWasRun = true ));
+         state.AddRunAction(new TestAction(TickResult.Done(), () => actionWasRun = true));
          var context = new Context();
          context.ExecState.ActionIndex = 1;
 
@@ -80,15 +80,15 @@ namespace Tests
       {
          var actionThatRan = new List<string>();
          var state = new State();
-         state.AddRunAction(new TestAction(TickResult.Done(), () => actionThatRan.Add("first") ));
-         state.AddRunAction(new TestAction(TickResult.Done(), () => actionThatRan.Add("second") ));
+         state.AddRunAction(new TestAction(TickResult.Done(), () => actionThatRan.Add("first")));
+         state.AddRunAction(new TestAction(TickResult.Done(), () => actionThatRan.Add("second")));
          var context = new Context();
          context.ExecState.ActionIndex = 0;
 
          state.Tick(context);
 
-         Assert.AreEqual("first",  actionThatRan[0]);
-         Assert.AreEqual("second",  actionThatRan[1]);
+         Assert.AreEqual("first", actionThatRan[0]);
+         Assert.AreEqual("second", actionThatRan[1]);
       }
 
       [Test]
@@ -96,14 +96,14 @@ namespace Tests
       {
          var actionThatRan = new List<string>();
          var state = new State();
-         state.AddRunAction(new TestAction(TickResult.Yield(), () => actionThatRan.Add("first") ));
-         state.AddRunAction(new TestAction(TickResult.Done(), () => actionThatRan.Add("second") ));
+         state.AddRunAction(new TestAction(TickResult.Yield(), () => actionThatRan.Add("first")));
+         state.AddRunAction(new TestAction(TickResult.Done(), () => actionThatRan.Add("second")));
          var context = new Context();
          context.ExecState.ActionIndex = 0;
 
          state.Tick(context);
 
-         Assert.AreEqual("first",  actionThatRan[0]);
+         Assert.AreEqual("first", actionThatRan[0]);
          Assert.AreEqual(1, actionThatRan.Count);
          Assert.AreEqual(0, context.ExecState.ActionIndex);
       }
@@ -149,6 +149,49 @@ namespace Tests
 
          Assert.AreEqual(TickResultType.Transition, result.ResultType);
          Assert.AreEqual(3, result.TransitionId);
+      }
+
+      [Test]
+      public void Enter_HasOneAction_ActionIsRun()
+      {
+         var actionThatRan = new List<string>();
+         var state = new State();
+         state.AddEnterAction(new TestAction(TickResult.Done(), () => actionThatRan.Add("first")));
+         var context = new Context();
+
+         state.Enter(context);
+
+         Assert.AreEqual("first", actionThatRan[0]);
+      }
+
+      [Test]
+      public void Enter_HasTwoActions_BothAreRunInOrder()
+      {
+         var actionThatRan = new List<string>();
+         var state = new State();
+         state.AddEnterAction(new TestAction(TickResult.Done(), () => actionThatRan.Add("first")));
+         state.AddEnterAction(new TestAction(TickResult.Done(), () => actionThatRan.Add("second")));
+         var context = new Context();
+
+         state.Enter(context);
+
+         Assert.AreEqual("first", actionThatRan[0]);
+         Assert.AreEqual("second", actionThatRan[1]);
+      }
+
+      [Test]
+      [TestCase(TickResultType.Yield)]
+      [TestCase(TickResultType.Loop)]
+      [TestCase(TickResultType.Transition)]
+      public void Enter_ActionDoesNotReturnYield_ErrorCodeRaised(TickResultType resultType)
+      {
+         var state = new State();
+         state.AddEnterAction(new TestAction(new TickResult { ResultType = resultType, TransitionId = 0 }));
+         var context = new Context();
+
+         state.Enter(context);
+
+         Assert.AreEqual(context.LastError, ErrorCode.State_Enter_ActionDidNotReturnYield);
       }
    }
 }

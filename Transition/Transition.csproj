@@ -51,6 +51,7 @@
     <Compile Include="Context.cs" />
     <Compile Include="ExecutionState.cs" />
     <Compile Include="Action.cs" />
+    <Compile Include="ErrorCode.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

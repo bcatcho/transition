@@ -46,6 +46,20 @@ namespace Transition
          return TickResult.Yield();
       }
 
+      public void Enter(Context context)
+      {
+         if (EnterActions == null)
+            return;
+
+         TickResult result;
+         for (int i = 0; i < EnterActions.Count; ++i) {
+            result = EnterActions[i].Tick(context);
+            if (result.ResultType != TickResultType.Done) {
+               context.RaiseError(ErrorCode.State_Enter_ActionDidNotReturnYield);
+            }
+         }
+      }
+
       private Action CurrentAction(Context context)
       {
          if (context.ExecState.ActionIndex < RunActions.Count) {
@@ -72,6 +86,14 @@ namespace Transition
             RunActions = new List<Action>(1);
          }
          RunActions.Add(action);
+      }
+
+      public void AddEnterAction(Action action)
+      {
+         if (EnterActions == null) {
+            EnterActions = new List<Action>(1);
+         }
+         EnterActions.Add(action);
       }
    }
 }
