@@ -1,8 +1,8 @@
-using System.Collections.Generic;
-
 namespace Transition
 {
-
+   /// <summary>
+   /// A list of all error codes that may be emitted durring compilation or execution
+   /// </summary>
    public enum ErrorCode
    {
       None,

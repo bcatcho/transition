@@ -2,16 +2,55 @@
 
 namespace Transition
 {
+   /// <summary>
+   /// A State is an executable representation of the StateAstNode. It has four sections which hold
+   /// a sequence or unordered collection of actions. When a state is ticked it will run actions from
+   /// the "Run" section. An action in the run section does not have to finish in one tick. 
+   /// 
+   /// When a state is entered or exited it runs all actions in "EnterActions" or "ExitActions"
+   /// respectively. An action shall not transition, yield or loop in either of these phases.
+   /// </summary>
    public class State
    {
+      /// <summary>
+      /// An ordered list of actions to be run every tick
+      /// </summary>
       public List<Action> RunActions { get; private set; }
 
+      /// <summary>
+      /// An ordered list of actions to run when the state is entered
+      /// </summary>
       public List<Action> EnterActions { get; private set; }
 
+      /// <summary>
+      /// An ordered list of actions to be run when the state is exited
+      /// </summary>
       public List<Action> ExitActions { get; private set; }
 
+      /// <summary>
+      /// A lookup table of actions to run when a message is recieved
+      /// </summary>
       public List<Action> OnActions { get; private set; }
 
+      /// <summary>
+      /// Running the Tick command will run actions in the "RunActions" list starting from the first.
+      /// If no Actions are present the state will return yield. This allows for passive states that 
+      /// wait for messages or other external forces to act.
+      /// Any action that is run will return one of four TickResultType enums with different side effects.
+      /// 
+      /// <term>Yield</term> causes State to immediately return yield itself without incrementing the
+      /// active action index in the execution context. This allows a long running action (across multiple ticks).
+      /// 
+      /// <term>Done</term> causes the State to increment the active action index and immediately execute 
+      /// the next action (if availabile). If none is available the State returns yield.
+      /// 
+      /// <term>Loop</term> causes the State to reset the active action index to zero and immedeitely yield itself.
+      /// The next time the State is ticked it starts over at the first action (index 0).
+      /// 
+      /// <term>Transition</term> causes the State to return the same transition result. The parent Machine will
+      /// immediately transition to the new state identified by result.TransitionId;
+      /// </summary>
+      /// <param name="context">Context.</param>
       public TickResult Tick(Context context)
       {
          if (RunActions == null) {
@@ -46,8 +85,14 @@ namespace Transition
          return TickResult.Yield();
       }
 
+      /// <summary>
+      /// Executes all actions in the "EnterActions" in order section when the state is entered.
+      /// Each action must finish in one tick and return done.
+      /// </summary>
       public void Enter(Context context)
       {
+         context.ExecState.ActionIndex = 0;
+
          if (EnterActions == null)
             return;
 
@@ -60,6 +105,10 @@ namespace Transition
          }
       }
 
+      /// <summary>
+      /// Executes all actions in the "ExitActions" in order section when the state is exited.
+      /// Each action must finish in one tick and return done.
+      /// </summary>
       public void Exit(Context context)
       {
          if (ExitActions == null)
@@ -94,6 +143,9 @@ namespace Transition
          context.ExecState.ActionIndex = 0;
       }
 
+      /// <summary>
+      /// Appends an action to the RunActions list
+      /// </summary>
       public void AddRunAction(Action action)
       {
          if (RunActions == null) {
@@ -102,6 +154,9 @@ namespace Transition
          RunActions.Add(action);
       }
 
+      /// <summary>
+      /// Appends an action to the EnterActions list
+      /// </summary>
       public void AddEnterAction(Action action)
       {
          if (EnterActions == null) {
@@ -110,6 +165,9 @@ namespace Transition
          EnterActions.Add(action);
       }
 
+      /// <summary>
+      /// Appends an action to the ExitActions list
+      /// </summary>
       public void AddExitAction(Action action)
       {
          if (ExitActions == null) {
@@ -118,6 +176,9 @@ namespace Transition
          ExitActions.Add(action);
       }
 
+      /// <summary>
+      /// Adds an action to the OnActions collection
+      /// </summary>
       public void AddOnAction(Action action)
       {
          if (OnActions == null) {

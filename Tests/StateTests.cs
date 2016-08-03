@@ -165,6 +165,18 @@ namespace Tests
       }
 
       [Test]
+      public void Enter_ActionIndexIsThree_ResetsActionIndex()
+      {
+         var state = new State();
+         var context = new Context();
+         context.ExecState.ActionIndex = 3;
+
+         state.Enter(context);
+
+         Assert.AreEqual(0, context.ExecState.ActionIndex);
+      }
+
+      [Test]
       public void Enter_HasTwoActions_BothAreRunInOrder()
       {
          var actionThatRan = new List<string>();
