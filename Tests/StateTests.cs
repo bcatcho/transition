@@ -136,5 +136,19 @@ namespace Tests
          Assert.AreEqual(0, context.ExecState.ActionIndex);
          Assert.AreEqual(TickResultType.Yield, result.ResultType);
       }
+
+      [Test]
+      public void Tick_ActionReturnsTransition_StateReturnsTransitionResult()
+      {
+         var state = new State();
+         state.AddRunAction(new TestAction(TickResult.Transition(3)));
+         var context = new Context();
+         context.ExecState.ActionIndex = 0;
+
+         var result = state.Tick(context);
+
+         Assert.AreEqual(TickResultType.Transition, result.ResultType);
+         Assert.AreEqual(3, result.TransitionId);
+      }
    }
 }

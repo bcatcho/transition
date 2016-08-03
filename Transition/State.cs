@@ -24,15 +24,20 @@ namespace Transition
             result = action.Tick(context);
 
             switch (result.ResultType) {
+               case TickResultType.Yield:
+                  // current action still has more work to do next tick
+                  return TickResult.Yield();
                case TickResultType.Done:
                   // if the last action finished, advance
                   action = AdvanceAction(context);
                   break;
-               case TickResultType.Yield:
-                  return TickResult.Yield();
                case TickResultType.Loop:
+                  // reset and yield to avoid infinite loops
                   ResetForLooping(context);
                   return TickResult.Yield();
+               case TickResultType.Transition:
+                  // exit and let machine handle transition
+                  return result;
                default:
                   return TickResult.Yield();
             }

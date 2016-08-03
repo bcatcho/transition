@@ -27,7 +27,7 @@ namespace Transition
       {
          return new TickResult
          {
-            ResultType = TickResultType.Done,
+            ResultType = TickResultType.Transition,
             TransitionId = transitionId
          };
       }
