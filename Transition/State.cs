@@ -60,6 +60,20 @@ namespace Transition
          }
       }
 
+      public void Exit(Context context)
+      {
+         if (ExitActions == null)
+            return;
+
+         TickResult result;
+         for (int i = 0; i < ExitActions.Count; ++i) {
+            result = ExitActions[i].Tick(context);
+            if (result.ResultType != TickResultType.Done) {
+               context.RaiseError(ErrorCode.State_Exit_ActionDidNotReturnYield);
+            }
+         }
+      }
+
       private Action CurrentAction(Context context)
       {
          if (context.ExecState.ActionIndex < RunActions.Count) {
@@ -94,6 +108,22 @@ namespace Transition
             EnterActions = new List<Action>(1);
          }
          EnterActions.Add(action);
+      }
+
+      public void AddExitAction(Action action)
+      {
+         if (ExitActions == null) {
+            ExitActions = new List<Action>(1);
+         }
+         ExitActions.Add(action);
+      }
+
+      public void AddOnAction(Action action)
+      {
+         if (OnActions == null) {
+            OnActions = new List<Action>(1);
+         }
+         OnActions.Add(action);
       }
    }
 }

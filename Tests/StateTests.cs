@@ -193,5 +193,48 @@ namespace Tests
 
          Assert.AreEqual(context.LastError, ErrorCode.State_Enter_ActionDidNotReturnYield);
       }
+
+      [Test]
+      public void Exit_HasOneAction_ActionIsRun()
+      {
+         var actionThatRan = new List<string>();
+         var state = new State();
+         state.AddExitAction(new TestAction(TickResult.Done(), () => actionThatRan.Add("first")));
+         var context = new Context();
+
+         state.Exit(context);
+
+         Assert.AreEqual("first", actionThatRan[0]);
+      }
+
+      [Test]
+      public void Exit_HasTwoActions_BothAreRunInOrder()
+      {
+         var actionThatRan = new List<string>();
+         var state = new State();
+         state.AddExitAction(new TestAction(TickResult.Done(), () => actionThatRan.Add("first")));
+         state.AddExitAction(new TestAction(TickResult.Done(), () => actionThatRan.Add("second")));
+         var context = new Context();
+
+         state.Exit(context);
+
+         Assert.AreEqual("first", actionThatRan[0]);
+         Assert.AreEqual("second", actionThatRan[1]);
+      }
+
+      [Test]
+      [TestCase(TickResultType.Yield)]
+      [TestCase(TickResultType.Loop)]
+      [TestCase(TickResultType.Transition)]
+      public void Exit_ActionDoesNotReturnYield_ErrorCodeRaised(TickResultType resultType)
+      {
+         var state = new State();
+         state.AddExitAction(new TestAction(new TickResult { ResultType = resultType, TransitionId = 0 }));
+         var context = new Context();
+
+         state.Exit(context);
+
+         Assert.AreEqual(context.LastError, ErrorCode.State_Exit_ActionDidNotReturnYield);
+      }
    }
 }
