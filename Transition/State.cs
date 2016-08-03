@@ -18,14 +18,24 @@ namespace Transition
             return TickResult.Yield();
          }
 
+         TickResult result;
          var action = CurrentAction(context);
+         while (action != null) {
+            result = action.Tick(context);
 
-         // no action == noop
-         if (action == null) {
-            return TickResult.Yield();
+            switch (result.ResultType) {
+               case TickResultType.Done:
+                  // if the last action finished, advance
+                  action = AdvanceAction(context);
+                  break;
+               case TickResultType.Yield:
+                  return TickResult.Yield();
+               default:
+                  return TickResult.Yield();
+            }
          }
 
-         return action.Tick(context);
+         return TickResult.Yield();
       }
 
       private Action CurrentAction(Context context)
@@ -35,6 +45,12 @@ namespace Transition
          }
 
          return null;
+      }
+
+      private Action AdvanceAction(Context context)
+      {
+         context.ExecState.ActionIndex++;
+         return CurrentAction(context);
       }
 
       public void AddRunAction(Action action)
