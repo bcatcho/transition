@@ -30,6 +30,9 @@ namespace Transition
                   break;
                case TickResultType.Yield:
                   return TickResult.Yield();
+               case TickResultType.Loop:
+                  ResetForLooping(context);
+                  return TickResult.Yield();
                default:
                   return TickResult.Yield();
             }
@@ -51,6 +54,11 @@ namespace Transition
       {
          context.ExecState.ActionIndex++;
          return CurrentAction(context);
+      }
+
+      private void ResetForLooping(Context context)
+      {
+         context.ExecState.ActionIndex = 0;
       }
 
       public void AddRunAction(Action action)

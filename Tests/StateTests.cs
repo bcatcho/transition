@@ -76,7 +76,7 @@ namespace Tests
       }
 
       [Test]
-      public void Tick_HasTwoRunActionsAndStartsAtFirstAndBothFinish_ResultIsYield()
+      public void Tick_HasTwoRunActionsAndStartsAtFirstAndBothFinish_BothAreRunInOrder()
       {
          var actionThatRan = new List<string>();
          var state = new State();
@@ -92,6 +92,23 @@ namespace Tests
       }
 
       [Test]
+      public void Tick_HasTwoRunActionsAndStartsAtFirstAndFirstYields_OnlyFirstIsRun()
+      {
+         var actionThatRan = new List<string>();
+         var state = new State();
+         state.AddRunAction(new TestAction(TickResult.Yield(), () => actionThatRan.Add("first") ));
+         state.AddRunAction(new TestAction(TickResult.Done(), () => actionThatRan.Add("second") ));
+         var context = new Context();
+         context.ExecState.ActionIndex = 0;
+
+         state.Tick(context);
+
+         Assert.AreEqual("first",  actionThatRan[0]);
+         Assert.AreEqual(1, actionThatRan.Count);
+         Assert.AreEqual(0, context.ExecState.ActionIndex);
+      }
+
+      [Test]
       public void Tick_HasTwoRunActionsAndStartsAtFirstAndBothFinish_ActionIndexIsSetProperly()
       {
          var state = new State();
@@ -103,6 +120,21 @@ namespace Tests
          state.Tick(context);
 
          Assert.AreEqual(2, context.ExecState.ActionIndex);
+      }
+
+      [Test]
+      public void Tick_HasTwoRunActionsAndSecondReturnsLoop_ActionIndexIsResetAndYieldReturned()
+      {
+         var state = new State();
+         state.AddRunAction(new TestAction(TickResult.Done()));
+         state.AddRunAction(new TestAction(TickResult.Loop()));
+         var context = new Context();
+         context.ExecState.ActionIndex = 1;
+
+         var result = state.Tick(context);
+
+         Assert.AreEqual(0, context.ExecState.ActionIndex);
+         Assert.AreEqual(TickResultType.Yield, result.ResultType);
       }
    }
 }
