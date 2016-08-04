@@ -12,7 +12,7 @@ namespace Transition
       /// <summary>
       /// Gets the last error raised (if any). This should be reset before each tick.
       /// </summary>
-      public ErrorCode LastError { get; private set; }
+      public ErrorCode LastError { get; set; }
 
       /// <summary>
       /// The execution state for the associated machine.

@@ -21,8 +21,6 @@ namespace Tests
       [Test]
       public void Tick_FirstTick_TransitionsToFirstState()
       {
-         var machine = new Machine();
-         var context = new Context();
          _machine.AddState(new State());
          _machine.EnterAction = new TestAction(TickResult.Transition(0));
 
@@ -75,6 +73,58 @@ namespace Tests
          _machine.Tick(_context);
 
          Assert.AreEqual(ErrorCode.Exec_Machine_Transition_DestinationStateDoesNotExist, _context.LastError);
+      }
+
+      [Test]
+      public void Tick_TransitionFromState_FirstStateIsExitedSecondIsEntered()
+      {
+         var state1exited = false;
+         var state2entered = false;
+         // add an action that will transition to a state that does not exist
+         var state1 = new State();
+         state1.AddExitAction(new TestAction(TickResult.Done(), () => state1exited = true));
+         state1.AddRunAction(new TestAction(TickResult.Transition(1)));
+         _machine.AddState(state1);
+
+         var state2 = new State();
+         state2.AddEnterAction(new TestAction(TickResult.Done(), () => state2entered = true));
+         _machine.AddState(state2);
+         // make sure the execution state is set to run the first state's Run action
+         _context.ExecState.ActionIndex = 0;
+         _context.ExecState.StateId = 0;
+
+         _machine.Tick(_context);
+
+         Assert.IsTrue(state1exited);
+         Assert.IsTrue(state2entered);
+      }
+
+      [Test]
+      public void Tick_StateReturnsDone_ActiveStateIdRemainsTheSame()
+      {
+         var state1 = new State();
+         state1.AddRunAction(new TestAction(TickResult.Done()));
+         _machine.AddState(state1);
+
+         // make sure the execution state is set to run the first state's Run action
+         _context.ExecState.ActionIndex = 0;
+         _context.ExecState.StateId = 0;
+
+         _machine.Tick(_context);
+
+         Assert.AreEqual(0, _context.ExecState.StateId);
+      }
+
+      [Test]
+      public void Tick_HasPreviousError_ResetsError()
+      {
+         _machine.AddState(new State());
+         _context.ExecState.StateId = 0;
+         _context.LastError = ErrorCode.Exec_Machine_Transition_DestinationStateDoesNotExist;
+
+         _machine.Tick(_context);
+
+         Assert.AreEqual(ErrorCode.None, _context.LastError);
       }
    }
 }

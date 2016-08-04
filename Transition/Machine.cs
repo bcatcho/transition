@@ -25,8 +25,13 @@ namespace Transition
          States = new List<State>();
       }
 
+      /// <summary>
+      /// Run the state machine for one tick. The resulting state of the Machine will be
+      /// stored in the context.
+      /// </summary>
       public void Tick(Context context)
       {
+         context.ResetError();
          if (context.ExecState.StateId == -1) {
             var result = EnterAction.Tick(context);
             if (result.ResultType != TickResultType.Transition) {
@@ -39,6 +44,10 @@ namespace Transition
             if (currentState == null) {
                context.RaiseError(ErrorCode.Exec_Machine_Tick_CurrentStateDoesNotExist);
                return;
+            }
+            var result = currentState.Tick(context);
+            if (result.ResultType == TickResultType.Transition) {
+               Transition(context, result.TransitionId);
             }
          }
       }
