@@ -10,7 +10,7 @@ namespace Tests
       private Machine _machine;
       private Context _context;
 
-      [TestFixtureSetUp]
+      [SetUp]
       public void SetUp()
       {
          // be sure to use a new machine and context for each step
@@ -21,6 +21,8 @@ namespace Tests
       [Test]
       public void Tick_FirstTick_TransitionsToFirstState()
       {
+         var machine = new Machine();
+         var context = new Context();
          _machine.AddState(new State());
          _machine.EnterAction = new TestAction(TickResult.Transition(0));
 
@@ -42,6 +44,37 @@ namespace Tests
          _machine.Tick(_context);
 
          Assert.IsTrue(firstStateEntered);
+      }
+
+      [Test]
+      public void Tick_EnterActionReturnsBadResult_RaisesError()
+      {
+         _machine.EnterAction = new TestAction(TickResult.Done());
+
+         _machine.Tick(_context);
+
+         Assert.AreEqual(ErrorCode.Exec_Machine_Tick_MachineActionMustReturnTransition, _context.LastError);
+      }
+
+      [Test]
+      public void Tick_CurrentStateDoesNotExist_RaisesError()
+      {
+         _machine.EnterAction = new TestAction(TickResult.Done());
+
+         _machine.Tick(_context);
+
+         Assert.AreEqual(ErrorCode.Exec_Machine_Tick_MachineActionMustReturnTransition, _context.LastError);
+      }
+
+      [Test]
+      public void Tick_TransitionToUnavailableState_RaisesError()
+      {
+         // add an action that will transition to a state that does not exist
+         _machine.EnterAction = new TestAction(TickResult.Transition(2));
+
+         _machine.Tick(_context);
+
+         Assert.AreEqual(ErrorCode.Exec_Machine_Transition_DestinationStateDoesNotExist, _context.LastError);
       }
    }
 }

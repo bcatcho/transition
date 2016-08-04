@@ -20,8 +20,12 @@ namespace Transition
       /// </summary>
       Exec_Machine_Tick_MachineActionMustReturnTransition,
       /// <summary>
+      /// Occurs when a Machine is ticked and can not find the current state
+      /// </summary>
+      Exec_Machine_Tick_CurrentStateDoesNotExist,
+      /// <summary>
       /// Occurs when a Machine moves to a state that does not exist during execution.
       /// </summary>
-      Exec_Machine_Transition_DestinationStateDoesNotExist
+      Exec_Machine_Transition_DestinationStateDoesNotExist,
    }
 }

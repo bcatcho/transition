@@ -34,6 +34,12 @@ namespace Transition
                return;
             }
             Transition(context, result.TransitionId);
+         } else {
+            var currentState = CurrentState(context);
+            if (currentState == null) {
+               context.RaiseError(ErrorCode.Exec_Machine_Tick_CurrentStateDoesNotExist);
+               return;
+            }
          }
       }
 
@@ -56,7 +62,7 @@ namespace Transition
       private State CurrentState(Context context)
       {
          var stateId = context.ExecState.StateId;
-         if (stateId < 0 || stateId > States.Count)
+         if (stateId < 0 || stateId >= States.Count)
             return null;
 
          return States[stateId];
