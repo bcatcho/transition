@@ -30,7 +30,7 @@ namespace Tests
       public void Tick_HasOneRunActionThatYeilds_ReturnsYield()
       {
          _state.AddRunAction(new TestAction(TickResult.Yield()));
-         _context.ExecState.ActionIndex = 0;
+         _context.ActionIndex = 0;
 
          var result = _state.Tick(_context);
 
@@ -43,7 +43,7 @@ namespace Tests
          bool actionWasRun = false;
          _state.AddRunAction(new TestAction(TickResult.Yield()));
          _state.AddRunAction(new TestAction(TickResult.Done(), () => actionWasRun = true));
-         _context.ExecState.ActionIndex = 1;
+         _context.ActionIndex = 1;
 
          _state.Tick(_context);
 
@@ -56,7 +56,7 @@ namespace Tests
          var actionThatRan = new List<string>();
          _state.AddRunAction(new TestAction(TickResult.Done(), () => actionThatRan.Add("first")));
          _state.AddRunAction(new TestAction(TickResult.Done(), () => actionThatRan.Add("second")));
-         _context.ExecState.ActionIndex = 0;
+         _context.ActionIndex = 0;
 
          _state.Tick(_context);
 
@@ -70,13 +70,13 @@ namespace Tests
          var actionThatRan = new List<string>();
          _state.AddRunAction(new TestAction(TickResult.Yield(), () => actionThatRan.Add("first")));
          _state.AddRunAction(new TestAction(TickResult.Done(), () => actionThatRan.Add("second")));
-         _context.ExecState.ActionIndex = 0;
+         _context.ActionIndex = 0;
 
          _state.Tick(_context);
 
          Assert.AreEqual("first", actionThatRan[0]);
          Assert.AreEqual(1, actionThatRan.Count);
-         Assert.AreEqual(0, _context.ExecState.ActionIndex);
+         Assert.AreEqual(0, _context.ActionIndex);
       }
 
       [Test]
@@ -84,11 +84,11 @@ namespace Tests
       {
          _state.AddRunAction(new TestAction(TickResult.Done()));
          _state.AddRunAction(new TestAction(TickResult.Done()));
-         _context.ExecState.ActionIndex = 0;
+         _context.ActionIndex = 0;
 
          _state.Tick(_context);
 
-         Assert.AreEqual(2, _context.ExecState.ActionIndex);
+         Assert.AreEqual(2, _context.ActionIndex);
       }
 
       [Test]
@@ -96,11 +96,11 @@ namespace Tests
       {
          _state.AddRunAction(new TestAction(TickResult.Done()));
          _state.AddRunAction(new TestAction(TickResult.Loop()));
-         _context.ExecState.ActionIndex = 1;
+         _context.ActionIndex = 1;
 
          var result = _state.Tick(_context);
 
-         Assert.AreEqual(0, _context.ExecState.ActionIndex);
+         Assert.AreEqual(0, _context.ActionIndex);
          Assert.AreEqual(TickResultType.Yield, result.ResultType);
       }
 
@@ -108,7 +108,7 @@ namespace Tests
       public void Tick_ActionReturnsTransition_StateReturnsTransitionResult()
       {
          _state.AddRunAction(new TestAction(TickResult.Transition(3)));
-         _context.ExecState.ActionIndex = 0;
+         _context.ActionIndex = 0;
 
          var result = _state.Tick(_context);
 
@@ -130,11 +130,11 @@ namespace Tests
       [Test]
       public void Enter_ActionIndexIsThree_ResetsActionIndex()
       {
-         _context.ExecState.ActionIndex = 3;
+         _context.ActionIndex = 3;
 
          _state.Enter(_context);
 
-         Assert.AreEqual(0, _context.ExecState.ActionIndex);
+         Assert.AreEqual(0, _context.ActionIndex);
       }
 
       [Test]

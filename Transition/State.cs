@@ -96,7 +96,7 @@ namespace Transition
       /// </summary>
       public void Enter(Context context)
       {
-         context.ExecState.ActionIndex = 0;
+         context.ActionIndex = 0;
 
          if (EnterActions == null)
             return;
@@ -163,8 +163,8 @@ namespace Transition
 
       private Action CurrentAction(Context context)
       {
-         if (context.ExecState.ActionIndex < RunActions.Count) {
-            return RunActions[context.ExecState.ActionIndex];
+         if (context.ActionIndex < RunActions.Count) {
+            return RunActions[context.ActionIndex];
          }
 
          return null;
@@ -172,13 +172,13 @@ namespace Transition
 
       private Action AdvanceAction(Context context)
       {
-         context.ExecState.ActionIndex++;
+         context.ActionIndex++;
          return CurrentAction(context);
       }
 
       private void ResetForLooping(Context context)
       {
-         context.ExecState.ActionIndex = 0;
+         context.ActionIndex = 0;
       }
 
       /// <summary>

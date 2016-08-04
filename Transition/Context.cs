@@ -15,9 +15,14 @@ namespace Transition
       public ErrorCode LastError { get; set; }
 
       /// <summary>
-      /// The execution state for the associated machine.
+      /// The current index of the currently running action in a State's RunActions section.
       /// </summary>
-      public ExecutionState ExecState { get; private set; }
+      public int ActionIndex { get; set; }
+
+      /// <summary>
+      /// The Identifier of the currently active state.
+      /// </summary>
+      public int StateId { get; set; }
 
       /// <summary>
       /// The Message property will be set when a state is responding to a message. This allows
@@ -27,9 +32,8 @@ namespace Transition
 
       public Context()
       {
-         ExecState = new ExecutionState();
          // this allows the machine to know if it has run for the very first time
-         ExecState.StateId = -1;
+         StateId = -1;
       }
 
       /// <summary>

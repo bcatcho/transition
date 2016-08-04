@@ -26,7 +26,7 @@ namespace Tests
 
          _machine.Tick(_context);
 
-         Assert.AreEqual(0, _context.ExecState.StateId);
+         Assert.AreEqual(0, _context.StateId);
       }
 
       [Test]
@@ -90,8 +90,8 @@ namespace Tests
          state1.AddEnterAction(new TestAction(TickResult.Done(), () => state1entered = true));
          _machine.AddState(state1);
          // make sure the execution state is set to run the first state's Run action
-         _context.ExecState.ActionIndex = 0;
-         _context.ExecState.StateId = 0;
+         _context.ActionIndex = 0;
+         _context.StateId = 0;
 
          _machine.Tick(_context);
 
@@ -107,12 +107,12 @@ namespace Tests
          _machine.AddState(state0);
 
          // make sure the execution state is set to run the first state's Run action
-         _context.ExecState.ActionIndex = 0;
-         _context.ExecState.StateId = 0;
+         _context.ActionIndex = 0;
+         _context.StateId = 0;
 
          _machine.Tick(_context);
 
-         Assert.AreEqual(0, _context.ExecState.StateId);
+         Assert.AreEqual(0, _context.StateId);
       }
 
       [Test]
@@ -128,11 +128,11 @@ namespace Tests
             Key = "test"
          };
          // make sure the execution state makes state0 the active state
-         _context.ExecState.StateId = 0;
+         _context.StateId = 0;
 
          _machine.SendMessage(_context, message);
 
-         Assert.AreEqual(1, _context.ExecState.StateId);
+         Assert.AreEqual(1, _context.StateId);
       }
 
       [Test]
@@ -146,11 +146,11 @@ namespace Tests
             Key = "test"
          };
          // make sure the execution state makes state0 the active state
-         _context.ExecState.StateId = 0;
+         _context.StateId = 0;
 
          _machine.SendMessage(_context, message);
 
-         Assert.AreEqual(0, _context.ExecState.StateId);
+         Assert.AreEqual(0, _context.StateId);
       }
 
       [Test]
@@ -161,18 +161,18 @@ namespace Tests
             Key = "test"
          };
          // make sure the execution state makes state0 the active state
-         _context.ExecState.StateId = 0;
+         _context.StateId = 0;
 
          _machine.SendMessage(_context, message);
 
-         Assert.AreEqual(0, _context.ExecState.StateId);
+         Assert.AreEqual(0, _context.StateId);
       }
 
       [Test]
       public void Tick_HasPreviousError_ResetsError()
       {
          _machine.AddState(new State());
-         _context.ExecState.StateId = 0;
+         _context.StateId = 0;
          _context.LastError = ErrorCode.Exec_Machine_Transition_DestinationStateDoesNotExist;
 
          _machine.Tick(_context);

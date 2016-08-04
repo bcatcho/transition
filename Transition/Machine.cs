@@ -31,7 +31,7 @@ namespace Transition
       public void Tick(Context context)
       {
          context.ResetError();
-         if (context.ExecState.StateId == -1) {
+         if (context.StateId == -1) {
             var result = EnterAction.Tick(context);
             if (result.ResultType != TickResultType.Transition) {
                context.RaiseError(ErrorCode.Exec_Machine_Tick_MachineActionMustReturnTransition);
@@ -80,7 +80,7 @@ namespace Transition
          if (currentState != null) {
             currentState.Exit(context);
          }
-         context.ExecState.StateId = destinationStateId;
+         context.StateId = destinationStateId;
          currentState = CurrentState(context);
          // ensure we land on a state
          if (currentState == null) {
@@ -92,7 +92,7 @@ namespace Transition
 
       private State CurrentState(Context context)
       {
-         var stateId = context.ExecState.StateId;
+         var stateId = context.StateId;
          if (stateId < 0 || stateId >= States.Count)
             return null;
 
