@@ -15,6 +15,10 @@ namespace Transition
       /// </summary>
       Exec_State_Exit_ActionDidNotReturnYield,
       /// <summary>
+      /// An action that is run as a result of a message MUST end in either a transition or done.
+      /// </summary>
+      Exec_State_SendMessage_MessageHandlerDidNotReturnTransitionOrDone,
+      /// <summary>
       /// The action that runs when a machine is ticked for the first time (before the first state) 
       /// MUST return a transition result so that the machine can move to the first state.
       /// </summary>

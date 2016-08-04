@@ -19,6 +19,12 @@ namespace Transition
       /// </summary>
       public ExecutionState ExecState { get; private set; }
 
+      /// <summary>
+      /// The Message property will be set when a state is responding to a message. This allows
+      /// actions to inspect the details or payload of the message.
+      /// </summary>
+      public MessageEnvelope Message { get; set; }
+
       public Context()
       {
          ExecState = new ExecutionState();

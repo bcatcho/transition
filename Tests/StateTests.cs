@@ -7,13 +7,21 @@ namespace Tests
    [TestFixture]
    public class StateTests
    {
+      // to reduce boilerplate
+      private Context _context;
+      private State _state;
+
+      [SetUp]
+      public void SetUp()
+      {
+         _context = new Context();
+         _state = new State();
+      }
+
       [Test]
       public void Tick_NoActions_ReturnsYield()
       {
-         var state = new State();
-         var context = new Context();
-
-         var result = state.Tick(context);
+         var result = _state.Tick(_context);
 
          Assert.AreEqual(TickResultType.Yield, result.ResultType);
       }
@@ -21,12 +29,10 @@ namespace Tests
       [Test]
       public void Tick_HasOneRunActionThatYeilds_ReturnsYield()
       {
-         var state = new State();
-         state.AddRunAction(new TestAction(TickResult.Yield()));
-         var context = new Context();
-         context.ExecState.ActionIndex = 0;
+         _state.AddRunAction(new TestAction(TickResult.Yield()));
+         _context.ExecState.ActionIndex = 0;
 
-         var result = state.Tick(context);
+         var result = _state.Tick(_context);
 
          Assert.AreEqual(TickResultType.Yield, result.ResultType);
       }
@@ -35,13 +41,11 @@ namespace Tests
       public void Tick_HasTwoRunActions_CorrectActionIsRun()
       {
          bool actionWasRun = false;
-         var state = new State();
-         state.AddRunAction(new TestAction(TickResult.Yield()));
-         state.AddRunAction(new TestAction(TickResult.Done(), () => actionWasRun = true));
-         var context = new Context();
-         context.ExecState.ActionIndex = 1;
+         _state.AddRunAction(new TestAction(TickResult.Yield()));
+         _state.AddRunAction(new TestAction(TickResult.Done(), () => actionWasRun = true));
+         _context.ExecState.ActionIndex = 1;
 
-         state.Tick(context);
+         _state.Tick(_context);
 
          Assert.IsTrue(actionWasRun);
       }
@@ -50,13 +54,11 @@ namespace Tests
       public void Tick_HasTwoRunActionsAndStartsAtFirstAndBothFinish_BothAreRunInOrder()
       {
          var actionThatRan = new List<string>();
-         var state = new State();
-         state.AddRunAction(new TestAction(TickResult.Done(), () => actionThatRan.Add("first")));
-         state.AddRunAction(new TestAction(TickResult.Done(), () => actionThatRan.Add("second")));
-         var context = new Context();
-         context.ExecState.ActionIndex = 0;
+         _state.AddRunAction(new TestAction(TickResult.Done(), () => actionThatRan.Add("first")));
+         _state.AddRunAction(new TestAction(TickResult.Done(), () => actionThatRan.Add("second")));
+         _context.ExecState.ActionIndex = 0;
 
-         state.Tick(context);
+         _state.Tick(_context);
 
          Assert.AreEqual("first", actionThatRan[0]);
          Assert.AreEqual("second", actionThatRan[1]);
@@ -66,57 +68,49 @@ namespace Tests
       public void Tick_HasTwoRunActionsAndStartsAtFirstAndFirstYields_OnlyFirstIsRun()
       {
          var actionThatRan = new List<string>();
-         var state = new State();
-         state.AddRunAction(new TestAction(TickResult.Yield(), () => actionThatRan.Add("first")));
-         state.AddRunAction(new TestAction(TickResult.Done(), () => actionThatRan.Add("second")));
-         var context = new Context();
-         context.ExecState.ActionIndex = 0;
+         _state.AddRunAction(new TestAction(TickResult.Yield(), () => actionThatRan.Add("first")));
+         _state.AddRunAction(new TestAction(TickResult.Done(), () => actionThatRan.Add("second")));
+         _context.ExecState.ActionIndex = 0;
 
-         state.Tick(context);
+         _state.Tick(_context);
 
          Assert.AreEqual("first", actionThatRan[0]);
          Assert.AreEqual(1, actionThatRan.Count);
-         Assert.AreEqual(0, context.ExecState.ActionIndex);
+         Assert.AreEqual(0, _context.ExecState.ActionIndex);
       }
 
       [Test]
       public void Tick_HasTwoRunActionsAndStartsAtFirstAndBothFinish_ActionIndexIsSetProperly()
       {
-         var state = new State();
-         state.AddRunAction(new TestAction(TickResult.Done()));
-         state.AddRunAction(new TestAction(TickResult.Done()));
-         var context = new Context();
-         context.ExecState.ActionIndex = 0;
+         _state.AddRunAction(new TestAction(TickResult.Done()));
+         _state.AddRunAction(new TestAction(TickResult.Done()));
+         _context.ExecState.ActionIndex = 0;
 
-         state.Tick(context);
+         _state.Tick(_context);
 
-         Assert.AreEqual(2, context.ExecState.ActionIndex);
+         Assert.AreEqual(2, _context.ExecState.ActionIndex);
       }
 
       [Test]
       public void Tick_HasTwoRunActionsAndSecondReturnsLoop_ActionIndexIsResetAndYieldReturned()
       {
-         var state = new State();
-         state.AddRunAction(new TestAction(TickResult.Done()));
-         state.AddRunAction(new TestAction(TickResult.Loop()));
-         var context = new Context();
-         context.ExecState.ActionIndex = 1;
+         _state.AddRunAction(new TestAction(TickResult.Done()));
+         _state.AddRunAction(new TestAction(TickResult.Loop()));
+         _context.ExecState.ActionIndex = 1;
 
-         var result = state.Tick(context);
+         var result = _state.Tick(_context);
 
-         Assert.AreEqual(0, context.ExecState.ActionIndex);
+         Assert.AreEqual(0, _context.ExecState.ActionIndex);
          Assert.AreEqual(TickResultType.Yield, result.ResultType);
       }
 
       [Test]
       public void Tick_ActionReturnsTransition_StateReturnsTransitionResult()
       {
-         var state = new State();
-         state.AddRunAction(new TestAction(TickResult.Transition(3)));
-         var context = new Context();
-         context.ExecState.ActionIndex = 0;
+         _state.AddRunAction(new TestAction(TickResult.Transition(3)));
+         _context.ExecState.ActionIndex = 0;
 
-         var result = state.Tick(context);
+         var result = _state.Tick(_context);
 
          Assert.AreEqual(TickResultType.Transition, result.ResultType);
          Assert.AreEqual(3, result.TransitionId);
@@ -126,11 +120,9 @@ namespace Tests
       public void Enter_HasOneAction_ActionIsRun()
       {
          var actionThatRan = new List<string>();
-         var state = new State();
-         state.AddEnterAction(new TestAction(TickResult.Done(), () => actionThatRan.Add("first")));
-         var context = new Context();
+         _state.AddEnterAction(new TestAction(TickResult.Done(), () => actionThatRan.Add("first")));
 
-         state.Enter(context);
+         _state.Enter(_context);
 
          Assert.AreEqual("first", actionThatRan[0]);
       }
@@ -138,25 +130,21 @@ namespace Tests
       [Test]
       public void Enter_ActionIndexIsThree_ResetsActionIndex()
       {
-         var state = new State();
-         var context = new Context();
-         context.ExecState.ActionIndex = 3;
+         _context.ExecState.ActionIndex = 3;
 
-         state.Enter(context);
+         _state.Enter(_context);
 
-         Assert.AreEqual(0, context.ExecState.ActionIndex);
+         Assert.AreEqual(0, _context.ExecState.ActionIndex);
       }
 
       [Test]
       public void Enter_HasTwoActions_BothAreRunInOrder()
       {
          var actionThatRan = new List<string>();
-         var state = new State();
-         state.AddEnterAction(new TestAction(TickResult.Done(), () => actionThatRan.Add("first")));
-         state.AddEnterAction(new TestAction(TickResult.Done(), () => actionThatRan.Add("second")));
-         var context = new Context();
+         _state.AddEnterAction(new TestAction(TickResult.Done(), () => actionThatRan.Add("first")));
+         _state.AddEnterAction(new TestAction(TickResult.Done(), () => actionThatRan.Add("second")));
 
-         state.Enter(context);
+         _state.Enter(_context);
 
          Assert.AreEqual("first", actionThatRan[0]);
          Assert.AreEqual("second", actionThatRan[1]);
@@ -168,24 +156,20 @@ namespace Tests
       [TestCase(TickResultType.Transition)]
       public void Enter_ActionDoesNotReturnYield_ErrorCodeRaised(TickResultType resultType)
       {
-         var state = new State();
-         state.AddEnterAction(new TestAction(new TickResult { ResultType = resultType, TransitionId = 0 }));
-         var context = new Context();
+         _state.AddEnterAction(new TestAction(new TickResult { ResultType = resultType, TransitionId = 0 }));
 
-         state.Enter(context);
+         _state.Enter(_context);
 
-         Assert.AreEqual(context.LastError, ErrorCode.Exec_State_Enter_ActionDidNotReturnYield);
+         Assert.AreEqual(_context.LastError, ErrorCode.Exec_State_Enter_ActionDidNotReturnYield);
       }
 
       [Test]
       public void Exit_HasOneAction_ActionIsRun()
       {
          var actionThatRan = new List<string>();
-         var state = new State();
-         state.AddExitAction(new TestAction(TickResult.Done(), () => actionThatRan.Add("first")));
-         var context = new Context();
+         _state.AddExitAction(new TestAction(TickResult.Done(), () => actionThatRan.Add("first")));
 
-         state.Exit(context);
+         _state.Exit(_context);
 
          Assert.AreEqual("first", actionThatRan[0]);
       }
@@ -194,12 +178,10 @@ namespace Tests
       public void Exit_HasTwoActions_BothAreRunInOrder()
       {
          var actionThatRan = new List<string>();
-         var state = new State();
-         state.AddExitAction(new TestAction(TickResult.Done(), () => actionThatRan.Add("first")));
-         state.AddExitAction(new TestAction(TickResult.Done(), () => actionThatRan.Add("second")));
-         var context = new Context();
+         _state.AddExitAction(new TestAction(TickResult.Done(), () => actionThatRan.Add("first")));
+         _state.AddExitAction(new TestAction(TickResult.Done(), () => actionThatRan.Add("second")));
 
-         state.Exit(context);
+         _state.Exit(_context);
 
          Assert.AreEqual("first", actionThatRan[0]);
          Assert.AreEqual("second", actionThatRan[1]);
@@ -211,13 +193,107 @@ namespace Tests
       [TestCase(TickResultType.Transition)]
       public void Exit_ActionDoesNotReturnYield_ErrorCodeRaised(TickResultType resultType)
       {
-         var state = new State();
-         state.AddExitAction(new TestAction(new TickResult { ResultType = resultType, TransitionId = 0 }));
-         var context = new Context();
+         _state.AddExitAction(new TestAction(new TickResult { ResultType = resultType, TransitionId = 0 }));
 
-         state.Exit(context);
+         _state.Exit(_context);
 
-         Assert.AreEqual(context.LastError, ErrorCode.Exec_State_Exit_ActionDidNotReturnYield);
+         Assert.AreEqual(_context.LastError, ErrorCode.Exec_State_Exit_ActionDidNotReturnYield);
+      }
+
+      [Test]
+      public void SendMessage_CanHandleMessage_MessageHandlerTicked()
+      {
+         var messageHandlerTicked = false;
+         var action = new TestAction(TickResult.Done(), () => messageHandlerTicked = true);
+         _state.AddOnAction("test", action);
+         var message = new MessageEnvelope
+         {
+            Key = "test"
+         };
+
+         _state.SendMessage(_context, message);
+
+         Assert.IsTrue(messageHandlerTicked);
+      }
+
+      [Test]
+      public void SendMessage_CanHandleMessage_MessageIsClearedAfterRun()
+      {
+         var action = new TestAction(TickResult.Done());
+         _state.AddOnAction("test", action);
+         var message = new MessageEnvelope
+         {
+            Key = "test"
+         };
+
+         _state.SendMessage(_context, message);
+
+         Assert.IsNull(_context.Message);
+      }
+
+      [Test]
+      public void SendMessage_HandlerReturnsTransition_StateReturnsTransition()
+      {
+         var action = new TestAction(TickResult.Transition(1));
+         _state.AddOnAction("test", action);
+         var message = new MessageEnvelope
+         {
+            Key = "test"
+         };
+
+         var result = _state.SendMessage(_context, message);
+
+         Assert.AreEqual(TickResultType.Transition, result.ResultType);
+      }
+
+      [Test]
+      public void SendMessage_HandlerReturnsDone_StateReturnsDone()
+      {
+         var action = new TestAction(TickResult.Done());
+         _state.AddOnAction("test", action);
+         var message = new MessageEnvelope
+         {
+            Key = "test"
+         };
+
+         var result = _state.SendMessage(_context, message);
+
+         Assert.AreEqual(TickResultType.Done, result.ResultType);
+      }
+
+      [Test]
+      [TestCase(TickResultType.Loop)]
+      [TestCase(TickResultType.Yield)]
+      public void SendMessage_HandlerReturnsInvalidResult_StateReturnsDoneAndRaisesError(TickResultType invalideType)
+      {
+         var invalidResult = new TickResult
+         {
+            ResultType = invalideType
+         };
+         var action = new TestAction(invalidResult);
+         _state.AddOnAction("test", action);
+         var message = new MessageEnvelope
+         {
+            Key = "test"
+         };
+
+         var result = _state.SendMessage(_context, message);
+
+         Assert.AreEqual(TickResultType.Done, result.ResultType);
+         Assert.AreEqual(ErrorCode.Exec_State_SendMessage_MessageHandlerDidNotReturnTransitionOrDone, _context.LastError);
+      }
+
+      [Test]
+      public void SendMessage_DoesNotHandleMessage_StateReturnsDone()
+      {
+         var message = new MessageEnvelope
+         {
+            Key = "test"
+         };
+
+         var result = _state.SendMessage(_context, message);
+
+         Assert.AreEqual(TickResultType.Done, result.ResultType);
       }
    }
 }

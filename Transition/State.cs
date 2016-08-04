@@ -30,7 +30,12 @@ namespace Transition
       /// <summary>
       /// A lookup table of actions to run when a message is recieved
       /// </summary>
-      public List<Action> OnActions { get; private set; }
+      public Dictionary<string, Action> OnActions { get; private set; }
+
+      public State()
+      {
+         OnActions = new Dictionary<string, Action>(0);
+      }
 
       /// <summary>
       /// Running the Tick command will run actions in the "RunActions" list starting from the first.
@@ -123,6 +128,39 @@ namespace Transition
          }
       }
 
+      /// <summary>
+      /// Send a message to a state. This has the possiblity of causing the state to transition.
+      /// A state does not have to handle every message sent to it.
+      /// </summary>
+      public TickResult SendMessage(Context context, MessageEnvelope message)
+      {
+         var messageHandler = GetMessageHandler(message);
+         if (messageHandler != null) {
+            context.Message = message;
+            var result = messageHandler.Tick(context);
+            context.Message = null;
+
+            switch (result.ResultType) {
+               case TickResultType.Done:
+                  return result;
+               case TickResultType.Transition:
+                  return result;
+               default:
+                  // all other results are an error
+                  context.RaiseError(ErrorCode.Exec_State_SendMessage_MessageHandlerDidNotReturnTransitionOrDone);
+                  return TickResult.Done();
+            }
+         }
+
+         return TickResult.Done();
+      }
+
+      private Action GetMessageHandler(MessageEnvelope message)
+      {
+         Action result;
+         return OnActions.TryGetValue(message.Key, out result) ? result : null;
+      }
+
       private Action CurrentAction(Context context)
       {
          if (context.ExecState.ActionIndex < RunActions.Count) {
@@ -179,12 +217,9 @@ namespace Transition
       /// <summary>
       /// Adds an action to the OnActions collection
       /// </summary>
-      public void AddOnAction(Action action)
+      public void AddOnAction(string key, Action action)
       {
-         if (OnActions == null) {
-            OnActions = new List<Action>(1);
-         }
-         OnActions.Add(action);
+         OnActions.Add(key, action);
       }
    }
 }
