@@ -78,39 +78,92 @@ namespace Tests
       [Test]
       public void Tick_TransitionFromState_FirstStateIsExitedSecondIsEntered()
       {
-         var state1exited = false;
-         var state2entered = false;
+         var state0exited = false;
+         var state1entered = false;
          // add an action that will transition to a state that does not exist
-         var state1 = new State();
-         state1.AddExitAction(new TestAction(TickResult.Done(), () => state1exited = true));
-         state1.AddRunAction(new TestAction(TickResult.Transition(1)));
-         _machine.AddState(state1);
+         var state0 = new State();
+         state0.AddExitAction(new TestAction(TickResult.Done(), () => state0exited = true));
+         state0.AddRunAction(new TestAction(TickResult.Transition(1)));
+         _machine.AddState(state0);
 
-         var state2 = new State();
-         state2.AddEnterAction(new TestAction(TickResult.Done(), () => state2entered = true));
-         _machine.AddState(state2);
+         var state1 = new State();
+         state1.AddEnterAction(new TestAction(TickResult.Done(), () => state1entered = true));
+         _machine.AddState(state1);
          // make sure the execution state is set to run the first state's Run action
          _context.ExecState.ActionIndex = 0;
          _context.ExecState.StateId = 0;
 
          _machine.Tick(_context);
 
-         Assert.IsTrue(state1exited);
-         Assert.IsTrue(state2entered);
+         Assert.IsTrue(state0exited);
+         Assert.IsTrue(state1entered);
       }
 
       [Test]
       public void Tick_StateReturnsDone_ActiveStateIdRemainsTheSame()
       {
-         var state1 = new State();
-         state1.AddRunAction(new TestAction(TickResult.Done()));
-         _machine.AddState(state1);
+         var state0 = new State();
+         state0.AddRunAction(new TestAction(TickResult.Done()));
+         _machine.AddState(state0);
 
          // make sure the execution state is set to run the first state's Run action
          _context.ExecState.ActionIndex = 0;
          _context.ExecState.StateId = 0;
 
          _machine.Tick(_context);
+
+         Assert.AreEqual(0, _context.ExecState.StateId);
+      }
+
+      [Test]
+      public void SendMessage_StateReturnsTransition_TransitionOccurs()
+      {
+         var state0 = new State();
+         state0.AddOnAction("test", new TestAction(TickResult.Transition(1)));
+         _machine.AddState(state0);
+         // add destination state
+         _machine.AddState(new State());
+         var message = new MessageEnvelope
+         {
+            Key = "test"
+         };
+         // make sure the execution state makes state0 the active state
+         _context.ExecState.StateId = 0;
+
+         _machine.SendMessage(_context, message);
+
+         Assert.AreEqual(1, _context.ExecState.StateId);
+      }
+
+      [Test]
+      public void SendMessage_StateReturnsDone_ExecStateRemainsTheSame()
+      {
+         var state0 = new State();
+         state0.AddOnAction("test", new TestAction(TickResult.Done()));
+         _machine.AddState(state0);
+         var message = new MessageEnvelope
+         {
+            Key = "test"
+         };
+         // make sure the execution state makes state0 the active state
+         _context.ExecState.StateId = 0;
+
+         _machine.SendMessage(_context, message);
+
+         Assert.AreEqual(0, _context.ExecState.StateId);
+      }
+
+      [Test]
+      public void SendMessage_NoStateIsAvailable_ExecStateRemainsTheSame()
+      {
+         var message = new MessageEnvelope
+         {
+            Key = "test"
+         };
+         // make sure the execution state makes state0 the active state
+         _context.ExecState.StateId = 0;
+
+         _machine.SendMessage(_context, message);
 
          Assert.AreEqual(0, _context.ExecState.StateId);
       }

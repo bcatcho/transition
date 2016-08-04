@@ -10,7 +10,6 @@ namespace Transition
       /// </summary>
       public List<State> States { get; private set; }
 
-
       /// <summary>
       /// The first action that the state takes on it's first tick before any state is executed.
       /// It MUST transition to the first state.
@@ -52,6 +51,29 @@ namespace Transition
          }
       }
 
+      /// <summary>
+      /// Sends the message to the active state in the machine. May result in a state transition.
+      /// </summary>
+      public void SendMessage(Context context, MessageEnvelope message)
+      {
+         var currentState = CurrentState(context);
+         if (currentState == null)
+            return;
+
+         var result = currentState.SendMessage(context, message);
+         if (result.ResultType == TickResultType.Transition) {
+            Transition(context, result.TransitionId);
+         }
+      }
+
+      /// <summary>
+      /// Add a state to the machine.
+      /// </summary>
+      public void AddState(State state)
+      {
+         States.Add(state);
+      }
+
       private void Transition(Context context, int destinationStateId)
       {
          var currentState = CurrentState(context);
@@ -75,14 +97,6 @@ namespace Transition
             return null;
 
          return States[stateId];
-      }
-
-      /// <summary>
-      /// Add a state to the machine.
-      /// </summary>
-      public void AddState(State state)
-      {
-         States.Add(state);
       }
    }
 }
