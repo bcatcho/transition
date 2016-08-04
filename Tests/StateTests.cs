@@ -7,35 +7,6 @@ namespace Tests
    [TestFixture]
    public class StateTests
    {
-      /// <summary>
-      /// A helper class to produce actions with specific results
-      /// </summary>
-      private class TestAction : Action
-      {
-         public TickResult Result;
-
-         public System.Action TickFunc;
-
-         public TestAction(TickResult result)
-         {
-            Result = result;
-         }
-
-         public TestAction(TickResult result, System.Action tickFunc)
-         {
-            Result = result;
-            TickFunc = tickFunc;
-         }
-
-         protected override TickResult OnTick(Context context)
-         {
-            if (TickFunc != null) {
-               TickFunc.Invoke();
-            }
-            return Result;
-         }
-      }
-
       [Test]
       public void Tick_NoActions_ReturnsYield()
       {
@@ -203,7 +174,7 @@ namespace Tests
 
          state.Enter(context);
 
-         Assert.AreEqual(context.LastError, ErrorCode.State_Enter_ActionDidNotReturnYield);
+         Assert.AreEqual(context.LastError, ErrorCode.Exec_State_Enter_ActionDidNotReturnYield);
       }
 
       [Test]
@@ -246,7 +217,7 @@ namespace Tests
 
          state.Exit(context);
 
-         Assert.AreEqual(context.LastError, ErrorCode.State_Exit_ActionDidNotReturnYield);
+         Assert.AreEqual(context.LastError, ErrorCode.Exec_State_Exit_ActionDidNotReturnYield);
       }
    }
 }

@@ -22,6 +22,8 @@ namespace Transition
       public Context()
       {
          ExecState = new ExecutionState();
+         // this allows the machine to know if it has run for the very first time
+         ExecState.StateId = -1;
       }
 
       /// <summary>

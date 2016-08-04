@@ -36,6 +36,8 @@
     <Compile Include="Compiler\TokenizerTests.cs" />
     <Compile Include="Compiler\ParserTests.cs" />
     <Compile Include="StateTests.cs" />
+    <Compile Include="TestAction.cs" />
+    <Compile Include="MachineTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

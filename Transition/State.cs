@@ -100,7 +100,7 @@ namespace Transition
          for (int i = 0; i < EnterActions.Count; ++i) {
             result = EnterActions[i].Tick(context);
             if (result.ResultType != TickResultType.Done) {
-               context.RaiseError(ErrorCode.State_Enter_ActionDidNotReturnYield);
+               context.RaiseError(ErrorCode.Exec_State_Enter_ActionDidNotReturnYield);
             }
          }
       }
@@ -118,7 +118,7 @@ namespace Transition
          for (int i = 0; i < ExitActions.Count; ++i) {
             result = ExitActions[i].Tick(context);
             if (result.ResultType != TickResultType.Done) {
-               context.RaiseError(ErrorCode.State_Exit_ActionDidNotReturnYield);
+               context.RaiseError(ErrorCode.Exec_State_Exit_ActionDidNotReturnYield);
             }
          }
       }
