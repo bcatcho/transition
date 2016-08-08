@@ -10,11 +10,20 @@ namespace Transition.Compiler
    /// </summary>
    public class MachineGenerator<T> where T : Context
    {
-      private Dictionary<string, System.Type> _taskLookupTable;
+      private Dictionary<string, Type> _actionLookupTable;
       //      private Dictionary<System.Type, IBehaviorTreeCompilerValueConverter> _valueConverterLookup;
       private HashSet<Assembly> _loadedAssemblies;
-      private Dictionary<string, Dictionary<string, PropertyInfo>> _propertyInfoCache;
-      private Dictionary<string, PropertyInfo> _defaultPropertyInfoCache;
+//      private Dictionary<string, Dictionary<string, PropertyInfo>> _propertyInfoCache;
+//      private Dictionary<string, PropertyInfo> _defaultPropertyInfoCache;
+
+      public MachineGenerator()
+      {
+         _actionLookupTable = new Dictionary<string, Type>();
+//         _valueConverterLookup = new Dictionary<System.Type, IBehaviorTreeCompilerValueConverter>();
+         _loadedAssemblies = new HashSet<Assembly>();
+//         _propertyInfoCache = new Dictionary<string, Dictionary<string, PropertyInfo>>();
+//         _defaultPropertyInfoCache = new Dictionary<string, PropertyInfo>();
+      }
 
       /// <summary>
       /// Call before generate to build a lookup table of Actions to instantiate during generation. This method
@@ -42,8 +51,28 @@ namespace Transition.Compiler
          {
             Identifier = machineAst.Identifier,
          };
+         machine.EnterAction = GenerateAction(machineAst.Action);
+
 
          return machine;
+      }
+
+      private Action<T> GenerateAction(ActionAstNode action)
+      {
+         return CreateInstance(action.Identifier);
+      }
+
+      private Action<T> CreateInstance(string actionIdentifier)
+      {
+         if (!_actionLookupTable.ContainsKey(actionIdentifier)) {
+            throw new KeyNotFoundException(string.Format("Could not find action for name [{0}]", actionIdentifier));
+         }
+         var type = _actionLookupTable[actionIdentifier];
+         if (type.IsGenericType) {
+            type = type.MakeGenericType(typeof(T));
+         }
+
+         return (Action<T>)Activator.CreateInstance(type);
       }
 
       private void LoadAssembly(Assembly assembly)
@@ -70,7 +99,7 @@ namespace Transition.Compiler
 
       private void LoadAllTasks(Assembly assembly)
       {
-         var action = typeof(Action);
+         var action = typeof(Transition.Action<>);
          var types = assembly.GetTypes();
          Type genericDef = null;
          string name = null;
@@ -80,25 +109,25 @@ namespace Transition.Compiler
                if (genericDef == action) {
                   // lowercase the names and remove generic param
                   name = type.Name.Split('`')[0];
-                  AddLookupTableId(name, type, genericDef);
+                  AddLookupTableId(name, type);
 
-//                  if (type.IsDefined(typeof(AltIdAttribute), true)) {
-//                     var altIdAttribs = (AltIdAttribute[])type.GetCustomAttributes(typeof(AltIdAttribute), true);
-//                     foreach (var attrib in altIdAttribs) {
-//                        foreach (var altId in attrib.AltIds) {
-//                           AddLookupTableId(altId, type, genericDef);
-//                        }
-//                     }
-//                  }
+                  if (type.IsDefined(typeof(AltIdAttribute), true)) {
+                     var altIdAttribs = (AltIdAttribute[])type.GetCustomAttributes(typeof(AltIdAttribute), true);
+                     foreach (var attrib in altIdAttribs) {
+                        foreach (var altId in attrib.AltIds) {
+                           AddLookupTableId(altId, type);
+                        }
+                     }
+                  }
                }
             }
          }
       }
 
-      private void AddLookupTableId(string name, Type type, Type genericTypeDef)
+      private void AddLookupTableId(string name, Type type)
       {
          name = name.ToLower();
-         _taskLookupTable.Add(name, type);
+         _actionLookupTable.Add(name, type);
       }
    }
 }

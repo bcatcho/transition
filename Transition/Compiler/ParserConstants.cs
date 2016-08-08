@@ -10,6 +10,6 @@ namespace Transition.Compiler
       /// Eg. "-> 'state'" becomes "$trans -> 'state'" so the compiler can
       /// use the built in TransitionAction.  
       /// </summary>
-      public static readonly string TransitionAction = "$trans";
+      public const string TransitionAction = "$trans";
    }
 }

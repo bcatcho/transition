@@ -21,5 +21,14 @@ namespace Transition
       /// instruct the calling State or Machine on what to do next. See <term>State</term> for details.
       /// </summary>
       protected abstract TickResult OnTick(T context);
+
+      /// <summary>
+      /// Returns a transition result given a transition parameter. Return the result of this method
+      /// to make an action transition.
+      /// </summary>
+      protected TickResult TransitionTo(int transitionId)
+      {
+         return TickResult.Transition(transitionId);
+      }
    }
 }

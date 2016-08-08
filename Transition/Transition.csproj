@@ -56,12 +56,15 @@
     <Compile Include="Compiler\Compiler.cs" />
     <Compile Include="Compiler\SymanticValidator.cs" />
     <Compile Include="Compiler\MachineGenerator.cs" />
+    <Compile Include="Actions\TransitionAction.cs" />
+    <Compile Include="AltIdAttribute.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="Compiler\" />
     <Folder Include="Compiler\AstNodes\" />
     <Folder Include="Compiler\Tokens\" />
+    <Folder Include="Actions\" />
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>
