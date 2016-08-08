@@ -7,10 +7,10 @@ using Transition;
 namespace Tests.Compiler
 {
    [TestFixture]
-   public class SyntaxTreeValidatorTests
+   public class SymanticValidatorTests
    {
       [Test]
-      public void TransitionsAreValid_StatesExist_ReturnsTrue()
+      public void IsValid_StatesForTransitionsExist_ReturnsTrue()
       {
          var machine = new MachineAstNode();
          var state1 = new StateAstNode() {
@@ -24,16 +24,16 @@ namespace Tests.Compiler
          state1.Run = new SectionAstNode();
          state1.Run.Actions.Add(action1);
          machine.States.Add(state1);
-         SyntaxTreeValidator validator = new SyntaxTreeValidator();
+         SymanticValidator validator = new SymanticValidator();
 
          ErrorCode errorCode;
-         var result = validator.TransitionsAreValid(machine, out errorCode);
+         var result = validator.IsValid(machine, out errorCode);
 
          Assert.IsTrue(result);
       }
 
       [Test]
-      public void ValidateTransitions_StatesDoNotExist_ReturnsFalseAndErrorCode()
+      public void ValidateTransitions_StatesForTransitionsAreMissing_ReturnsFalseAndErrorCode()
       {
          var machine = new MachineAstNode();
          var state1 = new StateAstNode() {
@@ -47,10 +47,10 @@ namespace Tests.Compiler
          state1.Run = new SectionAstNode();
          state1.Run.Actions.Add(action1);
          machine.States.Add(state1);
-         SyntaxTreeValidator validator = new SyntaxTreeValidator();
+         SymanticValidator validator = new SymanticValidator();
 
          ErrorCode errorCode;
-         var result = validator.TransitionsAreValid(machine, out errorCode);
+         var result = validator.IsValid(machine, out errorCode);
 
          Assert.IsFalse(result);
          Assert.AreEqual(ErrorCode.Validate_TransitionParams_StateNotFoundForTransition, errorCode);

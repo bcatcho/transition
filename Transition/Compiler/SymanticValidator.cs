@@ -4,11 +4,17 @@ using Transition.Compiler.AstNode;
 namespace Transition.Compiler
 {
    /// <summary>
-   /// Helpful validators to make compiler errors easier to identify
+   /// Performs symantic analysis on a Machine's syntax tree and produces helpful error codes.
    /// </summary>
-   public class SyntaxTreeValidator
+   public class SymanticValidator
    {
       private HashSet<string> _statesIds;
+
+      public bool IsValid(MachineAstNode machine, out ErrorCode errorCode)
+      {
+         var result = TransitionsAreValid(machine, out errorCode);
+         return result;
+      }
 
       /// <summary>
       /// Check all transition parameters to see if they indentify a valid state
@@ -16,7 +22,7 @@ namespace Transition.Compiler
       /// <returns><c>true</c>, if all transitions are valid, <c>false</c> otherwise.</returns>
       /// <param name="machine">Machine to validate.</param>
       /// <param name="errorCode">Error code if any.</param>
-      public bool TransitionsAreValid(MachineAstNode machine, out ErrorCode errorCode)
+      private bool TransitionsAreValid(MachineAstNode machine, out ErrorCode errorCode)
       {
          errorCode = ErrorCode.None;
          if (_statesIds == null) {

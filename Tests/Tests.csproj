@@ -38,8 +38,8 @@
     <Compile Include="StateTests.cs" />
     <Compile Include="TestAction.cs" />
     <Compile Include="MachineTests.cs" />
-    <Compile Include="Compiler\SyntaxTreeValidatorTests.cs" />
     <Compile Include="Compiler\CompilerTests.cs" />
+    <Compile Include="Compiler\SymanticValidatorTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
