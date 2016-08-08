@@ -54,6 +54,7 @@
     <Compile Include="Machine.cs" />
     <Compile Include="MessageEnvelope.cs" />
     <Compile Include="Compiler\SyntaxTreeValidator.cs" />
+    <Compile Include="Compiler\Compiler.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

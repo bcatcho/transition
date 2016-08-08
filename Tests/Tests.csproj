@@ -39,6 +39,7 @@
     <Compile Include="TestAction.cs" />
     <Compile Include="MachineTests.cs" />
     <Compile Include="Compiler\SyntaxTreeValidatorTests.cs" />
+    <Compile Include="Compiler\CompilerTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

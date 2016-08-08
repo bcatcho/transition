@@ -3,10 +3,19 @@ using Transition.Compiler.AstNode;
 
 namespace Transition.Compiler
 {
+   /// <summary>
+   /// Helpful validators to make compiler errors easier to identify
+   /// </summary>
    public class SyntaxTreeValidator
    {
       private HashSet<string> _statesIds;
 
+      /// <summary>
+      /// Check all transition parameters to see if they indentify a valid state
+      /// </summary>
+      /// <returns><c>true</c>, if all transitions are valid, <c>false</c> otherwise.</returns>
+      /// <param name="machine">Machine to validate.</param>
+      /// <param name="errorCode">Error code if any.</param>
       public bool TransitionsAreValid(MachineAstNode machine, out ErrorCode errorCode)
       {
          errorCode = ErrorCode.None;
