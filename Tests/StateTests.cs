@@ -8,14 +8,14 @@ namespace Tests
    public class StateTests
    {
       // to reduce boilerplate
-      private Context _context;
-      private State _state;
+      private TestMachineContext _context;
+      private State<TestMachineContext> _state;
 
       [SetUp]
       public void SetUp()
       {
-         _context = new Context();
-         _state = new State();
+         _context = new TestMachineContext();
+         _state = new State<TestMachineContext>();
       }
 
       [Test]

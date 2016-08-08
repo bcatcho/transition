@@ -8,7 +8,7 @@ namespace Transition.Compiler
    /// <summary>
    /// The "code" generator for the compiler. Accepts a validated syntax tree and returns an executable Machine.
    /// </summary>
-   public class MachineGenerator
+   public class MachineGenerator<T> where T : Context
    {
       private Dictionary<string, System.Type> _taskLookupTable;
       //      private Dictionary<System.Type, IBehaviorTreeCompilerValueConverter> _valueConverterLookup;
@@ -23,7 +23,7 @@ namespace Transition.Compiler
       public void Initialize(params Assembly[] assemblies)
       {
          // default assembly
-         LoadAssembly(Assembly.GetAssembly(typeof(MachineGenerator)));
+         LoadAssembly(Assembly.GetAssembly(typeof(MachineGenerator<>)));
 
          if (assemblies != null) {
             foreach (var assembly in assemblies) {
@@ -36,9 +36,9 @@ namespace Transition.Compiler
       /// Generates an executable Machine from a syntax tree
       /// </summary>
       /// <param name="machineAst">Machine syntax tree node</param>
-      public Machine Generate(MachineAstNode machineAst)
+      public Machine<T> Generate(MachineAstNode machineAst)
       {
-         var machine = new Machine
+         var machine = new Machine<T>
          {
             Identifier = machineAst.Identifier,
          };

@@ -6,12 +6,12 @@ namespace Transition
    /// 
    /// See <term>State</term> for the possible outcomes of the various TickResultTypes
    /// </summary>
-   public abstract class Action
+   public abstract class Action<T> where T : Context
    {
       /// <summary>
       /// Run this action and return an result.
       /// </summary>
-      public TickResult Tick(Context context)
+      public TickResult Tick(T context)
       {
          return OnTick(context);
       }
@@ -20,6 +20,6 @@ namespace Transition
       /// Implement this to execute code when an action is Ticked. The TickResult will
       /// instruct the calling State or Machine on what to do next. See <term>State</term> for details.
       /// </summary>
-      protected abstract TickResult OnTick(Context context);
+      protected abstract TickResult OnTick(T context);
    }
 }

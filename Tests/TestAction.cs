@@ -7,7 +7,7 @@ namespace Tests
    /// <summary>
    /// A helper class to produce actions with specific results
    /// </summary>
-   internal class TestAction : Action
+   internal class TestAction : Action<TestMachineContext>
    {
       public TickResult Result;
 
@@ -24,7 +24,7 @@ namespace Tests
          TickFunc = tickFunc;
       }
 
-      protected override TickResult OnTick(Context context)
+      protected override TickResult OnTick(TestMachineContext context)
       {
          if (TickFunc != null) {
             TickFunc.Invoke();

@@ -41,6 +41,7 @@
     <Compile Include="Compiler\CompilerTests.cs" />
     <Compile Include="Compiler\SymanticValidatorTests.cs" />
     <Compile Include="Compiler\MachineGeneratorTests.cs" />
+    <Compile Include="TestMachineContext.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -8,13 +8,13 @@ namespace Tests.Compiler
    public class MachineGeneratorTests
    {
       private MachineAstNode _machineNode;
-      private MachineGenerator _generator;
+      private MachineGenerator<TestMachineContext> _generator;
 
       [SetUp]
       public void SetUp()
       {
          _machineNode = new MachineAstNode();
-         _generator = new MachineGenerator();
+         _generator = new MachineGenerator<TestMachineContext>();
       }
 
       [TestCase]

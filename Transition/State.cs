@@ -10,31 +10,31 @@ namespace Transition
    /// When a state is entered or exited it runs all actions in "EnterActions" or "ExitActions"
    /// respectively. An action shall not transition, yield or loop in either of these phases.
    /// </summary>
-   public class State
+   public class State<T> where T: Context
    {
       /// <summary>
       /// An ordered list of actions to be run every tick
       /// </summary>
-      public List<Action> RunActions { get; private set; }
+      public List<Action<T>> RunActions { get; private set; }
 
       /// <summary>
       /// An ordered list of actions to run when the state is entered
       /// </summary>
-      public List<Action> EnterActions { get; private set; }
+      public List<Action<T>> EnterActions { get; private set; }
 
       /// <summary>
       /// An ordered list of actions to be run when the state is exited
       /// </summary>
-      public List<Action> ExitActions { get; private set; }
+      public List<Action<T>> ExitActions { get; private set; }
 
       /// <summary>
       /// A lookup table of actions to run when a message is recieved
       /// </summary>
-      public Dictionary<string, Action> OnActions { get; private set; }
+      public Dictionary<string, Action<T>> OnActions { get; private set; }
 
       public State()
       {
-         OnActions = new Dictionary<string, Action>(0);
+         OnActions = new Dictionary<string, Action<T>>(0);
       }
 
       /// <summary>
@@ -56,7 +56,7 @@ namespace Transition
       /// immediately transition to the new state identified by result.TransitionId;
       /// </summary>
       /// <param name="context">Context.</param>
-      public TickResult Tick(Context context)
+      public TickResult Tick(T context)
       {
          if (RunActions == null) {
             return TickResult.Yield();
@@ -94,7 +94,7 @@ namespace Transition
       /// Executes all actions in the "EnterActions" in order section when the state is entered.
       /// Each action must finish in one tick and return done.
       /// </summary>
-      public void Enter(Context context)
+      public void Enter(T context)
       {
          context.ActionIndex = 0;
 
@@ -114,7 +114,7 @@ namespace Transition
       /// Executes all actions in the "ExitActions" in order section when the state is exited.
       /// Each action must finish in one tick and return done.
       /// </summary>
-      public void Exit(Context context)
+      public void Exit(T context)
       {
          if (ExitActions == null)
             return;
@@ -132,7 +132,7 @@ namespace Transition
       /// Send a message to a state. This has the possiblity of causing the state to transition.
       /// A state does not have to handle every message sent to it.
       /// </summary>
-      public TickResult SendMessage(Context context, MessageEnvelope message)
+      public TickResult SendMessage(T context, MessageEnvelope message)
       {
          var messageHandler = GetMessageHandler(message);
          if (messageHandler != null) {
@@ -155,13 +155,13 @@ namespace Transition
          return TickResult.Done();
       }
 
-      private Action GetMessageHandler(MessageEnvelope message)
+      private Action<T> GetMessageHandler(MessageEnvelope message)
       {
-         Action result;
+         Action<T> result;
          return OnActions.TryGetValue(message.Key, out result) ? result : null;
       }
 
-      private Action CurrentAction(Context context)
+      private Action<T> CurrentAction(Context context)
       {
          if (context.ActionIndex < RunActions.Count) {
             return RunActions[context.ActionIndex];
@@ -170,7 +170,7 @@ namespace Transition
          return null;
       }
 
-      private Action AdvanceAction(Context context)
+      private Action<T> AdvanceAction(Context context)
       {
          context.ActionIndex++;
          return CurrentAction(context);
@@ -184,10 +184,10 @@ namespace Transition
       /// <summary>
       /// Appends an action to the RunActions list
       /// </summary>
-      public void AddRunAction(Action action)
+      public void AddRunAction(Action<T> action)
       {
          if (RunActions == null) {
-            RunActions = new List<Action>(1);
+            RunActions = new List<Action<T>>(1);
          }
          RunActions.Add(action);
       }
@@ -195,10 +195,10 @@ namespace Transition
       /// <summary>
       /// Appends an action to the EnterActions list
       /// </summary>
-      public void AddEnterAction(Action action)
+      public void AddEnterAction(Action<T> action)
       {
          if (EnterActions == null) {
-            EnterActions = new List<Action>(1);
+            EnterActions = new List<Action<T>>(1);
          }
          EnterActions.Add(action);
       }
@@ -206,10 +206,10 @@ namespace Transition
       /// <summary>
       /// Appends an action to the ExitActions list
       /// </summary>
-      public void AddExitAction(Action action)
+      public void AddExitAction(Action<T> action)
       {
          if (ExitActions == null) {
-            ExitActions = new List<Action>(1);
+            ExitActions = new List<Action<T>>(1);
          }
          ExitActions.Add(action);
       }
@@ -217,7 +217,7 @@ namespace Transition
       /// <summary>
       /// Adds an action to the OnActions collection
       /// </summary>
-      public void AddOnAction(string key, Action action)
+      public void AddOnAction(string key, Action<T> action)
       {
          OnActions.Add(key, action);
       }

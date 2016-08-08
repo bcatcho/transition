@@ -5,7 +5,7 @@ namespace Transition
    /// <summary>
    /// An executable state machine. 
    /// </summary>
-   public class Machine
+   public class Machine<T> where T : Context
    {
       /// <summary>
       /// The unique Id (or name) of the machine
@@ -16,7 +16,7 @@ namespace Transition
       /// All of the states that make up the machine. States are indexed
       /// by their position in this list.
       /// </summary>
-      public List<State> States { get; private set; }
+      public List<State<T>> States { get; private set; }
 
       /// <summary>
       /// The first action that the state takes on it's first tick before any state is executed.
@@ -25,18 +25,18 @@ namespace Transition
       /// <remarks>
       /// The Parser ensures that this exists and so null checking is unecessary.
       /// </remarks>
-      public Action EnterAction { get; set; }
+      public Action<T> EnterAction { get; set; }
 
       public Machine()
       {
-         States = new List<State>();
+         States = new List<State<T>>();
       }
 
       /// <summary>
       /// Run the state machine for one tick. The resulting state of the Machine will be
       /// stored in the context.
       /// </summary>
-      public void Tick(Context context)
+      public void Tick(T context)
       {
          context.ResetError();
          if (context.StateId == -1) {
@@ -62,7 +62,7 @@ namespace Transition
       /// <summary>
       /// Sends the message to the active state in the machine. May result in a state transition.
       /// </summary>
-      public void SendMessage(Context context, MessageEnvelope message)
+      public void SendMessage(T context, MessageEnvelope message)
       {
          var currentState = CurrentState(context);
          if (currentState == null)
@@ -77,12 +77,12 @@ namespace Transition
       /// <summary>
       /// Add a state to the machine.
       /// </summary>
-      public void AddState(State state)
+      public void AddState(State<T> state)
       {
          States.Add(state);
       }
 
-      private void Transition(Context context, int destinationStateId)
+      private void Transition(T context, int destinationStateId)
       {
          var currentState = CurrentState(context);
          if (currentState != null) {
@@ -98,7 +98,7 @@ namespace Transition
          currentState.Enter(context);
       }
 
-      private State CurrentState(Context context)
+      private State<T> CurrentState(T context)
       {
          var stateId = context.StateId;
          if (stateId < 0 || stateId >= States.Count)
