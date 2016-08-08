@@ -13,6 +13,10 @@ namespace Tests
 
       public System.Action TickFunc;
 
+      public TestAction()
+      {
+      }
+
       public TestAction(TickResult result)
       {
          Result = result;

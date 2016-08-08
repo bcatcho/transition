@@ -8,6 +8,13 @@ namespace Transition
    /// </summary>
    public abstract class Action<T> where T : Context
    {
+      /// <remarks>
+      /// Default constructor is necessary for runtime instantiation
+      /// </remarks>
+      public Action()
+      {
+      }
+
       /// <summary>
       /// Run this action and return an result.
       /// </summary>

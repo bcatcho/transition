@@ -13,8 +13,8 @@ namespace Transition.Compiler
       private Dictionary<string, Type> _actionLookupTable;
       //      private Dictionary<System.Type, IBehaviorTreeCompilerValueConverter> _valueConverterLookup;
       private HashSet<Assembly> _loadedAssemblies;
-//      private Dictionary<string, Dictionary<string, PropertyInfo>> _propertyInfoCache;
-//      private Dictionary<string, PropertyInfo> _defaultPropertyInfoCache;
+      //      private Dictionary<string, Dictionary<string, PropertyInfo>> _propertyInfoCache;
+      //      private Dictionary<string, PropertyInfo> _defaultPropertyInfoCache;
 
       public MachineGenerator()
       {
@@ -53,13 +53,45 @@ namespace Transition.Compiler
          };
          machine.EnterAction = GenerateAction(machineAst.Action);
 
+         for (int i = 0; i < machineAst.States.Count; ++i) {
+            machine.AddState(GenerateState(machineAst.States[i]));
+         }
 
          return machine;
       }
 
-      private Action<T> GenerateAction(ActionAstNode action)
+      private State<T> GenerateState(StateAstNode stateNode)
       {
-         return CreateInstance(action.Identifier);
+         var state = new State<T>
+         {
+            Identifier = stateNode.Identifier,
+         };
+         if (stateNode.Run != null) {
+            for (int i = 0; i < stateNode.Run.Actions.Count; ++i) {
+               state.AddRunAction(GenerateAction(stateNode.Run.Actions[i]));
+            }
+         }
+         if (stateNode.Enter != null) {
+            for (int i = 0; i < stateNode.Enter.Actions.Count; ++i) {
+               state.AddEnterAction(GenerateAction(stateNode.Enter.Actions[i]));
+            }
+         }
+         if (stateNode.Exit != null) {
+            for (int i = 0; i < stateNode.Exit.Actions.Count; ++i) {
+               state.AddExitAction(GenerateAction(stateNode.Exit.Actions[i]));
+            }
+         }
+         if (stateNode.On != null) {
+            for (int i = 0; i < stateNode.On.Actions.Count; ++i) {
+               state.AddOnAction(stateNode.On.Actions[i].Message, GenerateAction(stateNode.On.Actions[i]));
+            }
+         }
+         return state;
+      }
+
+      private Action<T> GenerateAction(ActionAstNode actionNode)
+      {
+         return CreateInstance(actionNode.Identifier);
       }
 
       private Action<T> CreateInstance(string actionIdentifier)
