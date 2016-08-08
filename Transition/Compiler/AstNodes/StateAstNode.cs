@@ -9,7 +9,23 @@ namespace Transition.Compiler.AstNode
       /// <summary>
       /// The unique (within a machine) name for this state.
       /// </summary>
-      public string Name;
+      public string Identifier;
+
+      private string _identifierLower;
+
+      /// <summary>
+      /// The lower version is used to reduce human error when testing for identifier equality
+      /// </summary>
+      public string IdentifierLower
+      {
+         get
+         {
+            if (_identifierLower == null) {
+               _identifierLower = Identifier.ToLower();
+            }
+            return _identifierLower;
+         }
+      }
 
       /// <summary>
       /// The Enter section represents an ordered sequence of actions that will execute when this state is entered.

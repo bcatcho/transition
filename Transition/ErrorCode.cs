@@ -7,6 +7,10 @@ namespace Transition
    {
       None,
       /// <summary>
+      /// A transition value in a parameter contained an identifier that did not match any known state.
+      /// </summary>
+      Validate_TransitionParams_StateNotFoundForTransition,
+      /// <summary>
       /// An action must return yield inside of the Enter section of a state
       /// </summary>
       Exec_State_Enter_ActionDidNotReturnYield,

@@ -116,7 +116,7 @@ namespace Transition.Compiler
             return null;
          }
 
-         state.Name = GetDataSubstring(t);
+         state.Identifier = GetDataSubstring(t);
          Advance(); // move past identifier
 
          while (TryParseStateSection(state) && ShouldContinueParsing()) {

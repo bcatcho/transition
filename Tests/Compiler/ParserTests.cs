@@ -126,7 +126,7 @@ namespace Tests.Compiler
          var ast = parser.Parse(tokens, input);
          var state = ast.States[0];
 
-         Assert.AreEqual("state1", state.Name);
+         Assert.AreEqual("state1", state.Identifier);
       }
 
       [Test]
@@ -143,8 +143,8 @@ namespace Tests.Compiler
 
          var ast = parser.Parse(tokens, input);
 
-         Assert.AreEqual("state1", ast.States[0].Name);
-         Assert.AreEqual("state2", ast.States[1].Name);
+         Assert.AreEqual("state1", ast.States[0].Identifier);
+         Assert.AreEqual("state2", ast.States[1].Identifier);
       }
 
       [Test]
@@ -319,7 +319,7 @@ namespace Tests.Compiler
          var ast = parser.Parse(tokens, input);
          var state2 = ast.States[1];
 
-         Assert.AreEqual("state2", state2.Name);
+         Assert.AreEqual("state2", state2.Identifier);
       }
 
       [Test]
