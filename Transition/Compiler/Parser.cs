@@ -72,7 +72,7 @@ namespace Transition.Compiler
 
             Next(out t);
             if (t.TokenType == TokenType.Identifier) {
-               _machine.Name = GetDataSubstring(t);
+               _machine.Identifier = GetDataSubstring(t);
             } else {
                HandleError("@machine missing name", t);
                return;
@@ -182,7 +182,7 @@ namespace Transition.Compiler
          if (t.TokenType == TokenType.Operator && t.Operator == TokenOperator.Transition) {
             var action = new ActionAstNode
             {
-               Name = ParserConstants.TransitionAction,
+               Identifier = ParserConstants.TransitionAction,
                LineNumber = t.LineNumber,
             };
 
@@ -236,7 +236,7 @@ namespace Transition.Compiler
                      LineNumber = t.LineNumber,
                   };
                }
-               action.Name = GetDataSubstring(t);
+               action.Identifier = GetDataSubstring(t);
 
                // advance to params
                Advance();
@@ -272,7 +272,7 @@ namespace Transition.Compiler
          var param = new ParamAstNode
          {
             LineNumber = t.LineNumber,
-            Name = GetDataSubstring(t)
+            Identifier = GetDataSubstring(t)
          };
 
          // look for operator

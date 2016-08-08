@@ -6,10 +6,17 @@ namespace Transition.Compiler.AstNode
    /// </summary>
    public class ParamAstNode : AstNode
    {
+      private string _identifier;
+
       /// <summary>
-      /// The name of the parameter. Used to supply the right value to an action.
+      /// The unique name (within an action) of the parameter
       /// </summary>
-      public string Name { get; set; }
+      public string Identifier
+      { 
+         get { return _identifier; }
+         // lowercase the identifier to reduce equality issues
+         set { _identifier = value.ToLower(); }
+      }
 
       /// <summary>
       /// The type of operation. This will change the type of the value at execution time.

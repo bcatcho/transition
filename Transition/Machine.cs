@@ -2,8 +2,16 @@ using System.Collections.Generic;
 
 namespace Transition
 {
+   /// <summary>
+   /// An executable state machine. 
+   /// </summary>
    public class Machine
    {
+      /// <summary>
+      /// The unique Id (or name) of the machine
+      /// </summary>
+      public string Identifier { get; set; }
+
       /// <summary>
       /// All of the states that make up the machine. States are indexed
       /// by their position in this list.

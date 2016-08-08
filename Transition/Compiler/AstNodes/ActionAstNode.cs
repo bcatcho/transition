@@ -13,10 +13,18 @@ namespace Transition.Compiler.AstNode
       /// </summary>
       public string Message { get; set; }
 
+      private string _identifier;
+
       /// <summary>
-      /// The name of the action
+      /// The unique ID (within a machine) of the state
       /// </summary>
-      public string Name { get; set; }
+      public string Identifier
+      { 
+         get { return _identifier; }
+         // lowercase the identifier to reduce equality issues
+         set { _identifier = value.ToLower(); }
+      }
+
 
       /// <summary>
       /// All of the actions parameters in order.

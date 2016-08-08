@@ -55,6 +55,7 @@
     <Compile Include="MessageEnvelope.cs" />
     <Compile Include="Compiler\Compiler.cs" />
     <Compile Include="Compiler\SymanticValidator.cs" />
+    <Compile Include="Compiler\MachineGenerator.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
