@@ -1,16 +1,16 @@
 using System;
 using NUnit.Framework;
 using Transition.Compiler;
-using Transition.Compiler.AstNode;
+using Transition.Compiler.AstNodes;
 using Transition;
 
 namespace Tests.Compiler
 {
    [TestFixture]
-   public class SymanticValidatorTests
+   public class SymanticAnalyzerTests
    {
       [Test]
-      public void IsValid_StatesForTransitionsExist_ReturnsTrue()
+      public void Analyze_StatesForTransitionsExist_ReturnsTrue()
       {
          var machine = new MachineAstNode();
          var state1 = new StateAstNode() {
@@ -24,12 +24,39 @@ namespace Tests.Compiler
          state1.Run = new SectionAstNode();
          state1.Run.Actions.Add(action1);
          machine.States.Add(state1);
-         SymanticValidator validator = new SymanticValidator();
+         SymanticAnalyzer validator = new SymanticAnalyzer();
 
          ErrorCode errorCode;
-         var result = validator.IsValid(machine, out errorCode);
+         var result = validator.Analyze(machine, out errorCode);
 
          Assert.IsTrue(result);
+      }
+
+      [Test]
+      public void Analyze_StatesForTransitionsExist_StateIdValIsSet()
+      {
+         var machine = new MachineAstNode();
+         var state1 = new StateAstNode() {
+            Identifier = "state1"
+         };
+         var state2 = new StateAstNode() {
+            Identifier = "state2"
+         };
+         var action1 = new ActionAstNode();
+         action1.Params.Add( new ParamAstNode {
+            Op = ParamOperation.Transition,
+            Val = "state2"
+         });
+         state1.Run = new SectionAstNode();
+         state1.Run.Actions.Add(action1);
+         machine.States.Add(state1);
+         machine.States.Add(state2);
+         SymanticAnalyzer validator = new SymanticAnalyzer();
+
+         ErrorCode errorCode;
+         validator.Analyze(machine, out errorCode);
+
+         Assert.AreEqual(1, machine.States[0].Run.Actions[0].Params[0].StateIdVal);
       }
 
       [Test]
@@ -47,10 +74,10 @@ namespace Tests.Compiler
          state1.Run = new SectionAstNode();
          state1.Run.Actions.Add(action1);
          machine.States.Add(state1);
-         SymanticValidator validator = new SymanticValidator();
+         SymanticAnalyzer validator = new SymanticAnalyzer();
 
          ErrorCode errorCode;
-         var result = validator.IsValid(machine, out errorCode);
+         var result = validator.Analyze(machine, out errorCode);
 
          Assert.IsFalse(result);
          Assert.AreEqual(ErrorCode.Validate_TransitionParams_StateNotFoundForTransition, errorCode);

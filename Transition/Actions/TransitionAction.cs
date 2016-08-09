@@ -8,9 +8,15 @@ namespace Transition.Actions
    [AltId(ParserConstants.TransitionAction)]
    public sealed class TransitionAction<T> : Action<T> where T : Context
    {
+      /// <summary>
+      /// The action will transition to this destination when ticked
+      /// </summary>
+      [DefaultParameterAttribute]
+      public TransitionDestination Destination { get; set; }
+
       protected override TickResult OnTick(T context)
       {
-         return TransitionTo(0);
+         return TransitionTo(Destination);
       }
    }
 }

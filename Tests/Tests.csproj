@@ -38,11 +38,11 @@
     <Compile Include="TestAction.cs" />
     <Compile Include="MachineTests.cs" />
     <Compile Include="Compiler\CompilerTests.cs" />
-    <Compile Include="Compiler\SymanticValidatorTests.cs" />
     <Compile Include="Compiler\MachineGeneratorTests.cs" />
     <Compile Include="TestMachineContext.cs" />
     <Compile Include="Compiler\ScannerTests.cs" />
     <Compile Include="Compiler\ValueConverterTests.cs" />
+    <Compile Include="Compiler\SymanticAnalyzerTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

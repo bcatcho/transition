@@ -1,6 +1,6 @@
 using NUnit.Framework;
 using Transition.Compiler;
-using Transition.Compiler.AstNode;
+using Transition.Compiler.AstNodes;
 using Transition.Actions;
 using System.Reflection;
 
@@ -183,6 +183,41 @@ namespace Tests.Compiler
 
          var resultAction = (TestAction)result.States[0].OnActions["blah"];
          Assert.AreEqual(1234, resultAction.TestProperty1);
+      }
+
+      [TestCase]
+      public void Generate_ActionWithTransitionParameter_ParameterIsTransitionDestination()
+      {
+         var state = new StateAstNode
+         {
+            Identifier = "state1"
+         };
+         state.On = new SectionAstNode();
+         var action = new ActionAstNode
+         {
+            Message = "blah",
+            Identifier = "testaction"
+         };
+         action.Params.Add(new ParamAstNode
+         {
+            Identifier = "DestinationProp",
+            Op = ParamOperation.Transition,
+            Val = "state2",
+            StateIdVal = 1
+         });
+         state.On.Actions.Add(action);
+         _machineNode.States.Add(state);
+         // add another state to transition to
+         _machineNode.States.Add(new StateAstNode
+         {
+            Identifier = "state2"
+         });
+
+         var result = _generator.Generate(_machineNode);
+
+         var resultAction = (TestAction)result.States[0].OnActions["blah"];
+         Assert.IsNotNull(resultAction.DestinationProp);
+         Assert.AreEqual(1, resultAction.DestinationProp.StateId);
       }
 
       [TestCase]

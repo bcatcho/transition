@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Transition.Compiler.AstNode
+namespace Transition.Compiler.AstNodes
 {
    /// <summary>
    /// The Section node holds an ordered sequence of actions to be executed.

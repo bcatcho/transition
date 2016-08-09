@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Transition.Compiler.AstNode;
+using Transition.Compiler.AstNodes;
 using Transition.Compiler.Tokens;
 
 namespace Transition.Compiler

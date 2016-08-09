@@ -1,4 +1,4 @@
-using Transition.Compiler.AstNode;
+using Transition.Compiler.AstNodes;
 using System.Reflection;
 using System.Collections.Generic;
 using System;
@@ -100,7 +100,11 @@ namespace Transition.Compiler
          for (int i = 0; i < actionNode.Params.Count; ++i) {
             param = actionNode.Params[i];
             propInfo = GetPropertyInfo(actionNode.Identifier, param.Identifier);
-            propInfo.SetValue(action, ConvertValueTo(param.Val, propInfo.PropertyType), null);
+            if (param.Op == ParamOperation.Transition) {
+               propInfo.SetValue(action, new TransitionDestination(param.StateIdVal), null);
+            } else {
+               propInfo.SetValue(action, ConvertValueTo(param.Val, propInfo.PropertyType), null);
+            }
          }
 
          return action;

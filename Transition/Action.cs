@@ -33,9 +33,9 @@ namespace Transition
       /// Returns a transition result given a transition parameter. Return the result of this method
       /// to make an action transition.
       /// </summary>
-      protected TickResult TransitionTo(int transitionId)
+      protected TickResult TransitionTo(TransitionDestination transition)
       {
-         return TickResult.Transition(transitionId);
+         return TickResult.Transition(transition.StateId);
       }
    }
 }

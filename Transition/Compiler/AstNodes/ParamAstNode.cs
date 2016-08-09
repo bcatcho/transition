@@ -1,4 +1,4 @@
-namespace Transition.Compiler.AstNode
+namespace Transition.Compiler.AstNodes
 {
    /// <summary>
    /// The Parameter node represents a name value pair that may be found in actions.
@@ -27,5 +27,11 @@ namespace Transition.Compiler.AstNode
       /// The value of the parameter. Will be converted to a specific type at compile time.
       /// </summary>
       public string Val { get; set; }
+
+      /// <summary>
+      /// The value of the parameter if it was a transition parameter. This will be the StateId to transition to.
+      /// It is set by the SymanticAnalyzer
+      /// </summary>
+      public int StateIdVal { get; set; }
    }
 }

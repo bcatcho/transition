@@ -16,6 +16,8 @@ namespace Tests
 
       public string TestProperty2 { get; set; }
 
+      public TransitionDestination DestinationProp { get; set; }
+
       public TestAction()
       {
       }

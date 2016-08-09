@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using Transition.Compiler;
 using System.Collections.Generic;
-using Transition.Compiler.AstNode;
+using Transition.Compiler.AstNodes;
 using Transition.Compiler.Tokens;
 
 namespace Tests.Compiler

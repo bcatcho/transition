@@ -1,4 +1,4 @@
-﻿namespace Transition.Compiler.AstNode
+﻿namespace Transition.Compiler.AstNodes
 {
    /// <summary>
    /// The type of operation for a parameter.

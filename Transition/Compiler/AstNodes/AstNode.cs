@@ -1,4 +1,4 @@
-namespace Transition.Compiler.AstNode
+namespace Transition.Compiler.AstNodes
 {
    /// <summary>
    /// Base class for all Abstract Syntax Tree Nodes

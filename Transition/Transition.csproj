@@ -53,7 +53,6 @@
     <Compile Include="Machine.cs" />
     <Compile Include="MessageEnvelope.cs" />
     <Compile Include="Compiler\Compiler.cs" />
-    <Compile Include="Compiler\SymanticValidator.cs" />
     <Compile Include="Compiler\MachineGenerator.cs" />
     <Compile Include="Actions\TransitionAction.cs" />
     <Compile Include="AltIdAttribute.cs" />
@@ -63,6 +62,8 @@
     <Compile Include="Compiler\ValueConverters\StringValueConverter.cs" />
     <Compile Include="Compiler\ValueConverters\FloatValueConverter.cs" />
     <Compile Include="DefaultParameterAttribute.cs" />
+    <Compile Include="TransitionDestination.cs" />
+    <Compile Include="Compiler\SymanticAnalyzer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
