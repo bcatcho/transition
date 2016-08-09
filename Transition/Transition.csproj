@@ -38,7 +38,6 @@
     <Compile Include="Compiler\AstNodes\ParamOperation.cs" />
     <Compile Include="Compiler\AstNodes\SectionAstNode.cs" />
     <Compile Include="Compiler\AstNodes\StateAstNode.cs" />
-    <Compile Include="Compiler\Tokenizer.cs" />
     <Compile Include="Compiler\Parser.cs" />
     <Compile Include="Compiler\ParserConstants.cs" />
     <Compile Include="Compiler\Tokens\Token.cs" />
@@ -58,6 +57,7 @@
     <Compile Include="Compiler\MachineGenerator.cs" />
     <Compile Include="Actions\TransitionAction.cs" />
     <Compile Include="AltIdAttribute.cs" />
+    <Compile Include="Compiler\Scanner.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

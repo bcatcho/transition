@@ -7,15 +7,15 @@ using Transition.Compiler.Tokens;
 namespace Tests.Compiler
 {
    /// <summary>
-   /// Because the tokenizer is built using ragel we can only test at a functional level.
+   /// Because the Scanner is built using ragel we can only test at a functional level.
    /// </summary>
    [TestFixture]
-   public class TokenizerTests
+   public class ScannerTests
    {
-      private List<Token> Tokenize(string input)
+      private List<Token> Scan(string input)
       {
-         var tokenizer = new Tokenizer();
-         var tokens = tokenizer.Tokenize(input.ToCharArray(), input.Length);
+         var scanner = new Scanner();
+         var tokens = scanner.Scan(input.ToCharArray(), input.Length);
          return tokens;
       }
 
@@ -25,41 +25,41 @@ namespace Tests.Compiler
       }
 
       [Test]
-      public void Tokenize_Blank_NoTokensProduced()
+      public void Scan_Blank_NoTokensProduced()
       {
          var input = "";
-         var tokens = Tokenize(input);
+         var tokens = Scan(input);
 
          Assert.AreEqual(0, tokens.Count); // two keywords and newline
       }
 
       [Test]
-      public void Tokenize_Machine_MachineHasCorrectName()
+      public void Scan_Machine_MachineHasCorrectName()
       {
          var input = @"@machine blah -> 'yar'";
 
-         var tokens = Tokenize(input);
+         var tokens = Scan(input);
 
          Assert.AreEqual(TokenType.Identifier, tokens[1].TokenType);
-         AssertTokenValue("blah", tokens[1], input); 
+         AssertTokenValue("blah", tokens[1], input);
       }
 
       [Test]
-      public void Tokenize_Machine_MachineHasCorrectNumberOfTokens()
+      public void Scan_Machine_MachineHasCorrectNumberOfTokens()
       {
          var input = @"@machine blah -> 'b'";
 
-         var tokens = Tokenize(input);
+         var tokens = Scan(input);
 
          Assert.AreEqual(4, tokens.Count);
       }
 
       [Test]
-      public void Tokenize_MachineNoSpaces_MachineHasAllComponents()
+      public void Scan_MachineNoSpaces_MachineHasAllComponents()
       {
          var input = @"@machine blah->'b'";
 
-         var tokens = Tokenize(input);
+         var tokens = Scan(input);
 
          Assert.AreEqual(4, tokens.Count);
          Assert.AreEqual(TokenType.Keyword, tokens[0].TokenType);
@@ -69,43 +69,43 @@ namespace Tests.Compiler
       }
 
       [Test]
-      public void Tokenize_Machine_MachineHasCorrectTransitionValue()
+      public void Scan_Machine_MachineHasCorrectTransitionValue()
       {
          var input = @"@machine blah -> 'yar'";
 
-         var tokens = Tokenize(input);
+         var tokens = Scan(input);
 
          Assert.AreEqual(TokenType.Value, tokens[3].TokenType);
-         AssertTokenValue("yar", tokens[3], input); 
+         AssertTokenValue("yar", tokens[3], input);
       }
 
       [Test]
-      public void Tokenize_MachineWithNewline_LastTokenIsNewline()
+      public void Scan_MachineWithNewline_LastTokenIsNewline()
       {
          var input = "@machine blah -> 'yar'\n";
 
-         var tokens = Tokenize(input);
+         var tokens = Scan(input);
 
          Assert.AreEqual(TokenType.NewLine, tokens[4].TokenType);
       }
 
       [Test]
-      public void Tokenize_MultipleNewLines_ProduceMultipleNewLineTokens()
+      public void Scan_MultipleNewLines_ProduceMultipleNewLineTokens()
       {
          var input = "@machine blah -> 'yar'\n\n\n";
 
-         var tokens = Tokenize(input);
+         var tokens = Scan(input);
 
          Assert.AreEqual(7, tokens.Count);
          Assert.AreEqual(TokenType.NewLine, tokens[4].TokenType);
       }
 
       [Test]
-      public void Tokenize_State_KeywordTokenIsProducedWithId()
+      public void Scan_State_KeywordTokenIsProducedWithId()
       {
          var input = "@state StateIdentifier";
 
-         var tokens = Tokenize(input);
+         var tokens = Scan(input);
 
          Assert.AreEqual(2, tokens.Count);
          Assert.AreEqual(TokenType.Keyword, tokens[0].TokenType);
@@ -114,11 +114,11 @@ namespace Tests.Compiler
       }
 
       [Test]
-      public void Tokenize_MultipleKeywordWithIds_TwoKeywordWithIdsProduced()
+      public void Scan_MultipleKeywordWithIds_TwoKeywordWithIdsProduced()
       {
          var input = "@state stateId1\n@state stateId2";
 
-         var tokens = Tokenize(input);
+         var tokens = Scan(input);
 
          Assert.AreEqual(5, tokens.Count);
          Assert.AreEqual(TokenType.Keyword, tokens[0].TokenType);
@@ -128,34 +128,34 @@ namespace Tests.Compiler
       }
 
       [Test]
-      public void Tokenize_KeywordLine_KeywordTokenProduced()
+      public void Scan_KeywordLine_KeywordTokenProduced()
       {
          var input = "@on";
 
-         var tokens = Tokenize(input);
+         var tokens = Scan(input);
 
          Assert.AreEqual(1, tokens.Count);
          Assert.AreEqual(TokenType.Keyword, tokens[0].TokenType);
       }
 
       [Test]
-      public void Tokenize_TwoKeywordLines_TwoKeywordTokenProduced()
+      public void Scan_TwoKeywordLines_TwoKeywordTokenProduced()
       {
          var input = "@on\n@exit";
 
-         var tokens = Tokenize(input);
+         var tokens = Scan(input);
 
-         Assert.AreEqual(3, tokens.Count); 
+         Assert.AreEqual(3, tokens.Count);
          Assert.AreEqual(TokenType.Keyword, tokens[0].TokenType);
          Assert.AreEqual(TokenType.Keyword, tokens[2].TokenType);
       }
 
       [Test]
-      public void Tokenize_AllKeywords_KeywordsCorrectlyIdentified()
+      public void Scan_AllKeywords_KeywordsCorrectlyIdentified()
       {
          var input = "@machine\n@state\n@enter\n@exit\n@run\n@on";
 
-         var tokens = Tokenize(input);
+         var tokens = Scan(input);
 
          Assert.AreEqual(11, tokens.Count);
          Assert.AreEqual(TokenKeyword.Machine, tokens[0].Keyword);
@@ -167,23 +167,23 @@ namespace Tests.Compiler
       }
 
       [Test]
-      public void Tokenize_TaskWithNoParams_OneIdentifierProduced()
+      public void Scan_TaskWithNoParams_OneIdentifierProduced()
       {
          var input = "dothing";
 
-         var tokens = Tokenize(input);
+         var tokens = Scan(input);
 
-         Assert.AreEqual(1, tokens.Count); 
+         Assert.AreEqual(1, tokens.Count);
          Assert.AreEqual(TokenType.Identifier, tokens[0].TokenType);
          AssertTokenValue("dothing", tokens[0], input);
       }
 
       [Test]
-      public void Tokenize_TaskWithOneAssignParam_OneAssignParamProduced()
+      public void Scan_TaskWithOneAssignParam_OneAssignParamProduced()
       {
          var input = "task set:'12341 asdf b'";
 
-         var tokens = Tokenize(input);
+         var tokens = Scan(input);
 
          Assert.AreEqual(4, tokens.Count);
          Assert.AreEqual(TokenType.Identifier, tokens[0].TokenType);
@@ -193,11 +193,11 @@ namespace Tests.Compiler
       }
 
       [Test]
-      public void Tokenize_TaskCommentTask_TwoTasksProduced()
+      public void Scan_TaskCommentTask_TwoTasksProduced()
       {
          var input = "task\n#task\ntask";
 
-         var tokens = Tokenize(input);
+         var tokens = Scan(input);
 
          Assert.AreEqual(4, tokens.Count);
          Assert.AreEqual(TokenType.Identifier, tokens[0].TokenType);
@@ -207,22 +207,22 @@ namespace Tests.Compiler
       }
 
       [Test]
-      public void Tokenize_TaskAndCommentInSameLine_OneTaskProduced()
+      public void Scan_TaskAndCommentInSameLine_OneTaskProduced()
       {
          var input = "task#Comment";
 
-         var tokens = Tokenize(input);
+         var tokens = Scan(input);
 
          Assert.AreEqual(1, tokens.Count);
          Assert.AreEqual(TokenType.Identifier, tokens[0].TokenType);
       }
 
       [Test]
-      public void Tokenize_TaskAndCommentNewLineTask_TwoTasksProduced()
+      public void Scan_TaskAndCommentNewLineTask_TwoTasksProduced()
       {
          var input = "task#comment\ntask2";
 
-         var tokens = Tokenize(input);
+         var tokens = Scan(input);
 
          Assert.AreEqual(3, tokens.Count);
          Assert.AreEqual(TokenType.Identifier, tokens[0].TokenType);
@@ -231,43 +231,43 @@ namespace Tests.Compiler
       }
 
       [Test]
-      public void Tokenize_CommentOnly_NoTaskProduced()
+      public void Scan_CommentOnly_NoTaskProduced()
       {
          var input = "#hello";
 
-         var tokens = Tokenize(input);
+         var tokens = Scan(input);
 
          Assert.AreEqual(0, tokens.Count);
       }
 
       [Test]
-      public void Tokenize_EmtpyLineThenTask_TaskIsProduced()
+      public void Scan_EmtpyLineThenTask_TaskIsProduced()
       {
          var input = "\ntask";
 
-         var tokens = Tokenize(input);
+         var tokens = Scan(input);
 
          Assert.AreEqual(1, tokens.Count);
          Assert.AreEqual(TokenType.Identifier, tokens[0].TokenType);
       }
 
       [Test]
-      public void Tokenize_BlankLineThenTask_TaskIsProduced()
+      public void Scan_BlankLineThenTask_TaskIsProduced()
       {
          var input = "\t \ntask";
 
-         var tokens = Tokenize(input);
+         var tokens = Scan(input);
 
          Assert.AreEqual(1, tokens.Count);
          Assert.AreEqual(TokenType.Identifier, tokens[0].TokenType);
       }
 
       [Test]
-      public void Tokenize_CommentLineThenTask_TaskIsProduced()
+      public void Scan_CommentLineThenTask_TaskIsProduced()
       {
          var input = "#hello\ntask";
 
-         var tokens = Tokenize(input);
+         var tokens = Scan(input);
 
          Assert.AreEqual(2, tokens.Count);
          Assert.AreEqual(TokenType.Identifier, tokens[1].TokenType);
@@ -277,22 +277,22 @@ namespace Tests.Compiler
       public void DidReachEndOfOutput_ValidInput_ReturnsTrue()
       {
          var input = "@machine mach";
-         var tokenizer = new Tokenizer();
-         
-         tokenizer.Tokenize(input.ToCharArray(), input.Length);
+         var scanner = new Scanner();
 
-         Assert.IsTrue(tokenizer.DidReachEndOfInput());
+         scanner.Scan(input.ToCharArray(), input.Length);
+
+         Assert.IsTrue(scanner.DidReachEndOfInput());
       }
 
       [Test]
       public void DidReachEndOfOutput_InvalidInput_ReturnsFalse()
       {
          var input = "@ma ch ine blah";
-         var tokenizer = new Tokenizer();
-         
-         tokenizer.Tokenize(input.ToCharArray(), input.Length);
+         var scanner = new Scanner();
 
-         Assert.IsFalse(tokenizer.DidReachEndOfInput());
+         scanner.Scan(input.ToCharArray(), input.Length);
+
+         Assert.IsFalse(scanner.DidReachEndOfInput());
       }
    }
 }

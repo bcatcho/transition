@@ -5,8 +5,8 @@ using Transition.Compiler.Tokens;
 namespace Transition.Compiler
 {
    /// <summary>
-   /// Parser analyzes a list of tokens produced by the tokenizer and builds a 
-   /// tree of AstNodes with a MachineAstNode as the root. It will also try to 
+   /// Parser analyzes a list of tokens produced by the Scanner and builds a
+   /// tree of AstNodes with a MachineAstNode as the root. It will also try to
    /// prouduce helpful errors.
    /// </summary>
    public class Parser
@@ -22,7 +22,7 @@ namespace Transition.Compiler
       }
 
       /// <summary>
-      /// Parses a sequence of tokens produced by the Tokenizer.
+      /// Parses a sequence of tokens produced by the Scanner.
       /// </summary>
       /// <returns>
       /// A MachineAstNode that is ready for compilation
@@ -203,7 +203,7 @@ namespace Transition.Compiler
             Advance();
             return action;
          } else {
-            
+
             ActionAstNode action = null;
 
             if (lookForMessage) {
@@ -299,7 +299,7 @@ namespace Transition.Compiler
 
          // move off val token
          Advance();
-          
+
          return param;
       }
 
@@ -319,7 +319,7 @@ namespace Transition.Compiler
             t = new Token();
             return false;
          }
-         
+
          t = _tokens[_index];
          return true;
       }

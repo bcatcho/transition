@@ -1,7 +1,7 @@
 namespace Transition.Compiler.Tokens
 {
    /// <summary>
-   /// A product of lexical analysis on a string of input. Emitted by the Tokenizer
+   /// A product of lexical analysis on a string of input. Emitted by the Scanner
    /// </summary>
    /// <remarks>
    /// A struct was choosen to save heap when analyzing many files.
@@ -39,7 +39,7 @@ namespace Transition.Compiler.Tokens
       /// If this Token represents a keyword, this property indicates which keyword is found.
       /// </summary>
       /// <remarks>
-      /// This identified during lexical analysis as an optimization. Identifying this after the 
+      /// This identified during lexical analysis as an optimization. Identifying this after the
       /// token has been created would require us to read the value of the token which is costly.
       /// </remarks>
       public TokenKeyword Keyword;

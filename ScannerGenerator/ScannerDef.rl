@@ -1,5 +1,5 @@
 %%{
-  machine TokenizerDef;
+  machine ScannerDef;
 
   action emitNewLine { _lineNumber++; EmitNewLine(); }
   action emitToken { EmitToken(); }
@@ -14,7 +14,7 @@
   nl = ('\n' | '\r\n') >emitNewLine;
   transOp = '->' >startTransOp %emitToken;
   assignOp = ':' >startAssignOp %emitToken;
-  
+
   squote = "'";
   dquote = '"';
   notSquoteOrEscape = [^'\\];

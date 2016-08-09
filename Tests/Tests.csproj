@@ -33,7 +33,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Compiler\TokenizerTests.cs" />
     <Compile Include="Compiler\ParserTests.cs" />
     <Compile Include="StateTests.cs" />
     <Compile Include="TestAction.cs" />
@@ -42,6 +41,7 @@
     <Compile Include="Compiler\SymanticValidatorTests.cs" />
     <Compile Include="Compiler\MachineGeneratorTests.cs" />
     <Compile Include="TestMachineContext.cs" />
+    <Compile Include="Compiler\ScannerTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
