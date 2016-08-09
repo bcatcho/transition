@@ -2,6 +2,7 @@ using Transition.Compiler.AstNode;
 using System.Reflection;
 using System.Collections.Generic;
 using System;
+using Transition.Compiler.ValueConverters;
 
 namespace Transition.Compiler
 {
@@ -11,18 +12,18 @@ namespace Transition.Compiler
    public class MachineGenerator<T> where T : Context
    {
       private Dictionary<string, Type> _actionLookupTable;
-      //      private Dictionary<System.Type, IBehaviorTreeCompilerValueConverter> _valueConverterLookup;
+      private Dictionary<Type, IValueConverter> _valueConverterLookup;
       private HashSet<Assembly> _loadedAssemblies;
-      //      private Dictionary<string, Dictionary<string, PropertyInfo>> _propertyInfoCache;
-      //      private Dictionary<string, PropertyInfo> _defaultPropertyInfoCache;
+      private readonly Dictionary<string, Dictionary<string, PropertyInfo>> _propertyInfoCache;
+      private readonly Dictionary<string, PropertyInfo> _defaultPropertyInfoCache;
 
       public MachineGenerator()
       {
          _actionLookupTable = new Dictionary<string, Type>();
-//         _valueConverterLookup = new Dictionary<System.Type, IBehaviorTreeCompilerValueConverter>();
+         _valueConverterLookup = new Dictionary<Type, IValueConverter>();
          _loadedAssemblies = new HashSet<Assembly>();
-//         _propertyInfoCache = new Dictionary<string, Dictionary<string, PropertyInfo>>();
-//         _defaultPropertyInfoCache = new Dictionary<string, PropertyInfo>();
+         _propertyInfoCache = new Dictionary<string, Dictionary<string, PropertyInfo>>();
+         _defaultPropertyInfoCache = new Dictionary<string, PropertyInfo>();
       }
 
       /// <summary>
@@ -112,24 +113,24 @@ namespace Transition.Compiler
          if (!_loadedAssemblies.Contains(assembly)) {
             _loadedAssemblies.Add(assembly);
             LoadValueConverters(assembly);
-            LoadAllTasks(assembly);
+            LoadActions(assembly);
          }
       }
 
       private void LoadValueConverters(Assembly assembly)
       {
-//         var converterType = typeof(IBehaviorTreeCompilerValueConverter);
-//         var types = assembly.GetTypes();
-//         IBehaviorTreeCompilerValueConverter converter;
-//         foreach (var type in types) {
-//            if (converterType.IsAssignableFrom(type) && !type.IsInterface) {
-//               converter = (IBehaviorTreeCompilerValueConverter)System.Activator.CreateInstance(type);
-//               _valueConverterLookup.Add(converter.GetConverterType(), converter);
-//            }
-//         }
+         var converterType = typeof(IValueConverter);
+         var types = assembly.GetTypes();
+         IValueConverter converter;
+         foreach (var type in types) {
+            if (converterType.IsAssignableFrom(type) && !type.IsInterface) {
+               converter = (IValueConverter)Activator.CreateInstance(type);
+               _valueConverterLookup.Add(converter.GetConverterType(), converter);
+            }
+         }
       }
 
-      private void LoadAllTasks(Assembly assembly)
+      private void LoadActions(Assembly assembly)
       {
          var action = typeof(Transition.Action<>);
          var types = assembly.GetTypes();
@@ -160,6 +161,21 @@ namespace Transition.Compiler
       {
          name = name.ToLower();
          _actionLookupTable.Add(name, type);
+      }
+
+      private void CachePropertyInfos(string objName, object obj)
+      {
+         if (!_propertyInfoCache.ContainsKey(objName)) {
+            var cache = new Dictionary<string, PropertyInfo>();
+            foreach (var prop in obj.GetType().GetProperties()) {
+               cache.Add(prop.Name.ToLower(), prop);
+
+//               if (prop.IsDefined(typeof(DefaultParameterAttribute), false)) {
+//                  _defaultPropertyInfoCache.Add(objName, prop);
+//               }
+            }
+            _propertyInfoCache.Add(objName, cache);
+         }
       }
    }
 }

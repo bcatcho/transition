@@ -58,6 +58,10 @@
     <Compile Include="Actions\TransitionAction.cs" />
     <Compile Include="AltIdAttribute.cs" />
     <Compile Include="Compiler\Scanner.cs" />
+    <Compile Include="Compiler\ValueConverters\IValueConverter.cs" />
+    <Compile Include="Compiler\ValueConverters\IntValueConverter.cs" />
+    <Compile Include="Compiler\ValueConverters\StringValueConverter.cs" />
+    <Compile Include="Compiler\ValueConverters\FloatValueConverter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -65,6 +69,7 @@
     <Folder Include="Compiler\AstNodes\" />
     <Folder Include="Compiler\Tokens\" />
     <Folder Include="Actions\" />
+    <Folder Include="Compiler\ValueConverters\" />
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>

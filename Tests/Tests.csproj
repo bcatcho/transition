@@ -42,6 +42,7 @@
     <Compile Include="Compiler\MachineGeneratorTests.cs" />
     <Compile Include="TestMachineContext.cs" />
     <Compile Include="Compiler\ScannerTests.cs" />
+    <Compile Include="Compiler\ValueConverterTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
