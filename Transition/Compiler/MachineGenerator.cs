@@ -92,7 +92,18 @@ namespace Transition.Compiler
 
       private Action<T> GenerateAction(ActionAstNode actionNode)
       {
-         return CreateInstance(actionNode.Identifier);
+         var action = CreateInstance(actionNode.Identifier);
+
+         CachePropertyInfos(actionNode.Identifier, action);
+         PropertyInfo propInfo;
+         ParamAstNode param;
+         for (int i = 0; i < actionNode.Params.Count; ++i) {
+            param = actionNode.Params[i];
+            propInfo = GetPropertyInfo(actionNode.Identifier, param.Identifier);
+            propInfo.SetValue(action, ConvertValueTo(param.Val, propInfo.PropertyType), null);
+         }
+
+         return action;
       }
 
       private Action<T> CreateInstance(string actionIdentifier)
@@ -106,6 +117,17 @@ namespace Transition.Compiler
          }
 
          return (Action<T>)Activator.CreateInstance(type);
+      }
+
+      private object ConvertValueTo(string value, System.Type type)
+      {
+         if (_valueConverterLookup.ContainsKey(type)) {
+            object result;
+            _valueConverterLookup[type].TryConvert(value, out result);
+            return result;
+         }
+
+         return null;
       }
 
       private void LoadAssembly(Assembly assembly)
@@ -170,12 +192,21 @@ namespace Transition.Compiler
             foreach (var prop in obj.GetType().GetProperties()) {
                cache.Add(prop.Name.ToLower(), prop);
 
-//               if (prop.IsDefined(typeof(DefaultParameterAttribute), false)) {
-//                  _defaultPropertyInfoCache.Add(objName, prop);
-//               }
+               if (prop.IsDefined(typeof(DefaultParameterAttribute), false)) {
+                  _defaultPropertyInfoCache.Add(objName, prop);
+               }
             }
             _propertyInfoCache.Add(objName, cache);
          }
+      }
+
+      private PropertyInfo GetPropertyInfo(string objectName, string paramName)
+      {
+         if (paramName == ParserConstants.DefaultParameterIdentifier) {
+            return _defaultPropertyInfoCache[objectName];
+         }
+
+         return _propertyInfoCache[objectName][paramName];
       }
    }
 }

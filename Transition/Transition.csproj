@@ -62,6 +62,7 @@
     <Compile Include="Compiler\ValueConverters\IntValueConverter.cs" />
     <Compile Include="Compiler\ValueConverters\StringValueConverter.cs" />
     <Compile Include="Compiler\ValueConverters\FloatValueConverter.cs" />
+    <Compile Include="DefaultParameterAttribute.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

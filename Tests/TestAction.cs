@@ -1,6 +1,4 @@
-using NUnit.Framework;
 using Transition;
-using System.Collections.Generic;
 
 namespace Tests
 {
@@ -12,6 +10,11 @@ namespace Tests
       public TickResult Result;
 
       public System.Action TickFunc;
+
+      [DefaultParameter]
+      public int TestProperty1 { get; set; }
+
+      public string TestProperty2 { get; set; }
 
       public TestAction()
       {
@@ -36,5 +39,4 @@ namespace Tests
          return Result;
       }
    }
-   
 }

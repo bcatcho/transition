@@ -239,6 +239,48 @@ namespace Tests.Compiler
       }
 
       [Test]
+      public void Parse_ActionWithDefaultParam_ActionHasParam()
+      {
+         var input = "@machine m -> 's'\n@state state1\n\trun\n\tact1 'val'";
+         var tokens = new List<Token>
+         {
+            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(19, 1, 1), NLTkn(1),
+            KeyTkn(TokenKeyword.State, 2), IdTkn(25, 6, 2), NLTkn(2),
+            KeyTkn(TokenKeyword.Run, 3), NLTkn(3),
+            IdTkn(38, 4, 4), ValTkn(44, 3, 5)
+         };
+         var parser = new Parser();
+
+         var ast = parser.Parse(tokens, input);
+         var param = ast.States[0].Run.Actions[0].Params[0];
+
+         Assert.AreEqual(ParserConstants.DefaultParameterIdentifier, param.Identifier);
+         Assert.AreEqual(ParamOperation.Assign, param.Op);
+         Assert.AreEqual("val", param.Val);
+      }
+
+      [Test]
+      public void Parse_ActionWithDefaultTransitionParam_ActionHasParam()
+      {
+         var input = "@machine m -> 's'\n@state state1\n\trun\n\tact1 ->'val'";
+         var tokens = new List<Token>
+         {
+            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(19, 1, 1), NLTkn(1),
+            KeyTkn(TokenKeyword.State, 2), IdTkn(25, 6, 2), NLTkn(2),
+            KeyTkn(TokenKeyword.Run, 3), NLTkn(3),
+            IdTkn(38, 4, 4), OpTkn(TokenOperator.Transition, 4), ValTkn(46, 3, 5)
+         };
+         var parser = new Parser();
+
+         var ast = parser.Parse(tokens, input);
+         var param = ast.States[0].Run.Actions[0].Params[0];
+
+         Assert.AreEqual(ParserConstants.DefaultParameterIdentifier, param.Identifier);
+         Assert.AreEqual(ParamOperation.Transition, param.Op);
+         Assert.AreEqual("val", param.Val);
+      }
+
+      [Test]
       public void Parse_ActionWithTransitionParam_ActionHasTransitionParam()
       {
          var input = "@machine m -> 's'\n@state state1\n\trun\n\tact1 param->'val'";

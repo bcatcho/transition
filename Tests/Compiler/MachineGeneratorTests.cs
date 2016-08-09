@@ -42,7 +42,6 @@ namespace Tests.Compiler
          Assert.IsInstanceOf<TransitionAction<TestMachineContext>>(result.EnterAction);
       }
 
-
       [TestCase]
       public void Generate_StateExists_MachineHasState()
       {
@@ -155,6 +154,101 @@ namespace Tests.Compiler
          var result = _generator.Generate(_machineNode);
 
          Assert.IsInstanceOf<TestAction>(result.States[0].OnActions["blah"]);
+      }
+
+      [TestCase]
+      public void Generate_ActionWithIntParameter_ParameterIsAssigned()
+      {
+         var state = new StateAstNode
+         {
+            Identifier = "state1"
+         };
+         state.On = new SectionAstNode();
+         var action = new ActionAstNode
+         {
+            Message = "blah",
+            Identifier = "testaction"
+         };
+         action.Params.Add(new ParamAstNode
+         {
+            Identifier = "TestProperty1",
+            Op = ParamOperation.Assign,
+            Val = "1234"
+         });
+
+         state.On.Actions.Add(action);
+         _machineNode.States.Add(state);
+
+         var result = _generator.Generate(_machineNode);
+
+         var resultAction = (TestAction)result.States[0].OnActions["blah"];
+         Assert.AreEqual(1234, resultAction.TestProperty1);
+      }
+
+      [TestCase]
+      public void Generate_ActionWithTwoParameters_ParametersAreAssigned()
+      {
+         var state = new StateAstNode
+         {
+            Identifier = "state1"
+         };
+         state.On = new SectionAstNode();
+         var action = new ActionAstNode
+         {
+            Message = "blah",
+            Identifier = "testaction"
+         };
+         action.Params.Add(new ParamAstNode
+         {
+            Identifier = "TestProperty1",
+            Op = ParamOperation.Assign,
+            Val = "1234"
+         });
+
+         action.Params.Add(new ParamAstNode
+         {
+            Identifier = "TestProperty2",
+            Op = ParamOperation.Assign,
+            Val = "hello"
+         });
+
+         state.On.Actions.Add(action);
+         _machineNode.States.Add(state);
+
+         var result = _generator.Generate(_machineNode);
+
+         var resultAction = (TestAction)result.States[0].OnActions["blah"];
+         Assert.AreEqual(1234, resultAction.TestProperty1);
+         Assert.AreEqual("hello", resultAction.TestProperty2);
+      }
+
+      [TestCase]
+      public void Generate_ActionWithDefaultParameter_ParameterIsAssigned()
+      {
+         var state = new StateAstNode
+         {
+            Identifier = "state1"
+         };
+         state.On = new SectionAstNode();
+         var action = new ActionAstNode
+         {
+            Message = "blah",
+            Identifier = "testaction"
+         };
+         action.Params.Add(new ParamAstNode
+         {
+            Identifier = ParserConstants.DefaultParameterIdentifier,
+            Op = ParamOperation.Assign,
+            Val = "1234"
+         });
+
+         state.On.Actions.Add(action);
+         _machineNode.States.Add(state);
+
+         var result = _generator.Generate(_machineNode);
+
+         var resultAction = (TestAction)result.States[0].OnActions["blah"];
+         Assert.AreEqual(1234, resultAction.TestProperty1);
       }
    }
 }

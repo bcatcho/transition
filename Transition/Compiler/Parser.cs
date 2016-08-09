@@ -264,6 +264,41 @@ namespace Transition.Compiler
             return null;
          } else if (t.TokenType == TokenType.NewLine) {
             return null;
+         } else if (t.TokenType == TokenType.Operator && t.Operator == TokenOperator.Transition) {
+            // Syntatic sugar: found a transition operator without an identifier, must be a default parameter
+            var defaultParam = new ParamAstNode
+            {
+               LineNumber = t.LineNumber,
+               Identifier = ParserConstants.DefaultParameterIdentifier,
+               Op = ParamOperation.Transition
+            };
+
+            if (!Next(out t)) {
+               HandleError("Expected a transition value. Reached end of input.", _tokens[_index - 1]);
+               return defaultParam;
+            } else if (t.TokenType != TokenType.Value) {
+               HandleError("Expected a transition value but found", t);
+               return defaultParam;
+            }
+
+            defaultParam.Val = GetDataSubstring(t);
+
+            // move off val token
+            Advance();
+            return defaultParam;
+         } else if (t.TokenType == TokenType.Value) {
+            // Syntatic sugar: found a value without an identifier, must be a default parameter
+            var defaultParam = new ParamAstNode
+            {
+               LineNumber = t.LineNumber,
+               Identifier = ParserConstants.DefaultParameterIdentifier,
+               Op = ParamOperation.Assign,
+               Val = GetDataSubstring(t)
+            };
+
+            // move off val token
+            Advance();
+            return defaultParam;
          } else if (t.TokenType != TokenType.Identifier) {
             HandleError("Parameter missing identifier. Found ", t);
             return null;
