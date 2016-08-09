@@ -1,8 +1,11 @@
 # A design document for the language and it's components
 
 ## components
-* Parser - creates syntax tree with metadata
-* Compiler - instantiates syntax tree as an executable machine
+* Scanner - Turns a string of input into a sequence of tokens
+* Parser - Creates an Abstract Syntax Tree from a sequence of tokens
+* SymanticValidator - Analyzes an Abstract Syntax Tree for symantic errors
+* MachineGenerator - Synthesizes an executable Machine from an Abstract Syntax Tree
+* Compiler - Wraps the Scanner, Parser, SymanticValidator and MachineGenerator in a simple abstraction
 * Executor - ticks a machine, handles messaging
 * Context - the state for a machine instance for an actor
   * current state
