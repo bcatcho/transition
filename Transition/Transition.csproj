@@ -64,6 +64,10 @@
     <Compile Include="TransitionDestination.cs" />
     <Compile Include="Compiler\SymanticAnalyzer.cs" />
     <Compile Include="Compiler\MachineCompiler.cs" />
+    <Compile Include="IContextFactory.cs" />
+    <Compile Include="DefaultContextFactory.cs" />
+    <Compile Include="MachineController.cs" />
+    <Compile Include="DefaultMachineController.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
