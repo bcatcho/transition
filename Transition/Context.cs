@@ -35,8 +35,15 @@ namespace Transition
       /// </summary>
       public MessageEnvelope Message { get; set; }
 
+      /// <summary>
+      /// The blackboard is a container for shared state. It allows actions within a machine to communicate
+      /// and share information
+      /// </summary>
+      public Blackboard Blackboard { get; private set; }
+
       public Context()
       {
+         Blackboard = new Blackboard();
          // this allows the machine to know if it has run for the very first time
          StateId = -1;
       }
