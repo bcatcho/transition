@@ -206,6 +206,17 @@ namespace Tests.Compiler
       }
 
       [Test]
+      public void Scan_TaskWithDefaultPAram_OneAssignParamProduced()
+      {
+         var input = "@machine x\n@state y\n@on\ntask 'blah'";
+
+         var tokens = Scan(input);
+
+         Assert.AreEqual(10, tokens.Count);
+         Assert.AreEqual(TokenType.Value, tokens[9].TokenType);
+      }
+
+      [Test]
       public void Scan_TaskCommentTask_TwoTasksProduced()
       {
          var input = "task\n#task\ntask";

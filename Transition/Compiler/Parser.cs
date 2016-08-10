@@ -35,8 +35,6 @@ namespace Transition.Compiler
          _exitEarly = false;
          _data = data;
          _tokens = tokens;
-         int count = tokens.Count;
-         Token t = tokens[_index];
 
          ParseBlanklines();
 
