@@ -68,7 +68,15 @@ namespace Transition
          }
 
          TickResult result;
-         var action = CurrentAction(context);
+         Action<T> action;
+         // if ticking first action for the first time, enter it
+         if (context.ActionIndex == -1) {
+            context.ActionIndex++;
+            action = CurrentAction(context);
+            action.EnterAction(context);
+         } else {
+            action = CurrentAction(context);
+         }
          while (action != null) {
             result = action.Tick(context);
 
@@ -101,7 +109,7 @@ namespace Transition
       /// </summary>
       public void Enter(T context)
       {
-         context.ActionIndex = 0;
+         context.ActionIndex = -1;
 
          if (EnterActions == null)
             return;
@@ -175,13 +183,17 @@ namespace Transition
          return null;
       }
 
-      private Action<T> AdvanceAction(Context context)
+      private Action<T> AdvanceAction(T context)
       {
          context.ActionIndex++;
-         return CurrentAction(context);
+         var nextAction = CurrentAction(context);
+         if (nextAction != null) {
+            nextAction.EnterAction(context);
+         }
+         return nextAction;
       }
 
-      private void ResetForLooping(Context context)
+      private void ResetForLooping(T context)
       {
          context.ActionIndex = 0;
       }

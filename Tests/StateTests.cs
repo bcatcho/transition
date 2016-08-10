@@ -117,6 +117,38 @@ namespace Tests
       }
 
       [Test]
+      public void Tick_NewActionIsEntered_ActionsOnEnterActionIsCalled()
+      {
+         _state.AddRunAction(new TestAction(TickResult.Done()));
+         var wasEntered = false;
+         var action2 = new TestAction(TickResult.Done()) {
+            EnterFunc = () => wasEntered = true
+         };
+         _state.AddRunAction(action2);
+         _context.ActionIndex = 0;
+
+         _state.Tick(_context);
+
+         Assert.IsTrue(wasEntered);
+      }
+
+      [Test]
+      public void Tick_FirstActionIsEnteredForFirstTime_ActionsOnEnterActionIsCalled()
+      {
+         var wasEntered = false;
+         var action = new TestAction(TickResult.Done()) {
+            EnterFunc = () => wasEntered = true
+         };
+         _state.AddRunAction(action);
+         // simulate State.enter being called
+         _context.ActionIndex = -1;
+
+         _state.Tick(_context);
+
+         Assert.IsTrue(wasEntered);
+      }
+
+      [Test]
       public void Enter_HasOneAction_ActionIsRun()
       {
          var actionThatRan = new List<string>();
@@ -134,7 +166,7 @@ namespace Tests
 
          _state.Enter(_context);
 
-         Assert.AreEqual(0, _context.ActionIndex);
+         Assert.AreEqual(-1, _context.ActionIndex);
       }
 
       [Test]

@@ -24,5 +24,10 @@ namespace Transition
       {
          _dataMap[name] = val;
       }
+
+      public bool Exists(string name)
+      {
+         return _dataMap.ContainsKey(name);
+      }
    }
 }

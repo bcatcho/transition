@@ -68,7 +68,7 @@
     <Compile Include="DefaultContextFactory.cs" />
     <Compile Include="MachineController.cs" />
     <Compile Include="DefaultMachineController.cs" />
-    <Compile Include="DefaultBehaviorTreeBlackboard.cs" />
+    <Compile Include="Blackboard.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

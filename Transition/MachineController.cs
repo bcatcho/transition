@@ -56,13 +56,13 @@ namespace Transition
       /// Machine with that Id. 
       /// The Context is returned for further customization by the caller. 
       /// </summary>
-      public T2 AddMachineInstance(T1 id, string treeName)
+      public T2 AddMachineInstance(T1 id, string machineIdentifier)
       {
-         if (!_machineMap.ContainsKey(treeName)) {
-            throw new KeyNotFoundException("A Machine not found for name " + treeName);
+         if (!_machineMap.ContainsKey(machineIdentifier)) {
+            throw new KeyNotFoundException("A Machine not found for name " + machineIdentifier);
          }
          var context = _contextFactory.BuildContext();
-         context.MachineIdentifier = treeName;
+         context.MachineIdentifier = machineIdentifier;
          _contextMap.Add(id, context);
 
          // return the context for further customization

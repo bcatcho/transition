@@ -24,6 +24,19 @@ namespace Transition
       }
 
       /// <summary>
+      /// This method is called when an action is first entered before it's first tick
+      /// </summary>
+      /// <param name="context">Context.</param>
+      public void EnterAction(T context)
+      {
+         OnEnterAction(context);
+      }
+
+      protected virtual void OnEnterAction(T context)
+      {
+      }
+
+      /// <summary>
       /// Implement this to execute code when an action is Ticked. The TickResult will
       /// instruct the calling State or Machine on what to do next. See <term>State</term> for details.
       /// </summary>

@@ -10,6 +10,7 @@ namespace Tests
       public TickResult Result;
 
       public System.Action TickFunc;
+      public System.Action EnterFunc;
 
       [DefaultParameter]
       public int TestProperty1 { get; set; }
@@ -39,6 +40,13 @@ namespace Tests
             TickFunc.Invoke();
          }
          return Result;
+      }
+
+      protected override void OnEnterAction(TestMachineContext context)
+      {
+         if (EnterFunc != null) {
+            EnterFunc.Invoke();
+         }
       }
    }
 }
