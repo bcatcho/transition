@@ -5,11 +5,11 @@ using System.Runtime.CompilerServices;
 // Change them to the values specific to your project.
 
 [assembly: AssemblyTitle ("Transition")]
-[assembly: AssemblyDescription ("")]
+[assembly: AssemblyDescription ("A state machine language and interpreter")]
 [assembly: AssemblyConfiguration ("")]
 [assembly: AssemblyCompany ("")]
 [assembly: AssemblyProduct ("")]
-[assembly: AssemblyCopyright ("bcatcho")]
+[assembly: AssemblyCopyright ("Brandon Catcho")]
 [assembly: AssemblyTrademark ("")]
 [assembly: AssemblyCulture ("")]
 
