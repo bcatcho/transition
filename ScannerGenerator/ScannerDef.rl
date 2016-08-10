@@ -37,7 +37,7 @@
   keywordLine = keyword (space+ identifier (space* transOp space* quotedValue)?)?;
 
   param = identifier space* (transOp | assignOp) space* quotedValue;
-  taskLine = ((transOp space* quotedValue) | (identifier (space+ param)*));
+  taskLine = ((transOp space* quotedValue) | ((quotedValue space* assignOp space*)? identifier (space+ param)*));
   comment = ('#' (any - (empty|'\n'|'\n\r'))*);
 
   main := (space* (comment | keywordLine | taskLine) comment? space* nl+)*;

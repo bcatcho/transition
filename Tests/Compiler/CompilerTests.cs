@@ -1,13 +1,33 @@
 using NUnit.Framework;
 using Transition.Compiler;
-using System.Collections.Generic;
-using System;
-using Transition.Compiler.Tokens;
+using System.Reflection;
+using Transition.Actions;
 
 namespace Tests.Compiler
 {
-   public class CompilerTests
+   [TestFixture]
+   public class MachineCompilerTests
    {
+      private MachineCompiler<TestMachineContext> _compiler;
 
+      [SetUp]
+      public void SetUp()
+      {
+         _compiler = new MachineCompiler<TestMachineContext>();
+         _compiler.Initialize(Assembly.GetAssembly(typeof(TestAction)));
+      }
+
+      [Test]
+      public void Compile_StateWithAction_AllNodesAreCompiled()
+      {
+         var input = "@machine m -> 'state1'\n@state state1\n\t@on\n\t'msg': TestAction";
+
+         var result = _compiler.Compile(input);
+
+         Assert.AreEqual("m", result.Identifier);
+         Assert.AreEqual(0, ((TransitionAction<TestMachineContext>)result.EnterAction).Destination.StateId);
+         Assert.AreEqual("state1", result.States[0].Identifier);
+         Assert.IsInstanceOf<TestAction>(result.States[0].OnActions["msg"]);
+      }
    }
 }

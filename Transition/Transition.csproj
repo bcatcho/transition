@@ -52,7 +52,6 @@
     <Compile Include="ErrorCode.cs" />
     <Compile Include="Machine.cs" />
     <Compile Include="MessageEnvelope.cs" />
-    <Compile Include="Compiler\Compiler.cs" />
     <Compile Include="Compiler\MachineGenerator.cs" />
     <Compile Include="Actions\TransitionAction.cs" />
     <Compile Include="AltIdAttribute.cs" />
@@ -64,6 +63,7 @@
     <Compile Include="DefaultParameterAttribute.cs" />
     <Compile Include="TransitionDestination.cs" />
     <Compile Include="Compiler\SymanticAnalyzer.cs" />
+    <Compile Include="Compiler\MachineCompiler.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

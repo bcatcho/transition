@@ -167,6 +167,19 @@ namespace Tests.Compiler
       }
 
       [Test]
+      public void Scan_Message_TokensAreCorrect()
+      {
+         var input = "@machine MachineName\n@state stateName\n@on\n'msg':action";
+
+         var tokens = Scan(input);
+
+         Assert.AreEqual(11, tokens.Count);
+         Assert.AreEqual(TokenType.Value, tokens[8].TokenType);
+         Assert.AreEqual(TokenType.Operator, tokens[9].TokenType);
+         Assert.AreEqual(TokenType.Identifier, tokens[10].TokenType);
+      }
+
+      [Test]
       public void Scan_TaskWithNoParams_OneIdentifierProduced()
       {
          var input = "dothing";

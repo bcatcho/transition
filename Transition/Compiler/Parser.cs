@@ -197,6 +197,7 @@ namespace Transition.Compiler
                HandleError("transition missing value", _tokens[_index - 1]);
                return null;
             }
+            param.Identifier = ParserConstants.DefaultParameterIdentifier;
             param.Val = GetDataSubstring(t);
             action.Params.Add(param);
 
