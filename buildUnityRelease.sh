@@ -15,7 +15,7 @@ if [ ! -d "tmp" ]; then
 fi
 cd tmp
 
-dirname="transition_$1"
+dirname="transition_unity_$1"
 if [ -d "$dirname" ]; then
   rm -rf $dirname
 fi
@@ -24,7 +24,7 @@ mkdir $dirname
 cp ../Transition/*.cs $dirname
 cp -R ../Transition/Compiler $dirname
 cp -R ../Transition/Actions $dirname
-zip -r "transition_$1.zip" $dirname
+zip -r "transition_unity_$1.zip" $dirname
 
-echo "==> Output: ${pwd}/transition_$1.zip"
+echo "==> Output: ${pwd}/transition_unity_$1.zip"
 rm -rf $dirname
