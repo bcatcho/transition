@@ -8,33 +8,33 @@ namespace Transition
    /// to get started with Transition but is not necessary. At the very least it serves as a template for the entire
    /// Machine lifecycle from compilation to execution.
    /// 
-   /// It has two generic parameters.
-   /// T1 represents the way in which you wish to associate a Context with a Machine. For instance, say you 
-   /// are making a game where each state-machine-driven agent is assigned an integer Id. In this case you would
-   /// instantiate a "StateMachineController<int, Context>". Then later, when you wish to run the state machine for
-   /// a specific agent, you would write "stageMachineController.Tick(agent.Id)". The controller will locate the 
-   /// correct context by the integer Id, match it with the Machine that it is for and will call "tick" on the machine.
-   /// 
-   /// T2 is the Context that will besupplied to all actions. This is a way of injecting your own custom context
+   /// T is the Context that will besupplied to all actions. This is a way of injecting your own custom context
    /// into each action as it is processed. The DefaultStateMachineController uses the base Context class.
    /// </summary>
-   public abstract class MachineController<T1, T2> where T2 : Context
+   public abstract class MachineController<T> where T : Context
    {
-      private readonly Dictionary<string, Machine<T2>> _machineMap;
-      private readonly Dictionary<T1, T2> _contextMap;
-      private MachineCompiler<T2> _compiler;
+      /// <summary>
+      /// The machineIdMap should only be used during Context creation as dictionary lookups are slow.
+      /// </summary>
+      private readonly Dictionary<string, int> _machineIdMap;
+      private readonly Machine<T>[] _machines;
+      private int _machineCount;
+      private readonly T[] _contexts;
+      private int _contextCount;
+      private MachineCompiler<T> _compiler;
 
       protected MachineController()
       {
-         _contextMap = new Dictionary<T1, T2>();
-         _compiler = new MachineCompiler<T2>();
-         _machineMap = new Dictionary<string, Machine<T2>>();
+         _machines = new Machine<T>[200];
+         _contexts = new T[5000];
+         _compiler = new MachineCompiler<T>();
+         _machineIdMap = new Dictionary<string, int>();
       }
 
       /// <summary>
       /// This is a factory function for Contexts. Use this to supply your own custom Context for each machine instance.
       /// </summary>
-      protected abstract T2 BuildContext();
+      protected abstract T BuildContext();
 
       /// <summary>
       /// Call this method to initialize the compiler. Only needs to be run once and before any compilation.
@@ -51,7 +51,9 @@ namespace Transition
       public void Compile(string input)
       {
          var machine = _compiler.Compile(input);
-         _machineMap.Add(machine.Identifier, machine);
+         _machines[_machineCount] = machine;
+         _machineIdMap.Add(machine.Identifier, _machineCount);
+         _machineCount++;
       }
 
       /// <summary>
@@ -59,27 +61,43 @@ namespace Transition
       /// Machine with that Id. 
       /// The Context is returned for further customization by the caller. 
       /// </summary>
-      public T2 AddMachineInstance(T1 id, string machineIdentifier)
+      public T AddMachineInstance(string machineIdentifier)
       {
-         if (!_machineMap.ContainsKey(machineIdentifier)) {
+         if (!_machineIdMap.ContainsKey(machineIdentifier)) {
             throw new KeyNotFoundException("A Machine not found for name " + machineIdentifier);
          }
          var context = BuildContext();
-         context.MachineId = machineIdentifier;
-         _contextMap.Add(id, context);
+         context.MachineId = _machineIdMap[machineIdentifier];
+         context.ContextId = _contextCount;
+         _contexts[_contextCount] = context;
+         _contextCount++;
 
          // return the context for further customization
          return context;
       }
 
       /// <summary>
-      /// Runs the Machine for the given id
+      /// Runs the Machine for the given the contextId
       /// </summary>
-      public void Tick(T1 id)
+      public void Tick(int contextId)
       {
-         var context = _contextMap[id];
-         var machine = _machineMap[context.MachineId];
+         var context = _contexts[contextId];
+         var machine = _machines[context.MachineId];
          machine.Tick(context);
+      }
+
+      /// <summary>
+      /// Runs the Machine for all contexts
+      /// </summary>
+      public void TickAll()
+      {
+         T context;
+         Machine<T> machine;
+         for (int i = 0; i < _contextCount; ++i) {
+            context = _contexts[i];
+            machine = _machines[context.MachineId];
+            machine.Tick(context);
+         }
       }
    }
 }
