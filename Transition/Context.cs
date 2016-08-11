@@ -25,9 +25,14 @@ namespace Transition
       public int StateId { get; set; }
 
       /// <summary>
-      /// The identifier for the Machine that uses this context.
+      /// The id for the Machine that uses this context. Used by a controller to know which Machine to tick
       /// </summary>
-      public string MachineIdentifier { get; set; }
+      public string MachineId { get; set; }
+
+      /// <summary>
+      /// The unique identifier (per MachineController) of this context. 
+      /// </summary>
+      public string ContextId { get; set; }
 
       /// <summary>
       /// The Message property will be set when a state is responding to a message. This allows

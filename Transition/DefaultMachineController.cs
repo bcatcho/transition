@@ -5,8 +5,9 @@ namespace Transition
    /// </summary>
    public class DefaultMachineController<T1> : MachineController<T1, Context>
    {
-      public DefaultMachineController() : base(new DefaultContextFactory())
+      protected override Context BuildContext()
       {
+         return new Context();
       }
    }
 }

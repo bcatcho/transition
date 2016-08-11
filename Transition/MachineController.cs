@@ -20,18 +20,21 @@ namespace Transition
    /// </summary>
    public abstract class MachineController<T1, T2> where T2 : Context
    {
-      private IContextFactory<T2> _contextFactory;
       private readonly Dictionary<string, Machine<T2>> _machineMap;
       private readonly Dictionary<T1, T2> _contextMap;
       private MachineCompiler<T2> _compiler;
 
-      protected MachineController(IContextFactory<T2> contextFactory)
+      protected MachineController()
       {
          _contextMap = new Dictionary<T1, T2>();
          _compiler = new MachineCompiler<T2>();
          _machineMap = new Dictionary<string, Machine<T2>>();
-         _contextFactory = contextFactory;
       }
+
+      /// <summary>
+      /// This is a factory function for Contexts. Use this to supply your own custom Context for each machine instance.
+      /// </summary>
+      protected abstract T2 BuildContext();
 
       /// <summary>
       /// Call this method to initialize the compiler. Only needs to be run once and before any compilation.
@@ -61,8 +64,8 @@ namespace Transition
          if (!_machineMap.ContainsKey(machineIdentifier)) {
             throw new KeyNotFoundException("A Machine not found for name " + machineIdentifier);
          }
-         var context = _contextFactory.BuildContext();
-         context.MachineIdentifier = machineIdentifier;
+         var context = BuildContext();
+         context.MachineId = machineIdentifier;
          _contextMap.Add(id, context);
 
          // return the context for further customization
@@ -75,7 +78,7 @@ namespace Transition
       public void Tick(T1 id)
       {
          var context = _contextMap[id];
-         var machine = _machineMap[context.MachineIdentifier];
+         var machine = _machineMap[context.MachineId];
          machine.Tick(context);
       }
    }
