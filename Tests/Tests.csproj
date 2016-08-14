@@ -43,6 +43,7 @@
     <Compile Include="Compiler\ScannerTests.cs" />
     <Compile Include="Compiler\ValueConverterTests.cs" />
     <Compile Include="Compiler\SymanticAnalyzerTests.cs" />
+    <Compile Include="MessageBusTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

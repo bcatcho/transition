@@ -6,6 +6,10 @@ namespace Transition
    public class MessageEnvelope
    {
       /// <summary>
+      /// The context id of the recipient
+      /// </summary>
+      public int RecipientContextId { get; set; }
+      /// <summary>
       /// The identifier of the message
       /// </summary>
       public string Key { get; set; }

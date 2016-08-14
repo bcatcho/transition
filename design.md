@@ -1,60 +1,28 @@
 # A design document for the language and it's components
 
 ## components
-* Scanner - Turns a string of input into a sequence of tokens
-* Parser - Creates an Abstract Syntax Tree from a sequence of tokens
-* SymanticAnalyzer - Analyzes an Abstract Syntax Tree for symantic errors
-* MachineGenerator - Synthesizes an executable Machine from an Abstract Syntax Tree
-* Compiler - Wraps the Scanner, Parser, SymanticValidator and MachineGenerator in a simple abstraction
-* MachineController - ticks a machine, handles messaging
-* Context - the state for a machine instance for an actor
-  * current state
-  * current action
-* Blackboard - bb
-* ValueConverters - used to parse param input
+* Compiler
+  * **Scanner** - Turns a string of input into a sequence of tokens
+  * **Parser** - Creates an Abstract Syntax Tree from a sequence of tokens
+  * **SymanticAnalyzer** - Analyzes an Abstract Syntax Tree for symantic errors
+  * **MachineGenerator** - Synthesizes an executable Machine from an Abstract Syntax Tree
+  * **MachineCompiler** - Wraps the Scanner, Parser, SymanticValidator and MachineGenerator in a simple abstraction
+* **MachineController** - ticks a machine, handles messaging
+* **Context** - the state for a machine instance for an actor
+* **Blackboard** - A shared bag of state
+* **ValueConverters**
   * bool
   * string
   * float
   * int
-* Nodes
-  * machine
-  * state
-  * actions
-    * action
-    * transition
-  * message
+* **Nodes**
+  * Machine
+  * State
+  * Action
+    * TransitionAction
+  * MessageEnvelope
 
-## syntax tree nodes
-```
-machine
-  start
-  state []
-
-state
-  enter
-    action []
-  run
-    action []
-  exit
-    action []
-  on
-    message []
-
-action
-  name
-  params
-  transitions
-
-param
-  name
-  value
-
-message
-  name
-  action
-```
-
-# design
+# Execution Design
 
 ## Ticking Semantics
 Should we run everything as fast as possible?

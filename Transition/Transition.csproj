@@ -67,6 +67,7 @@
     <Compile Include="MachineController.cs" />
     <Compile Include="DefaultMachineController.cs" />
     <Compile Include="Blackboard.cs" />
+    <Compile Include="MessageBus.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
