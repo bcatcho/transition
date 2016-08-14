@@ -176,6 +176,11 @@ namespace Transition.Compiler
             return null;
          }
 
+         // if a keyword is found we must be in a new section or state
+         if (t.TokenType == TokenType.Keyword) {
+            return null;
+         }
+
          // transition operator found. This is syntatic sugar. handle first.
          if (t.TokenType == TokenType.Operator && t.Operator == TokenOperator.Transition) {
             var action = new ActionAstNode
