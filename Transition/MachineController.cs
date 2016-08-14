@@ -22,13 +22,15 @@ namespace Transition
       private readonly T[] _contexts;
       private int _contextCount;
       private MachineCompiler<T> _compiler;
+      protected MessageBus MessageBus;
 
-      protected MachineController()
+      protected MachineController(int messageBusCapacity)
       {
          _machines = new Machine<T>[200];
          _contexts = new T[5000];
          _compiler = new MachineCompiler<T>();
          _machineIdMap = new Dictionary<string, int>();
+         MessageBus = new MessageBus(messageBusCapacity);
       }
 
       /// <summary>
@@ -67,6 +69,7 @@ namespace Transition
             throw new KeyNotFoundException("A Machine not found for name " + machineIdentifier);
          }
          var context = BuildContext();
+         context.MessageBus = MessageBus;
          context.MachineId = _machineIdMap[machineIdentifier];
          context.ContextId = _contextCount;
          _contexts[_contextCount] = context;
@@ -87,10 +90,30 @@ namespace Transition
       }
 
       /// <summary>
+      /// Delivers all messages in the MessageBus
+      /// </summary>
+      public void DeliverQueuedMessages()
+      {
+         T context;
+         Machine<T> machine;
+         MessageEnvelope envelope;
+         while (MessageBus.Count > 0) {
+            envelope = MessageBus.Dequeue();
+            context = _contexts[envelope.RecipientContextId];
+            machine = _machines[context.MachineId];
+            machine.SendMessage(context, envelope);
+            MessageBus.Recycle(envelope);
+         }
+      }
+
+      /// <summary>
       /// Runs the Machine for all contexts
       /// </summary>
       public void TickAll()
       {
+         // deliver any messages sent by external components since last tick
+         DeliverQueuedMessages();
+         // tick all machines
          T context;
          Machine<T> machine;
          for (int i = 0; i < _contextCount; ++i) {
@@ -98,6 +121,19 @@ namespace Transition
             machine = _machines[context.MachineId];
             machine.Tick(context);
          }
+         // deliver any messages enqueued by Machines during this tick
+         DeliverQueuedMessages();
+      }
+
+      /// <summary>
+      /// Send a message to a Machine
+      /// </summary>
+      /// <param name="messageKey">Message key (as per the "@on" section of a State.</param>
+      /// <param name="recipientContextId">Recipient's context identifier.</param>
+      /// <param name="value">Optional Value</param>
+      public void SendMessage(string messageKey, int recipientContextId, object value)
+      {
+         MessageBus.EnqueueMessage(messageKey, recipientContextId, value);
       }
    }
 }

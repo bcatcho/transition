@@ -47,6 +47,11 @@ namespace Transition
       /// </summary>
       public Blackboard Blackboard { get; private set; }
 
+      /// <summary>
+      /// The Message bus is used to send messages to other Machines in the same MachineController
+      /// </summary>
+      public MessageBus MessageBus { get; set; }
+
       public Context()
       {
          Blackboard = new Blackboard();
