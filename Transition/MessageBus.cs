@@ -9,14 +9,19 @@ namespace Transition
       /// </summary>
       private MessageEnvelope[] _envelopes;
       private int _head;
-      private int _count;
+
+      /// <summary>
+      /// The numver of messages in the bus
+      /// </summary>
+      public int Count { get; private set; }
+
       private int _capacity;
 
       public MessageBus(int capacity)
       {
          _capacity = capacity;
          _head = 0;
-         _count = 0;
+         Count = 0;
          _envelopes = new MessageEnvelope[_capacity];
          // instantiate a pool of message envelopes
          for (int i = 0; i < _capacity; ++i) {
@@ -32,29 +37,30 @@ namespace Transition
       /// <param name="messageValue">Message value if any.</param>
       public void EnqueueMessage(string messageKey, int recipientContextId, object messageValue)
       {
-         if (_count > _capacity) {
+         if (Count >= _capacity) {
             throw new Exception("MessageBus ring buffer ran out of space, initialize with a larger capacity.");
          }
-         var nextPosition = (_head + _count) % _capacity;
+         var nextPosition = (_head + Count) % _capacity;
          var envelope = _envelopes[nextPosition];
          envelope.RecipientContextId = recipientContextId;
          envelope.Key = messageKey;
          envelope.Value = messageValue;
-         _count++;
+         Count++;
       }
 
       /// <summary>
       /// Get the next available message in the bus
       /// </summary>
       /// <returns>The first message or null.</returns>
-      public MessageEnvelope DequeueFirst()
+      public MessageEnvelope Dequeue()
       {
-         if (_count == 0) {
+         if (Count == 0) {
             return null;
          }
          var result = _envelopes[_head];
          // wrap around
          _head = (_head + 1) % _capacity;
+         Count -= 1;
          return result;
       }
 
