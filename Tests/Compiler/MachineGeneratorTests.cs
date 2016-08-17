@@ -2,7 +2,6 @@ using NUnit.Framework;
 using Transition.Compiler;
 using Transition.Compiler.AstNodes;
 using Transition.Actions;
-using System.Reflection;
 
 namespace Tests.Compiler
 {
@@ -19,7 +18,7 @@ namespace Tests.Compiler
          _machineNode.Identifier = "mach";
          _machineNode.Action = new ActionAstNode() { Identifier = ParserConstants.TransitionAction };
          _generator = new MachineGenerator<TestMachineContext>();
-         _generator.Initialize(Assembly.GetAssembly(typeof(TestAction)));
+         _generator.LoadActions(typeof(TestAction));
       }
 
       [TestCase]

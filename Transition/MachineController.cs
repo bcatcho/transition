@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Transition.Compiler;
+using System;
 
 namespace Transition
 {
@@ -39,11 +40,19 @@ namespace Transition
       protected abstract T BuildContext();
 
       /// <summary>
-      /// Call this method to initialize the compiler. Only needs to be run once and before any compilation.
+      /// Loads Actions that will be used in future compiled machines
       /// </summary>
-      public void InitializeCompiler(params System.Reflection.Assembly[] assemblies)
+      public void LoadActions(params Type[] actions)
       {
-         _compiler.Initialize(assemblies);
+         _compiler.LoadActions(actions);
+      }
+
+      /// <summary>
+      /// Loads ValueConverters that will be used future compiled machines
+      /// </summary>
+      public void LoadValueConverters(params Type[] valueConverters)
+      {
+         _compiler.LoadValueConverters(valueConverters);
       }
 
       /// <summary>

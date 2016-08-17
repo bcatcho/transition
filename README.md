@@ -1,6 +1,6 @@
 # transition
 
-A light-weight state machine language, parser and interpreter built for run-time compilation and execution. It's designed to create simple state machine's out of reusable components instead of custom coded states. In this way it's similar to behavior trees, but only in that way.
+A light-weight state machine language, parser and interpreter built for run-time compilation and execution. It's designed to create simple state machine's out of reusable components instead of custom coded states.
 
 
 <a href="https://travis-ci.org/bcatcho/transition"><img src="https://travis-ci.org/bcatcho/transition.svg?branch=master" alt="Build Status"></a>

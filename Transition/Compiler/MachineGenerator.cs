@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using System;
 using Transition.Compiler.ValueConverters;
+using Transition.Actions;
 
 namespace Transition.Compiler
 {
@@ -13,7 +14,6 @@ namespace Transition.Compiler
    {
       private Dictionary<string, Type> _actionLookupTable;
       private Dictionary<Type, IValueConverter> _valueConverterLookup;
-      private HashSet<Assembly> _loadedAssemblies;
       private readonly Dictionary<string, Dictionary<string, PropertyInfo>> _propertyInfoCache;
       private readonly Dictionary<string, PropertyInfo> _defaultPropertyInfoCache;
 
@@ -21,25 +21,12 @@ namespace Transition.Compiler
       {
          _actionLookupTable = new Dictionary<string, Type>();
          _valueConverterLookup = new Dictionary<Type, IValueConverter>();
-         _loadedAssemblies = new HashSet<Assembly>();
          _propertyInfoCache = new Dictionary<string, Dictionary<string, PropertyInfo>>();
          _defaultPropertyInfoCache = new Dictionary<string, PropertyInfo>();
-      }
 
-      /// <summary>
-      /// Call before generate to build a lookup table of Actions to instantiate during generation. This method
-      /// uses reflection to look for decendants of "Action" and cache anything that is used to instantiate them.
-      /// </summary>
-      public void Initialize(params Assembly[] assemblies)
-      {
-         // default assembly
-         LoadAssembly(Assembly.GetAssembly(typeof(MachineGenerator<>)));
-
-         if (assemblies != null) {
-            foreach (var assembly in assemblies) {
-               LoadAssembly(assembly);
-            }
-         }
+         // load built-in types
+         LoadValueConverters(typeof(FloatValueConverter), typeof(IntValueConverter), typeof(StringValueConverter));
+         LoadActions(typeof(TransitionAction<>));
       }
 
       /// <summary>
@@ -134,50 +121,48 @@ namespace Transition.Compiler
          return null;
       }
 
-      private void LoadAssembly(Assembly assembly)
+      /// <summary>
+      /// Loads ValueConverters that will be used future compiled machines
+      /// </summary>
+      public void LoadValueConverters(params Type[] valueConverters)
       {
-         if (!_loadedAssemblies.Contains(assembly)) {
-            _loadedAssemblies.Add(assembly);
-            LoadValueConverters(assembly);
-            LoadActions(assembly);
+         foreach (var valueConverterType in valueConverters) {
+            LoadValueConverter(valueConverterType);
          }
       }
 
-      private void LoadValueConverters(Assembly assembly)
+      /// <summary>
+      /// Loads Actions that will be used future compiled machines
+      /// </summary>
+      public void LoadActions(params Type[] actions)
+      {
+         foreach (var actionType in actions) {
+            LoadAction(actionType);
+         }
+      }
+
+      private void LoadValueConverter(Type type)
       {
          var converterType = typeof(IValueConverter);
-         var types = assembly.GetTypes();
-         IValueConverter converter;
-         foreach (var type in types) {
-            if (converterType.IsAssignableFrom(type) && !type.IsInterface) {
-               converter = (IValueConverter)Activator.CreateInstance(type);
+         if (converterType.IsAssignableFrom(type) && !type.IsInterface) {
+            var converter = (IValueConverter)Activator.CreateInstance(type);
+            if (!_valueConverterLookup.ContainsKey(converter.GetConverterType())) {
                _valueConverterLookup.Add(converter.GetConverterType(), converter);
             }
          }
       }
 
-      private void LoadActions(Assembly assembly)
+      private void LoadAction(Type type)
       {
-         var action = typeof(Transition.Action<>);
-         var types = assembly.GetTypes();
-         Type genericDef = null;
-         string name = null;
-         foreach (var type in types) {
-            if ((type.BaseType != null && type.BaseType.IsGenericType)) {
-               genericDef = type.BaseType.GetGenericTypeDefinition();
-               if (genericDef == action) {
-                  // lowercase the names and remove generic param
-                  name = type.Name.Split('`')[0];
-                  AddLookupTableId(name, type);
+         // lowercase the names and remove generic param
+         var name = type.Name.Split('`')[0];
+         AddLookupTableId(name, type);
 
-                  if (type.IsDefined(typeof(AltIdAttribute), true)) {
-                     var altIdAttribs = (AltIdAttribute[])type.GetCustomAttributes(typeof(AltIdAttribute), true);
-                     foreach (var attrib in altIdAttribs) {
-                        foreach (var altId in attrib.AltIds) {
-                           AddLookupTableId(altId, type);
-                        }
-                     }
-                  }
+         if (type.IsDefined(typeof(AltIdAttribute), true)) {
+            var altIdAttribs = (AltIdAttribute[])type.GetCustomAttributes(typeof(AltIdAttribute), true);
+            foreach (var attrib in altIdAttribs) {
+               foreach (var altId in attrib.AltIds) {
+                  AddLookupTableId(altId, type);
                }
             }
          }
@@ -186,7 +171,9 @@ namespace Transition.Compiler
       private void AddLookupTableId(string name, Type type)
       {
          name = name.ToLower();
-         _actionLookupTable.Add(name, type);
+         if (!_actionLookupTable.ContainsKey(name)) {
+            _actionLookupTable.Add(name, type);
+         }
       }
 
       private void CachePropertyInfos(string objName, object obj)

@@ -1,5 +1,3 @@
-using System.Reflection;
-
 namespace Transition.Compiler
 {
    /// <summary>
@@ -21,11 +19,19 @@ namespace Transition.Compiler
       }
 
       /// <summary>
-      /// Call before Compile to build a lookup table of Actions to instantiate during generation.
+      /// Loads Actions that will be used future compiled machines
       /// </summary>
-      public void Initialize(params Assembly[] assemblies)
+      public void LoadActions(params System.Type[] actions)
       {
-         _generator.Initialize(assemblies);
+         _generator.LoadActions(actions);
+      }
+
+      /// <summary>
+      /// Loads ValueConverters that will be used future compiled machines
+      /// </summary>
+      public void LoadValueConverters(params System.Type[] valueConverters)
+      {
+         _generator.LoadValueConverters(valueConverters);
       }
 
       /// <summary>

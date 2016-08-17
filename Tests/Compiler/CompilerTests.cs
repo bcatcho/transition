@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using Transition.Compiler;
-using System.Reflection;
 using Transition.Actions;
 
 namespace Tests.Compiler
@@ -14,7 +13,7 @@ namespace Tests.Compiler
       public void SetUp()
       {
          _compiler = new MachineCompiler<TestMachineContext>();
-         _compiler.Initialize(Assembly.GetAssembly(typeof(TestAction)));
+         _compiler.LoadActions(typeof(TestAction));
       }
 
       [Test]
