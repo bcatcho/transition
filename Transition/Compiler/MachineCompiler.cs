@@ -43,7 +43,7 @@ namespace Transition.Compiler
          var charArray = input.ToCharArray();
          var tokens = _scanner.Scan(charArray, input.Length);
          if (!_scanner.DidReachEndOfInput()) {
-            throw new System.Exception(string.Format("Error found {0}<--",_scanner.GetErrorLocation(input, 10)));
+            throw new System.Exception(string.Format("Error found {0}<--",_scanner.GetErrorLocation(charArray, 10)));
          }
          var rootNode = _parser.Parse(tokens, input);
          _analyzer.Analyze(rootNode, out errorCode);

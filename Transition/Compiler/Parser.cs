@@ -397,6 +397,8 @@ namespace Transition.Compiler
       private void HandleError(string message, Token error)
       {
          _exitEarly = true;
+         // in the future errors should be handled more gracefully
+         throw new System.Exception(string.Format("[Parsing error on Line {0}] {1}", error.LineNumber, message));
       }
    }
 }

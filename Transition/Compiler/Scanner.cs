@@ -522,14 +522,18 @@ _again:
       /// <summary>
       /// Returns the last characters before an error
       /// </summary>
-      public string GetErrorLocation(string input, int charCount)
+      public string GetErrorLocation(char[] input, int charCount)
       {
-         var start = p - charCount;
-         if (start < 0) {
-            charCount += start;
-            start = 0;
+         var end = p;
+         var start = p;
+         while (start > 0 && end - start < charCount && input[start] != '\n') {
+            start--;
          }
-         return input.Substring(start, charCount);
+         if (input[start] == '\n') {
+            start++;
+         }
+
+         return "(line " + _lineNumber + "): " + new string(input, start, end - start + 1);
       }
    }
 }
