@@ -42,6 +42,9 @@ namespace Transition.Compiler
          ErrorCode errorCode;
          var charArray = input.ToCharArray();
          var tokens = _scanner.Scan(charArray, input.Length);
+         if (!_scanner.DidReachEndOfInput()) {
+            throw new System.Exception(string.Format("Error found {0}<--",_scanner.GetErrorLocation(input, 10)));
+         }
          var rootNode = _parser.Parse(tokens, input);
          _analyzer.Analyze(rootNode, out errorCode);
          var machine = _generator.Generate(rootNode);

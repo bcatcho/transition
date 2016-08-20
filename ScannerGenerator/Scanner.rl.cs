@@ -125,5 +125,18 @@ namespace Transition.Compiler
       {
          return (p >= eof);
       }
+
+      /// <summary>
+      /// Returns the last characters before an error
+      /// </summary>
+      public string GetErrorLocation(string input, int charCount)
+      {
+         var start = p - charCount;
+         if (start < 0) {
+            charCount += start;
+            start = 0;
+         }
+         return input.Substring(start, charCount);
+      }
    }
 }

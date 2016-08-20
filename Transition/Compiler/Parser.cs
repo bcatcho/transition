@@ -183,29 +183,7 @@ namespace Transition.Compiler
 
          // transition operator found. This is syntatic sugar. handle first.
          if (t.TokenType == TokenType.Operator && t.Operator == TokenOperator.Transition) {
-            var action = new ActionAstNode
-            {
-               Identifier = ParserConstants.TransitionAction,
-               LineNumber = t.LineNumber,
-            };
-
-            var param = new ParamAstNode
-            {
-               LineNumber = t.LineNumber,
-               Op = ParamOperation.Transition
-            };
-            // aquire the value
-            Next(out t);
-            if (t.TokenType != TokenType.Value) {
-               HandleError("transition missing value", _tokens[_index - 1]);
-               return null;
-            }
-            param.Identifier = ParserConstants.DefaultParameterIdentifier;
-            param.Val = GetDataSubstring(t);
-            action.Params.Add(param);
-
-            Advance();
-            return action;
+            return ParseTransitionAction(null);
          } else {
 
             ActionAstNode action = null;
@@ -233,7 +211,9 @@ namespace Transition.Compiler
                }
             }
 
-            if (t.TokenType == TokenType.Identifier) {
+            if (t.TokenType == TokenType.Operator && t.Operator == TokenOperator.Transition) {
+               return ParseTransitionAction(action);
+            } else if (t.TokenType == TokenType.Identifier) {
                if (action == null) {
                   action = new ActionAstNode
                   {
@@ -258,6 +238,39 @@ namespace Transition.Compiler
          }
 
          return null;
+      }
+
+      private ActionAstNode ParseTransitionAction(ActionAstNode action)
+      {  
+         Token t;
+         if (!Current(out t)) {
+            return null;
+         }
+
+         if (action == null) {
+            action = new ActionAstNode();
+         }
+
+         action.Identifier = ParserConstants.TransitionAction;
+         action.LineNumber = t.LineNumber;
+
+         var param = new ParamAstNode
+         {
+            LineNumber = t.LineNumber,
+            Op = ParamOperation.Transition
+         };
+         // aquire the value
+         Next(out t);
+         if (t.TokenType != TokenType.Value) {
+            HandleError("transition missing value", _tokens[_index - 1]);
+            return null;
+         }
+         param.Identifier = ParserConstants.DefaultParameterIdentifier;
+         param.Val = GetDataSubstring(t);
+         action.Params.Add(param);
+
+         Advance();
+         return action;
       }
 
       private ParamAstNode ParseParam()
