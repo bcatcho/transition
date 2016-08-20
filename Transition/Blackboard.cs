@@ -29,5 +29,10 @@ namespace Transition
       {
          return _dataMap.ContainsKey(name);
       }
+
+      public void Clear()
+      {
+         _dataMap.Clear();
+      }
    }
 }

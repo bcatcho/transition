@@ -18,15 +18,18 @@ namespace Transition
       /// The machineIdMap should only be used during Context creation as dictionary lookups are slow.
       /// </summary>
       private readonly Dictionary<string, int> _machineIdMap;
+      private readonly Dictionary<int, int> _contextIdToArrayPosMap;
       private readonly Machine<T>[] _machines;
       private int _machineCount;
       private readonly T[] _contexts;
       private int _contextCount;
+      private int _nextContextId;
       private MachineCompiler<T> _compiler;
       protected MessageBus MessageBus;
 
       protected MachineController(int messageBusCapacity)
       {
+         _contextIdToArrayPosMap = new Dictionary<int, int>(5000);
          _machines = new Machine<T>[200];
          _contexts = new T[5000];
          _compiler = new MachineCompiler<T>();
@@ -80,20 +83,43 @@ namespace Transition
          var context = BuildContext();
          context.MessageBus = MessageBus;
          context.MachineId = _machineIdMap[machineIdentifier];
-         context.ContextId = _contextCount;
+         context.ContextId = _nextContextId;
+         _contextIdToArrayPosMap.Add(context.ContextId, _contextCount);
          _contexts[_contextCount] = context;
          _contextCount++;
+         _nextContextId++;
 
          // return the context for further customization
          return context;
       }
 
       /// <summary>
+      /// Remove a context id from the list. Will no longer be ticked
+      /// </summary>
+      public void RemoveMachineInstance(int contextId)
+      {
+         var arrayPos = _contextIdToArrayPosMap[contextId];
+         var contextToRemove = _contexts[arrayPos];
+         contextToRemove.Reset();
+         _contextIdToArrayPosMap.Remove(contextId);
+
+         // now compact the list of contexts by copying the last into the array pos
+         _contexts[arrayPos] = _contexts[_contextCount - 1];
+         _contextIdToArrayPosMap[_contexts[arrayPos].ContextId] = arrayPos;
+         // set the last index to null and reduce the count
+         _contexts[_contextCount - 1] = null;
+         _contextCount--;
+      }
+
+      /// <summary>
       /// Runs the Machine for the given the contextId
+      /// NOTE: This is very slow due to dictionary lookup! If you have many machines to run use
+      /// TickAll instead
       /// </summary>
       public void Tick(int contextId)
       {
-         var context = _contexts[contextId];
+         var arrayPos = _contextIdToArrayPosMap[contextId];
+         var context = _contexts[arrayPos];
          var machine = _machines[context.MachineId];
          machine.Tick(context);
       }

@@ -75,5 +75,18 @@ namespace Transition
       {
          LastError = code;
       }
+
+      /// <summary>
+      /// Reinitializes all state so that this context can be reused. Important for reducing garbage collection.
+      /// </summary>
+      public virtual void Reset()
+      {
+         Message = null;
+         ResetError();
+         Blackboard.Clear();
+         ActionIndex = 0;
+         StateId = 0;
+         MessageBus = null;
+      }
    }
 }
