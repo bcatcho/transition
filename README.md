@@ -6,7 +6,7 @@ A light-weight state machine language, parser and interpreter built for run-time
 <a href="https://travis-ci.org/bcatcho/transition"><img src="https://travis-ci.org/bcatcho/transition.svg?branch=master" alt="Build Status"></a>
 <a href="https://twitter.com/catchco"><img src="https://img.shields.io/badge/twitter-follow%20%40catchco-blue.svg" alt="Twitter Follow Me"></a>
 
-
+- [See it in action](#see-it-in-action)
 - [A simple example for a simple language](#a-simple-example-for-a-simple-language)
 	- [The Machine and Code](#the-machine-and-code)
 	- [Machine Definition Line](#machine-definition-line)
@@ -17,6 +17,9 @@ A light-weight state machine language, parser and interpreter built for run-time
 	- [Wait Action](#wait-action)
 	- [Conclusion](#conclusion)
 - [Contributing](#contributing)
+
+## See it in action
+While it is recommended to read through the documentation, you can check out a number of examples implemented in Unity here: [Unity Transition Examples](https://github.com/bcatcho/transition-unity-examples)
 
 ## A simple example for a simple language
 Let's demonstrate some important language features with a an example of a Machine (state machine) for a door that closes after three seconds. The examples pretend you are working in a _Unity-like_ environment. We will start from the product:
