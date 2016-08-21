@@ -64,10 +64,10 @@ namespace Tests.Compiler
       [Test]
       public void Parse_MachineLine_MachineHasName()
       {
-         var input = "@machine machinename -> 'blah'";
+         var input = "@machine machinename -> blah";
          var tokens = new List<Token>
          {
-            KeyTkn(TokenKeyword.Machine, 1), IdTkn(9, 11, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(26, 4, 1)
+            KeyTkn(TokenKeyword.Machine, 1), IdTkn(9, 11, 1), OpTkn(TokenOperator.Transition, 1), IdTkn(24, 4, 1)
          };
          var parser = new Parser();
 
@@ -80,13 +80,13 @@ namespace Tests.Compiler
       [Test]
       public void Parse_NewLinesThenMachineLine_MachineHasName()
       {
-         var input = "\n\n\r\n@machine machinename -> 'blah'";
+         var input = "\n\n\r\n@machine machinename -> blah";
          var tokens = new List<Token>
          {
             NLTkn(1),
             NLTkn(1),
             NLTkn(1),
-            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 11, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(30, 4, 1)
+            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 11, 1), OpTkn(TokenOperator.Transition, 1), IdTkn(28, 4, 1)
          };
          var parser = new Parser();
 
@@ -98,10 +98,10 @@ namespace Tests.Compiler
       [Test]
       public void Parse_NewLinesThenMachineLine_HasTransition()
       {
-         var input = "@machine mach -> 'State1'";
+         var input = "@machine mach -> State1";
          var tokens = new List<Token>
          {
-            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 4, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(18, 6, 1)
+            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 4, 1), OpTkn(TokenOperator.Transition, 1), IdTkn(17, 6, 1)
          };
          var parser = new Parser();
 
@@ -115,11 +115,11 @@ namespace Tests.Compiler
       [Test]
       public void Parse_OneState_OneStateMade()
       {
-         var input = "@machine m -> 's'\n@state state1";
+         var input = "@machine m -> s\n@state state1";
          var tokens = new List<Token>
          {
-            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(19, 1, 1), NLTkn(1),
-            KeyTkn(TokenKeyword.State, 2), IdTkn(25, 6, 1)
+            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), IdTkn(18, 1, 1), NLTkn(1),
+            KeyTkn(TokenKeyword.State, 2), IdTkn(23, 6, 1)
          };
          var parser = new Parser();
 
@@ -132,12 +132,12 @@ namespace Tests.Compiler
       [Test]
       public void Parse_TwoStatesNoSections_TwoStatesMade()
       {
-         var input = "@machine m -> 's'\n@state state1\n@state state2";
+         var input = "@machine m -> s\n@state state1\n@state state2";
          var tokens = new List<Token>
          {
-            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(19, 1, 1), NLTkn(1),
-            KeyTkn(TokenKeyword.State, 2), IdTkn(25, 6, 2), NLTkn(2),
-            KeyTkn(TokenKeyword.State, 3), IdTkn(39, 6, 3)
+            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), IdTkn(18, 1, 1), NLTkn(1),
+            KeyTkn(TokenKeyword.State, 2), IdTkn(23, 6, 2), NLTkn(2),
+            KeyTkn(TokenKeyword.State, 3), IdTkn(37, 6, 3)
          };
          var parser = new Parser();
 
@@ -155,10 +155,10 @@ namespace Tests.Compiler
       public void Parse_StateWithOneSection_StateHasSection(TokenKeyword sectionKeyword)
       {
          // the "section" doesn't matter as the input is not used in the asserts
-         var input = "@machine m -> 's'\n@state state1\n\tsection";
+         var input = "@machine m -> s  \n@state state1\n\tsection";
          var tokens = new List<Token>
          {
-            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(19, 1, 1), NLTkn(1),
+            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), IdTkn(18, 1, 1), NLTkn(1),
             KeyTkn(TokenKeyword.State, 2), IdTkn(25, 6, 2), NLTkn(2),
             KeyTkn(sectionKeyword, 3)
          };
@@ -180,10 +180,10 @@ namespace Tests.Compiler
       [Test]
       public void Parse_OneAction_HasOneAction()
       {
-         var input = "@machine m -> 's'\n@state state1\n\trun\n\tact1";
+         var input = "@machine m -> s  \n@state state1\n\trun\n\tact1";
          var tokens = new List<Token>
          {
-            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(19, 1, 1), NLTkn(1),
+            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), IdTkn(18, 1, 1), NLTkn(1),
             KeyTkn(TokenKeyword.State, 2), IdTkn(25, 6, 2), NLTkn(2),
             KeyTkn(TokenKeyword.Run, 3), NLTkn(3),
             IdTkn(38, 4, 4)
@@ -199,10 +199,10 @@ namespace Tests.Compiler
       [Test]
       public void Parse_TwoActions_HasTwoActionsInCorrectOrder()
       {
-         var input = "@machine m -> 's'\n@state state1\n\trun\n\tact1\n\tact2";
+         var input = "@machine m -> s  \n@state state1\n\trun\n\tact1\n\tact2";
          var tokens = new List<Token>
          {
-            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(19, 1, 1), NLTkn(1),
+            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), IdTkn(18, 1, 1), NLTkn(1),
             KeyTkn(TokenKeyword.State, 2), IdTkn(25, 6, 2), NLTkn(2),
             KeyTkn(TokenKeyword.Run, 3), NLTkn(3),
             IdTkn(38, 4, 4), NLTkn(4),
@@ -220,10 +220,10 @@ namespace Tests.Compiler
       [Test]
       public void Parse_ActionWithAssignParam_ActionHasAssignParam()
       {
-         var input = "@machine m -> 's'\n@state state1\n\trun\n\tact1 param:'val'";
+         var input = "@machine m -> s  \n@state state1\n\trun\n\tact1 param:'val'";
          var tokens = new List<Token>
          {
-            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(19, 1, 1), NLTkn(1),
+            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), IdTkn(18, 1, 1), NLTkn(1),
             KeyTkn(TokenKeyword.State, 2), IdTkn(25, 6, 2), NLTkn(2),
             KeyTkn(TokenKeyword.Run, 3), NLTkn(3),
             IdTkn(38, 4, 4), IdTkn(43, 5, 4), OpTkn(TokenOperator.Assign, 5), ValTkn(50, 3, 5)
@@ -241,10 +241,10 @@ namespace Tests.Compiler
       [Test]
       public void Parse_ActionWithDefaultParam_ActionHasParam()
       {
-         var input = "@machine m -> 's'\n@state state1\n\trun\n\tact1 'val'";
+         var input = "@machine m -> s  \n@state state1\n\trun\n\tact1 'val'";
          var tokens = new List<Token>
          {
-            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(19, 1, 1), NLTkn(1),
+            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), IdTkn(18, 1, 1), NLTkn(1),
             KeyTkn(TokenKeyword.State, 2), IdTkn(25, 6, 2), NLTkn(2),
             KeyTkn(TokenKeyword.Run, 3), NLTkn(3),
             IdTkn(38, 4, 4), ValTkn(44, 3, 5)
@@ -262,13 +262,13 @@ namespace Tests.Compiler
       [Test]
       public void Parse_ActionWithDefaultTransitionParam_ActionHasParam()
       {
-         var input = "@machine m -> 's'\n@state state1\n\trun\n\tact1 ->'val'";
+         var input = "@machine m -> s  \n@state state1\n\trun\n\tact1 -> val";
          var tokens = new List<Token>
          {
-            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(19, 1, 1), NLTkn(1),
+            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), IdTkn(18, 1, 1), NLTkn(1),
             KeyTkn(TokenKeyword.State, 2), IdTkn(25, 6, 2), NLTkn(2),
             KeyTkn(TokenKeyword.Run, 3), NLTkn(3),
-            IdTkn(38, 4, 4), OpTkn(TokenOperator.Transition, 4), ValTkn(46, 3, 5)
+            IdTkn(38, 4, 4), OpTkn(TokenOperator.Transition, 4), IdTkn(46, 3, 5)
          };
          var parser = new Parser();
 
@@ -283,13 +283,13 @@ namespace Tests.Compiler
       [Test]
       public void Parse_ActionWithTransitionParam_ActionHasTransitionParam()
       {
-         var input = "@machine m -> 's'\n@state state1\n\trun\n\tact1 param->'val'";
+         var input = "@machine m -> s  \n@state state1\n\t@run\nact1 param-> val";
          var tokens = new List<Token>
          {
-            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(19, 1, 1), NLTkn(1),
+            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), IdTkn(19, 1, 1), NLTkn(1),
             KeyTkn(TokenKeyword.State, 2), IdTkn(25, 6, 2), NLTkn(2),
             KeyTkn(TokenKeyword.Run, 3), NLTkn(3),
-            IdTkn(38, 4, 4), IdTkn(43, 5, 4), OpTkn(TokenOperator.Transition, 5), ValTkn(51, 3, 5)
+            IdTkn(38, 4, 4), IdTkn(43, 5, 4), OpTkn(TokenOperator.Transition, 5), IdTkn(51, 3, 5)
          };
          var parser = new Parser();
 
@@ -304,10 +304,10 @@ namespace Tests.Compiler
       [Test]
       public void Parse_ActionWithTwoAssignParams_ActionHasTwoAssignParams()
       {
-         var input = "@machine m -> 's'\n@state state1\n\trun\n\tact1 param:'val' p2:'v2'";
+         var input = "@machine m -> s  \n@state state1\n\trun\n\tact1 param:'val' p2:'v2'";
          var tokens = new List<Token>
          {
-            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(19, 1, 1), NLTkn(1),
+            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), IdTkn(18, 1, 1), NLTkn(1),
             KeyTkn(TokenKeyword.State, 2), IdTkn(25, 6, 2), NLTkn(2),
             KeyTkn(TokenKeyword.Run, 3), NLTkn(3),
             IdTkn(38, 4, 4), IdTkn(43, 5, 4), OpTkn(TokenOperator.Assign, 5), ValTkn(50, 3, 5), IdTkn(55, 2, 4), OpTkn(TokenOperator.Assign, 5), ValTkn(59, 2, 5)
@@ -325,13 +325,13 @@ namespace Tests.Compiler
       [Test]
       public void Parse_StateSectionWithShorthandAction_TransitionActionProduced()
       {
-         var input = "@machine m -> 's'\n@state state1\n\trun\n\t->'blah'";
+         var input = "@machine m -> s  \n@state state1\n\trun\n\t-> blah";
          var tokens = new List<Token>
          {
-            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(19, 1, 1), NLTkn(1),
+            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), IdTkn(18, 1, 1), NLTkn(1),
             KeyTkn(TokenKeyword.State, 2), IdTkn(25, 6, 2), NLTkn(2),
             KeyTkn(TokenKeyword.Run, 3), NLTkn(3),
-            OpTkn(TokenOperator.Transition, 4), ValTkn(41, 4, 4)
+            OpTkn(TokenOperator.Transition, 4), IdTkn(41, 4, 4)
          };
          var parser = new Parser();
 
@@ -346,13 +346,13 @@ namespace Tests.Compiler
       [Test]
       public void Parse_StateAfterActions_TwoStatesProduced()
       {
-         var input = "@machine m -> 's'\n@state state1\n\trun\n\t->'blah'\n\n@state state2";
+         var input = "@machine m -> s  \n@state state1\n\trun\n\t-> blah \n\n@state state2";
          var tokens = new List<Token>
          {
-            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(19, 1, 1), NLTkn(1),
+            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), IdTkn(18, 1, 1), NLTkn(1),
             KeyTkn(TokenKeyword.State, 2), IdTkn(25, 6, 2), NLTkn(2),
             KeyTkn(TokenKeyword.Run, 3), NLTkn(3),
-            OpTkn(TokenOperator.Transition, 4), ValTkn(41, 4, 4), NLTkn(4),
+            OpTkn(TokenOperator.Transition, 4), IdTkn(41, 4, 4), NLTkn(4),
             NLTkn(5),
             KeyTkn(TokenKeyword.State, 6), IdTkn(55, 6, 6)
          };
@@ -367,10 +367,10 @@ namespace Tests.Compiler
       [Test]
       public void Parse_ActionWithMessageInOnSection_ActionHasMessage()
       {
-         var input = "@machine m -> 's'\n@state state1\n\ton\n\t'msg': act";
+         var input = "@machine m -> s  \n@state state1\n\ton\n\t'msg': act";
          var tokens = new List<Token>
          {
-            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(19, 1, 1), NLTkn(1),
+            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), IdTkn(18, 1, 1), NLTkn(1),
             KeyTkn(TokenKeyword.State, 2), IdTkn(25, 6, 2), NLTkn(2),
             KeyTkn(TokenKeyword.On, 3), NLTkn(3),
             ValTkn(38, 3, 4), OpTkn(TokenOperator.Assign, 4), IdTkn(44, 3, 4)
@@ -387,10 +387,10 @@ namespace Tests.Compiler
       [Test]
       public void Parse_MessageFollowedBySectionKeyword_StateWillHaveTwoSections()
       {
-         var input = "@machine m -> 's'\n@state state1\n\t@on\n\t'msg': act\n@run\n\tblah";
+         var input = "@machine m -> s  \n@state state1\n\t@on\n\t'msg': act\n@run\n\tblah";
          var tokens = new List<Token>
          {
-            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(19, 1, 1), NLTkn(1),
+            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), IdTkn(18, 1, 1), NLTkn(1),
             KeyTkn(TokenKeyword.State, 2), IdTkn(25, 6, 2), NLTkn(2),
             KeyTkn(TokenKeyword.On, 3), NLTkn(3),
             ValTkn(39, 3, 4), OpTkn(TokenOperator.Assign, 4), IdTkn(45, 3, 4), NLTkn(4),
@@ -409,13 +409,13 @@ namespace Tests.Compiler
       [Test]
       public void Parse_ActionWithTransitionSyntacticSugar_ActionIsCorrect()
       {
-         var input = "@machine m -> 's'\n@state state1\n\ton\n\t'msg': ->'thing'";
+         var input = "@machine m -> s  \n@state state1\n\ton\n\t'msg': -> thing";
          var tokens = new List<Token>
          {
-            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), ValTkn(19, 1, 1), NLTkn(1),
+            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 1, 1), OpTkn(TokenOperator.Transition, 1), IdTkn(18, 1, 1), NLTkn(1),
             KeyTkn(TokenKeyword.State, 2), IdTkn(25, 6, 2), NLTkn(2),
             KeyTkn(TokenKeyword.On, 3), NLTkn(3),
-            ValTkn(38, 3, 4), OpTkn(TokenOperator.Assign, 4), OpTkn(TokenOperator.Transition, 4), ValTkn(47, 5, 4)
+            ValTkn(38, 3, 4), OpTkn(TokenOperator.Assign, 4), OpTkn(TokenOperator.Transition, 4), IdTkn(47, 5, 4)
          };
          var parser = new Parser();
 

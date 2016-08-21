@@ -34,9 +34,9 @@
              | ('run' @{ SetKeyword(TokenKeyword.Run); })
             )) %emitToken;
   identifier = (([a-zA-Z_] >startId) ([a-zA-Z_0-9]**)) %emitToken;
-  keywordLine = keyword (space+ identifier (space* transOp space* quotedValue)?)?;
-  param = identifier space* (transOp | assignOp) space* quotedValue;
-  taskLine = (quotedValue space* assignOp space*)? ((transOp space* quotedValue) | (identifier ((space+ param)*|(space+ quotedValue))));
+  keywordLine = keyword (space+ identifier (space* transOp space* identifier)?)?;
+  param = identifier space* (transOp space* identifier | assignOp space* quotedValue);
+  taskLine = (quotedValue space* assignOp space*)? ((transOp space* identifier) | (identifier ((space+ param)*|(space+ quotedValue))));
   comment = ('#' (any - (empty|'\n'|'\n\r'))*);
   main := (space* (comment | keywordLine | taskLine) space* comment? space* nl+)*;
 }%%

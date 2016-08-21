@@ -27,13 +27,13 @@ Let's demonstrate some important language features with a an example of a Machin
 ### The Machine and Code
 **Here is an example machine**
 <pre class="code">
-<strong>@machine</strong> SelfClosingDoor -><em>'Closed'</em>
+<strong>@machine</strong> SelfClosingDoor -><em>Closed</em>
 
 <strong>@state</strong> Closed
   <strong>@enter</strong>
     SetAnimation 'closed'
   <strong>@on</strong>
-    'OpenDoor': ->'Open'
+    'OpenDoor': -><em>Open</em>
 
 <strong>@state</strong> Open
   <strong>@enter</strong>
@@ -41,7 +41,7 @@ Let's demonstrate some important language features with a an example of a Machin
   <strong>@run</strong>
     WaitForAnimation
     Wait seconds:'3'
-    -> <em>'Closed'</em>
+    -> <em>Closed</em>
 </pre>
 
 **Here is all the code it takes to power it**
@@ -88,7 +88,7 @@ Now we can dissect it section by section, line by line.
 
 ### Machine Definition Line
 <pre class="code">
-<strong>@machine</strong> SelfClosingDoor -><em>'Closed'</em>
+<strong>@machine</strong> SelfClosingDoor -><em>Closed</em>
 </pre>
 This line is very straight forward and has three components: `@machine` keyword, a Name for the machine and which state to transition the first time it is run.
 
@@ -98,7 +98,7 @@ This line is very straight forward and has three components: `@machine` keyword,
 2   <strong>@enter</strong>
 3     SetAnimation 'closed'
 4   <strong>@on</strong>
-5     'OpenDoor': ->'Open'
+5     'OpenDoor': ->Open
 </pre>
 
 This State is more interesting. Let's break it down line by line.
@@ -119,7 +119,7 @@ This State is more interesting. Let's break it down line by line.
 4   <strong>@run</strong>
 5     WaitForAnimation
 6     Wait seconds:'3'
-7     -> <em>'Closed'</em>
+7     -> <em>Closed</em>
 </pre>
 
 This state demonstrates even more language features. We will skip over those already mentioned above.
@@ -130,7 +130,7 @@ This state demonstrates even more language features. We will skip over those alr
 |4|The `@run` section is executed every frame in order. Actions in the `Run` section can take as many frames as is necessary to complete.|
 |5|The `WaitForAnimation` Action will only exit once the door opening animation is complete. Thus, it may take a few frames before we reach line 6|
 |6|The `Wait` Action takes a parameter that indicates how many seconds to wait before moving to the next Action.|
-|7|The `-> 'closed'` is actually syntactic sugar for `$trans -> 'closed'`. It's a special built in action that makes transitioning to another state really easy to type.|
+|7|The `-> closed` is actually syntactic sugar for `$trans -> closed`. It's a special built in action that makes transitioning to another state really easy to type.|
 
 What follows is all the code necessary to power the Machine. While there is a little more code necessary to make it work in your game or simulation, it is the least interesting part.
 

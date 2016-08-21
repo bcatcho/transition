@@ -97,7 +97,7 @@ namespace Transition.Compiler
          }
 
          if (t.TokenType != TokenType.Keyword || t.Keyword != TokenKeyword.State) {
-            HandleError("Expected @state but found ", t);
+            HandleError("Expected @state.", t);
             return null;
          }
 
@@ -110,7 +110,7 @@ namespace Transition.Compiler
             HandleError("Expected @state identifier, reached end of input.", t);
             return null;
          } else if (t.TokenType != TokenType.Identifier) {
-            HandleError("Expected @state identifier found ", t);
+            HandleError("Expected @state identifier.", t);
             return null;
          }
 
@@ -131,7 +131,7 @@ namespace Transition.Compiler
          if (!Current(out t)) {
             return false;
          } else if (t.TokenType != TokenType.Keyword) {
-            HandleError("Expected keyword but found", t);
+            HandleError("Expected keyword.", t);
             return false;
          } else if (t.Keyword == TokenKeyword.Enter || t.Keyword == TokenKeyword.Exit ||
                     t.Keyword == TokenKeyword.Run || t.Keyword == TokenKeyword.On) {
@@ -190,7 +190,7 @@ namespace Transition.Compiler
 
             if (lookForMessage) {
                if (t.TokenType != TokenType.Value) {
-                  HandleError("Action missing message. Found ", t);
+                  HandleError("Action missing message.", t);
                   return null;
                }
 
@@ -261,7 +261,7 @@ namespace Transition.Compiler
          };
          // aquire the value
          Next(out t);
-         if (t.TokenType != TokenType.Value) {
+         if (t.TokenType != TokenType.Identifier) {
             HandleError("transition missing value", _tokens[_index - 1]);
             return null;
          }
@@ -293,8 +293,8 @@ namespace Transition.Compiler
             if (!Next(out t)) {
                HandleError("Expected a transition value. Reached end of input.", _tokens[_index - 1]);
                return defaultParam;
-            } else if (t.TokenType != TokenType.Value) {
-               HandleError("Expected a transition value but found", t);
+            } else if (t.TokenType != TokenType.Identifier) {
+               HandleError("Expected a transition destination.", t);
                return defaultParam;
             }
 
@@ -317,7 +317,7 @@ namespace Transition.Compiler
             Advance();
             return defaultParam;
          } else if (t.TokenType != TokenType.Identifier) {
-            HandleError("Parameter missing identifier. Found ", t);
+            HandleError("Parameter missing identifier.", t);
             return null;
          }
 
@@ -332,7 +332,7 @@ namespace Transition.Compiler
             HandleError("Parameter missing operator and value. Reached end of input.", _tokens[_index - 1]);
             return param;
          } else if (t.TokenType != TokenType.Operator) {
-            HandleError("Parameter missing operator and value. Found ", t);
+            HandleError("Parameter missing operator and value.", t);
             return param;
          }
 
@@ -342,8 +342,11 @@ namespace Transition.Compiler
          if (!Next(out t)) {
             HandleError("Parameter missing value. Reached end of input.", _tokens[_index - 1]);
             return param;
-         } else if (t.TokenType != TokenType.Value) {
-            HandleError("Parameter missing value. Found ", t);
+         } else if (param.Op == ParamOperation.Assign && t.TokenType != TokenType.Value) {
+            HandleError("Parameter missing value.", t);
+            return param;
+         } else if (param.Op == ParamOperation.Transition && t.TokenType != TokenType.Identifier) {
+            HandleError("Parameter missing transition destination.", t);
             return param;
          }
 

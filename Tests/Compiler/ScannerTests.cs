@@ -36,7 +36,7 @@ namespace Tests.Compiler
       [Test]
       public void Scan_Machine_MachineHasCorrectName()
       {
-         var input = @"@machine blah -> 'yar'";
+         var input = @"@machine blah -> yar";
 
          var tokens = Scan(input);
 
@@ -47,7 +47,7 @@ namespace Tests.Compiler
       [Test]
       public void Scan_Machine_MachineHasCorrectNumberOfTokens()
       {
-         var input = @"@machine blah -> 'b'";
+         var input = @"@machine blah -> b";
 
          var tokens = Scan(input);
 
@@ -57,7 +57,7 @@ namespace Tests.Compiler
       [Test]
       public void Scan_MachineNoSpaces_MachineHasAllComponents()
       {
-         var input = @"@machine blah->'b'";
+         var input = @"@machine blah->b";
 
          var tokens = Scan(input);
 
@@ -65,24 +65,24 @@ namespace Tests.Compiler
          Assert.AreEqual(TokenType.Keyword, tokens[0].TokenType);
          Assert.AreEqual(TokenType.Identifier, tokens[1].TokenType);
          Assert.AreEqual(TokenType.Operator, tokens[2].TokenType);
-         Assert.AreEqual(TokenType.Value, tokens[3].TokenType);
+         Assert.AreEqual(TokenType.Identifier, tokens[3].TokenType);
       }
 
       [Test]
       public void Scan_Machine_MachineHasCorrectTransitionValue()
       {
-         var input = @"@machine blah -> 'yar'";
+         var input = @"@machine blah -> yar";
 
          var tokens = Scan(input);
 
-         Assert.AreEqual(TokenType.Value, tokens[3].TokenType);
+         Assert.AreEqual(TokenType.Identifier, tokens[3].TokenType);
          AssertTokenValue("yar", tokens[3], input);
       }
 
       [Test]
       public void Scan_MachineWithNewline_LastTokenIsNewline()
       {
-         var input = "@machine blah -> 'yar'\n";
+         var input = "@machine blah -> yar\n";
 
          var tokens = Scan(input);
 
@@ -92,7 +92,7 @@ namespace Tests.Compiler
       [Test]
       public void Scan_MultipleNewLines_ProduceMultipleNewLineTokens()
       {
-         var input = "@machine blah -> 'yar'\n\n\n";
+         var input = "@machine blah -> yar\n\n\n";
 
          var tokens = Scan(input);
 

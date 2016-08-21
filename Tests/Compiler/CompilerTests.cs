@@ -19,7 +19,7 @@ namespace Tests.Compiler
       [Test]
       public void Compile_StateWithAction_AllNodesAreCompiled()
       {
-         var input = "@machine m -> 'state1'\n@state state1\n\t@on\n\t'msg': TestAction";
+         var input = "@machine m -> state1\n@state state1\n\t@on\n\t'msg': TestAction";
 
          var result = _compiler.Compile(input);
 

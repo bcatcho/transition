@@ -127,9 +127,9 @@ namespace Transition.Compiler
       }
 
       /// <summary>
-      /// Returns the last characters before an error
+      /// Returns the error location
       /// </summary>
-      public string GetErrorLocation(string input, int charCount)
+      public string GetErrorLocation(char[] input, int charCount)
       {
          var end = p;
          var start = p;

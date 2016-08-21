@@ -26,7 +26,7 @@ namespace Tests
          _contexts = new List<Context>();
          _controller = new DefaultMachineController();
          _controller.LoadActions(typeof(Increment));
-         _controller.Compile("@machine a -> 'b'\n@state b\n@run\nincrement");
+         _controller.Compile("@machine a -> b\n@state b\n@run\nincrement");
       }
 
       [Test]
@@ -120,7 +120,7 @@ namespace Tests
          _controller = new DefaultMachineController();
 
          _controller.LoadActions(typeof(Increment));
-         _controller.Compile("@machine a -> 'b'\n@state b\n@enter\nincrement");
+         _controller.Compile("@machine a -> b\n@state b\n@enter\nincrement");
          _contexts.Add(_controller.AddMachineInstance("a"));
          _contexts[0].Blackboard.Set<int>("x", 0);
          _controller.TickAll();
