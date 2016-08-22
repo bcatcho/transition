@@ -6,8 +6,54 @@ A light-weight state machine language, parser and interpreter built for run-time
 <a href="https://travis-ci.org/bcatcho/transition"><img src="https://travis-ci.org/bcatcho/transition.svg?branch=master" alt="Build Status"></a>
 <a href="https://twitter.com/catchco"><img src="https://img.shields.io/badge/twitter-follow%20%40catchco-blue.svg" alt="Twitter Follow Me"></a>
 
-- [See it in action](#see-it-in-action)
-- [A simple example for a simple language](#a-simple-example-for-a-simple-language)
+Describe and execute state machines like this:
+<pre class="code">
+<strong>@machine</strong> SelfClosingDoor -><em>Closed</em>
+
+<strong>@state</strong> Closed
+  <strong>@enter</strong>
+    SetAnimation 'closed'
+  <strong>@on</strong>
+    'OpenDoor': -><em>Open</em>
+
+<strong>@state</strong> Open
+  <strong>@enter</strong>
+    SetAnimation 'open'
+  <strong>@run</strong>
+    WaitForAnimation
+    Wait seconds:'3'
+    -><em>Closed</em>
+</pre>
+
+---
+<!-- TOC depthFrom:2 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
+
+- [Unity Examples](#unity-examples)
+- [Language concepts](#language-concepts)
+	- [@machine](#machine)
+	- [@state](#state)
+	- [@run](#run)
+	- [@enter, @exit](#enter-exit)
+	- [@on](#on)
+	- [Actions](#actions)
+		- [Return Types (controlling execution flow)](#return-types-controlling-execution-flow)
+		- [Parameters](#parameters)
+		- [Transition Parameters](#transition-parameters)
+	- [Comments](#comments)
+- [Ticking](#ticking)
+	- [Tick boundaries (timing)](#tick-boundaries-timing)
+		- [Transitions](#transitions)
+		- [First Tick](#first-tick)
+		- [Return Type: Yield](#return-type-yield)
+		- [Return Type: Done](#return-type-done)
+		- [Return Type: Loop](#return-type-loop)
+- [Messaging](#messaging)
+- [MachineController](#machinecontroller)
+- [Value Converters](#value-converters)
+- [Contexts](#contexts)
+- [Default Parameters](#default-parameters)
+- [AltId](#altid)
+- [An example in excruciating detail](#an-example-in-excruciating-detail)
 	- [The Machine and Code](#the-machine-and-code)
 	- [Machine Definition Line](#machine-definition-line)
 	- [Closed State](#closed-state)
@@ -18,12 +64,35 @@ A light-weight state machine language, parser and interpreter built for run-time
 	- [Conclusion](#conclusion)
 - [Contributing](#contributing)
 
-## See it in action
-While it is recommended to read throughf the documentation, you can check out a number of examples implemented in Unity here: [Unity Transition Examples](https://github.com/bcatcho/transition-unity-examples)
+<!-- /TOC -->
 
----
+
+
+## Unity Examples
+
+While it is recommended to read through the documentation, you can check out a number of examples implemented in Unity here:
+
+[Unity Transition Examples](https://github.com/bcatcho/transition-unity-examples)
 
 ## Language concepts
+
+A Machine (state machine) in Transition looks like this:
+
+```
+@machine MachineName ->FirstState
+
+@state FirstState
+  @enter
+    DoSomethingOnEnter
+  @run
+    say message:'hi'
+    DoSomethingElse
+    ->StateTwo
+  @exit
+    say message:'bye'
+  @on
+    'poke': say:'ouch!'
+```
 
 ### @machine
 ```
@@ -169,18 +238,88 @@ on [Value Converters](#value-converters) for details.
 
 #### Transition Parameters
 
+If you want your state to transition to another (or the same) you'll need to use a special
+type of parameter. Any state name that occurs after an arrow `->` will be assigned to that
+parameter. The parameter must be backed by a property with the `TransitionDestination` type.
+For example:
+
+`exampleAction a->NextState`
+
+```csharp
+public class ExampleAction : Action<Context> {
+  public TransitionDestination A {get; set;}
+  //... the rest of the action
+}
+```
 
 ### Comments
 
+Comments are made by using the `#` symbol. These are all valid comments:
+
+```
+#comment on it's own line
+@state Name #comment at end of line
+	@run
+	  #comments inside of sections
+```
+
 ## Ticking
 
+"Ticking" is the process of running a Machine. When a Machine is ticked the current
+state's current action is executed and based on the TickResult returned an action
+is taken.
+
+### Tick boundaries (timing)
+
+Certain actions happen can happen in the same tick, but for performance and conceptual
+reasons some can't.
+
+#### Transitions
+When a state transitions to another, the `@exit` and `@enter` sections are executed.
+The `@run` section of the new state is not executed until the next tick:
+
+*Tick 1*
+1. An action in State A causes transition to State B
+2. All Actions in State A's `@exit` section are executed in order
+3. All Actions in State B's `@enter` section are executed in order
+
+*Tick 2*
+The first Action in State B's `@run` section is executed (and processing occurs normally).
+
+This behavior is meant to reduce the need for an implementor to worry about the
+performance of the Machine. Without this boundary it would be very easy to create
+infinite loops between states.
+
+#### First Tick
+When a Machine is first ticked it must transition to the initial state. This
+follows all the rules of the Transition Tick Boundary above. Thus, the first
+Action in the Initial State's `@run` section won't be executed until the second tick.
+
+#### Return Type: Yield
+Yielding (see section on return types) tells the machine to stop processing and start at the same Action on the next tick. It is the simplest form of a tick boundary.
+
+#### Return Type: Done
+Returning `Done` from an action does not cause a tick boundary. The next Action in the same section will be run immediately.
+
+#### Return Type: Loop
+Returning `Loop` does cause a tick boundary. The first Action in the same section will be run on the _next_ tick. This is to help prevent infinite loops.
+
 ## Messaging
+TODO
 
+## MachineController
+TODO
 ## Value Converters
-
+TODO
+## Contexts
+TODO
+## Default Parameters
+TODO
+## AltId
+TODO
 ---
 
-## A simple example for a simple language
+## An example in excruciating detail
 Let's demonstrate some important language features with a an example of a Machine (state machine) for a door that closes after three seconds. The examples pretend you are working in a _Unity-like_ environment. We will start from the product:
 
 ### The Machine and Code
