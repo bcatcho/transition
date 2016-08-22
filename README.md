@@ -19,7 +19,129 @@ A light-weight state machine language, parser and interpreter built for run-time
 - [Contributing](#contributing)
 
 ## See it in action
-While it is recommended to read through the documentation, you can check out a number of examples implemented in Unity here: [Unity Transition Examples](https://github.com/bcatcho/transition-unity-examples)
+While it is recommended to read throughf the documentation, you can check out a number of examples implemented in Unity here: [Unity Transition Examples](https://github.com/bcatcho/transition-unity-examples)
+
+---
+
+## Language concepts
+
+### @machine
+```
+@machine Name -> StateName
+```
+The first line in a machine describes the name of the machine and the first state
+to transition toward. This line is required in all machines.
+
+### @state
+
+```
+@state Name
+```
+A state has a name and 4 sections: `@enter`, `@run`, `@exit`, `@on`. A state can
+exist without anything but this first line.
+
+### @run
+```
+@state Name
+  @run
+    Action
+    Action2
+```
+
+The `@run` section describes a list of Actions to run in order. Every time the
+machine is _ticked_ the current state will run the active Action. If all Actions have
+run the state will not perform any Actions on subsequent ticks. Actions are the primary
+way of controlling behavior and are discussed below.
+
+### @enter, @exit
+```
+@state Name
+  @enter
+    Action
+    Action2
+  @exit
+    Action2
+    Action3
+```
+The `@enter` and `@exit` state sections describe a list of Actions to run in order when
+a state is entered or exited and only then.
+
+*Actions in this section are special*. They _must_ return `TickResult.Done()`. In other words
+they must end in the same tick they are run and can not transition to a different state. This
+is discussed in the [Ticking](#ticking) section.
+
+### @on
+```
+@state Name
+  @on
+    'message': Action
+    'message2': Action
+```
+The `@on` section is a special state section that describes a collection of messages
+and associated Actions. Each message can have only one Action. When a Machine is sent an
+Action it will look in this section to see if the current state can handle it. If so the
+associated Action will be run.
+
+*Actions in this section are special*. They _must_ return `TickResult.Done()` or transition.
+This is discussed in the [Messaging](#messaging) section.
+
+### Actions
+```
+@state Name
+  @run
+    Action param:'3' transitionParam->OtherState
+```
+Actions are the part that makes everything work. They are associated with a c# class
+that you must write. Actions can accept as many parameters as you wish including special
+Transition Parameters.
+
+#### Return Types (controlling execution flow)
+When implementing an Action there are 4 return types to choose from. Each affects the
+Machine differently and all control the flow of behavior in some way.
+
+* `Done` specifies that the Action is done and that the next (if any) should be run. Use `TickResult.Done()` to create this type of result.
+* `Yield` specifies that the Action is not done processing and should be run again on the
+next Tick. This allows actions to execute over many Ticks (or in-game time). Useful for
+behavior like movement, delays, animation. Use `TickResult.Yield()` to create this type of result.
+* `Transition` tells the machine to transition to a state. To specify which state to
+transition to you must use a `TransitionDestination`. This is described in the section
+on [Transition Parameters](#transition-parameters). Use the protected method `TransitionTo()`
+to return a `Transition` result.
+* `Loop` tells the current state to run the first action in the section on the very next Tick.
+
+#### Parameters
+
+An action can have many parameters. Each parameter is associated with a property in the
+backing class. For instance an action that takes an c# `int` and `string` called `a` and `b` respectively
+would look like this:
+
+`exampleAction a:'200' b:'woof'`
+
+```csharp
+public class ExampleAction : Action<Context> {
+  public int A {get; set;}
+  public string B {get; set;}
+  //... the rest of the action
+}
+```
+
+The few types that are supported by default are: `float`, `int`, `string`. However, you can
+support any type of object or value just by implementing a `IValueConverter`. See the section
+on [Value Converters](#value-converters) for details.
+
+#### Transition Parameters
+
+
+
+### Comments
+
+## Ticking
+
+## Messaging
+
+## Value Converters
+
+---
 
 ## A simple example for a simple language
 Let's demonstrate some important language features with a an example of a Machine (state machine) for a door that closes after three seconds. The examples pretend you are working in a _Unity-like_ environment. We will start from the product:
@@ -108,8 +230,8 @@ This State is more interesting. Let's break it down line by line.
 |1|The first line declares a new state and it's name.|
 |2|On the second line we start a new _section_, in particular the `@enter` section. Any _Actions_ in this section will be run when the state is first entered.|
 |3|The next line contains an _Action_. This is the bit that you would write code for. In this case it is an Action that sets some animation state.|
-|4|Now we have reached a new section that is slightly special. An `@on` section contains a list of Actions that will be run in response to an incoming message. In this case the action is simply to transition to the 'Open' state.|
-|5|Finally we have a _message-action tuple_ that instructs the State to transition to the `Open` State when the `OpenDoor` message is received if the door was unlocked. Any Action can be used in response to a message, not just Actions that transition. In fact this Action doesn't have to transition (which we will see later).|
+|4|Now we have reached a new section that is slightly special. An `@on` section contains a list of Actions that will be run in response to an incoming message. In this case the Action is simply to transition to the 'Open' state.|
+|5|Finally we have a _message-Action tuple_ that instructs the State to transition to the `Open` State when the `OpenDoor` message is received if the door was unlocked. Any Action can be used in response to a message, not just Actions that transition. In fact this Action doesn't have to transition (which we will see later).|
 
 ### Open State
 <pre class="code">
@@ -130,13 +252,13 @@ This state demonstrates even more language features. We will skip over those alr
 |4|The `@run` section is executed every frame in order. Actions in the `Run` section can take as many frames as is necessary to complete.|
 |5|The `WaitForAnimation` Action will only exit once the door opening animation is complete. Thus, it may take a few frames before we reach line 6|
 |6|The `Wait` Action takes a parameter that indicates how many seconds to wait before moving to the next Action.|
-|7|The `-> closed` is actually syntactic sugar for `$trans -> closed`. It's a special built in action that makes transitioning to another state really easy to type.|
+|7|The `-> closed` is actually syntactic sugar for `$trans -> closed`. It's a special built in Action that makes transitioning to another state really easy to type.|
 
 What follows is all the code necessary to power the Machine. While there is a little more code necessary to make it work in your game or simulation, it is the least interesting part.
 
 ### SetAnimation Action
 
-The `SetAnimation` action is a great example of _Action reuse_. It is a small action that plays an animation and exits. The `OnTick` method is what is called by the Machine Controller when it run's your code. It uses the `TickResult` to determine if it should run the next action in the state or not. We will see examples of that later.
+The `SetAnimation` Action is a great example of _Action reuse_. It is a small Action that plays an animation and exits. The `OnTick` method is what is called by the Machine Controller when it run's your code. It uses the `TickResult` to determine if it should run the next Action in the state or not. We will see examples of that later.
 
 **Note** the `DefaultParameter` attribute - this allows for syntactic sugar: `SetAnimation AnimationVal:'blah'` is equivalent to `SetAnimation 'blah'`.
 
