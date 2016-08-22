@@ -279,11 +279,13 @@ When a state transitions to another, the `@exit` and `@enter` sections are execu
 The `@run` section of the new state is not executed until the next tick:
 
 *Tick 1*
+
 1. An action in State A causes transition to State B
 2. All Actions in State A's `@exit` section are executed in order
 3. All Actions in State B's `@enter` section are executed in order
 
 *Tick 2*
+
 The first Action in State B's `@run` section is executed (and processing occurs normally).
 
 This behavior is meant to reduce the need for an implementor to worry about the
@@ -320,7 +322,7 @@ TODO
 ---
 
 ## An example in excruciating detail
-Let's demonstrate some important language features with a an example of a Machine (state machine) for a door that closes after three seconds. The examples pretend you are working in a _Unity-like_ environment. We will start from the product:
+Let's demonstrate some important language features with a an example of a Machine for a door that closes after three seconds. The examples pretend you are working in a _Unity-like_ environment. We will start from the product:
 
 ### The Machine and Code
 **Here is an example machine**
