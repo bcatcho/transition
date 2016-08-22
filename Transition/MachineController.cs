@@ -27,11 +27,11 @@ namespace Transition
       private MachineCompiler<T> _compiler;
       protected MessageBus MessageBus;
 
-      protected MachineController(int messageBusCapacity)
+      protected MachineController(int messageBusCapacity, int contextCapacity)
       {
-         _contextIdToArrayPosMap = new Dictionary<int, int>(5000);
+         _contextIdToArrayPosMap = new Dictionary<int, int>(contextCapacity);
          _machines = new Machine<T>[200];
-         _contexts = new T[5000];
+         _contexts = new T[contextCapacity];
          _compiler = new MachineCompiler<T>();
          _machineIdMap = new Dictionary<string, int>();
          MessageBus = new MessageBus(messageBusCapacity);
@@ -41,6 +41,14 @@ namespace Transition
       /// This is a factory function for Contexts. Use this to supply your own custom Context for each machine instance.
       /// </summary>
       protected abstract T BuildContext();
+
+      /// <summary>
+      /// Implement this method if you wish to pool contexts. Highly advised
+      /// </summary>
+      /// <param name="context">Context that was recycled</param>
+      protected virtual void OnRecycleContext(T context)
+      {
+      }
 
       /// <summary>
       /// Loads Actions that will be used in future compiled machines
@@ -101,13 +109,16 @@ namespace Transition
          var arrayPos = _contextIdToArrayPosMap[contextId];
          var contextToRemove = _contexts[arrayPos];
          contextToRemove.Reset();
+         OnRecycleContext(contextToRemove);
          _contextIdToArrayPosMap.Remove(contextId);
 
          // now compact the list of contexts by copying the last into the array pos
-         _contexts[arrayPos] = _contexts[_contextCount - 1];
-         _contextIdToArrayPosMap[_contexts[arrayPos].ContextId] = arrayPos;
-         // set the last index to null and reduce the count
-         _contexts[_contextCount - 1] = null;
+         if (_contextCount > 1) {
+            _contexts[arrayPos] = _contexts[_contextCount - 1];
+            _contextIdToArrayPosMap[_contexts[arrayPos].ContextId] = arrayPos;
+            // set the last index to null and reduce the count
+            _contexts[_contextCount - 1] = null;
+         }
          _contextCount--;
       }
 

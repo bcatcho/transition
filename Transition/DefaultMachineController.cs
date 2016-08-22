@@ -5,7 +5,7 @@ namespace Transition
    /// </summary>
    public class DefaultMachineController : MachineController<Context>
    {
-      public DefaultMachineController() : base(500)
+      public DefaultMachineController() : base(500, 5000)
       {
       }
 
