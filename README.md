@@ -99,16 +99,54 @@ Transition Parameters.
 When implementing an Action there are 4 return types to choose from. Each affects the
 Machine differently and all control the flow of behavior in some way.
 
-* `Done` specifies that the Action is done and that the next (if any) should be run. Use `TickResult.Done()` to create this type of result.
-* `Yield` specifies that the Action is not done processing and should be run again on the
+* **Done** specifies that the Action is done and that the next (if any) should be run. Use `TickResult.Done()` to create this type of result.
+
+* **Yield** specifies that the Action is not done processing and should be run again on the
 next Tick. This allows actions to execute over many Ticks (or in-game time). Useful for
 behavior like movement, delays, animation. Use `TickResult.Yield()` to create this type of result.
-* `Transition` tells the machine to transition to a state. To specify which state to
+
+* **Transition** tells the machine to transition to a state. To specify which state to
 transition to you must use a `TransitionDestination`. This is described in the section
 on [Transition Parameters](#transition-parameters). Use the protected method `TransitionTo()`
 to return a `Transition` result.
-* `Loop` tells the current state to run the first action in the section on the very next Tick.
 
+* **Loop** tells the current state to run the first action in the section on the very next Tick.
+
+Example actions:
+```csharp
+public class SimpleAction : Action<Context> {
+  protected override TickResult OnTick(Context context) {
+    // return done and move on to the next action
+    return TickResult.Done();
+  }
+}
+```
+```csharp
+public class LongRunningAction : Action<Context> {
+  protected override TickResult OnTick(Context context) {
+    // always returning yield means the next action will never be run
+    return TickResult.Yield();
+  }
+}
+```
+```csharp
+public class TransitionAction : Action<Context> {
+  public TransitionDestination NextState {get; set;}
+
+  protected override TickResult OnTick(Context context) {
+    // TransitionTo is a built in method to help build a Transition TickResult
+    return TransitionTo(NextState);
+  }
+}
+```
+```csharp
+public class LoopingAction : Action<Context> {
+  protected override TickResult OnTick(Context context) {
+    // this will restart the state at the very first @run action in the next tick
+    return TickResult.Loop();
+  }
+}
+```
 #### Parameters
 
 An action can have many parameters. Each parameter is associated with a property in the
@@ -130,7 +168,6 @@ support any type of object or value just by implementing a `IValueConverter`. Se
 on [Value Converters](#value-converters) for details.
 
 #### Transition Parameters
-
 
 
 ### Comments
