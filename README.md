@@ -53,6 +53,8 @@ Describe and execute state machines like this:
 - [Contexts](#contexts)
 - [Default Parameters](#default-parameters)
 - [AltId](#altid)
+- [Blackboard](#blackboard)
+	- [ValueWrapper](#valuewrapper)
 - [An example in excruciating detail](#an-example-in-excruciating-detail)
 	- [The Machine and Code](#the-machine-and-code)
 	- [Machine Definition Line](#machine-definition-line)
@@ -318,6 +320,10 @@ TODO
 ## Default Parameters
 TODO
 ## AltId
+TODO
+## Blackboard
+TODO
+### ValueWrapper
 TODO
 ---
 
