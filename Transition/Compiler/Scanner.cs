@@ -69,6 +69,9 @@ namespace Transition.Compiler
       }
 
       private void EmitNewLine() {
+        // collapse newline tokens down to one
+        if (_tokens.Count > 0 && _tokens[_tokens.Count-1].TokenType == TokenType.NewLine)
+           return;
         _token.TokenType = TokenType.NewLine;
         #if PARSER_LOGGING
         Log(string.Format("emit {0}", _token.TokenType));
@@ -88,7 +91,7 @@ namespace Transition.Compiler
       }
 
       
-#line 92 "tmp/Scanner.cs"
+#line 95 "tmp/Scanner.cs"
 static readonly sbyte[] _Scanner_actions =  new sbyte [] {
 	0, 1, 0, 1, 1, 1, 2, 1, 
 	3, 1, 4, 1, 5, 1, 6, 1, 
@@ -352,7 +355,7 @@ const int Scanner_error = 0;
 const int Scanner_en_main = 82;
 
 
-#line 92 "Scanner.rl.cs"
+#line 95 "Scanner.rl.cs"
 
 
       ///<summary>
@@ -365,12 +368,12 @@ const int Scanner_en_main = 82;
       public List<Token> Scan(char[] data, int len)
       {
          
-#line 369 "tmp/Scanner.cs"
+#line 372 "tmp/Scanner.cs"
 	{
 	cs = Scanner_start;
 	}
 
-#line 104 "Scanner.rl.cs"
+#line 107 "Scanner.rl.cs"
          if (_tokens == null) {
            _tokens = new List<Token>(128);
          }
@@ -380,7 +383,7 @@ const int Scanner_en_main = 82;
          int pe = len;
          eof = len;
          
-#line 384 "tmp/Scanner.cs"
+#line 387 "tmp/Scanner.cs"
 	{
 	sbyte _klen;
 	short _trans;
@@ -506,7 +509,7 @@ _match:
 #line 34 "ScannerDef.rl"
 	{ SetKeyword(TokenKeyword.Run); }
 	break;
-#line 510 "tmp/Scanner.cs"
+#line 513 "tmp/Scanner.cs"
 		default: break;
 		}
 	}
@@ -520,7 +523,7 @@ _again:
 	_out: {}
 	}
 
-#line 113 "Scanner.rl.cs"
+#line 116 "Scanner.rl.cs"
          CommitLastToken();
          return _tokens;
       }

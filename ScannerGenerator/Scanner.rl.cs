@@ -67,6 +67,9 @@ namespace Transition.Compiler
       }
 
       private void EmitNewLine() {
+        // collapse newline tokens down to one
+        if (_tokens.Count > 0 && _tokens[_tokens.Count-1].TokenType == TokenType.NewLine)
+           return;
         _token.TokenType = TokenType.NewLine;
         #if PARSER_LOGGING
         Log(string.Format("emit {0}", _token.TokenType));

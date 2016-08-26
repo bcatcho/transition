@@ -69,6 +69,8 @@
     <Compile Include="Blackboard.cs" />
     <Compile Include="MessageBus.cs" />
     <Compile Include="ValueWrapper.cs" />
+    <Compile Include="Actions\Loop.cs" />
+    <Compile Include="Actions\Yield.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

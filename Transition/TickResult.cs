@@ -29,6 +29,18 @@ namespace Transition
       }
 
       /// <summary>
+      /// Helper method to build a yielddone result
+      /// </summary>
+      public static TickResult YieldDone()
+      {
+         return new TickResult
+         {
+            ResultType = TickResultType.YieldDone,
+            TransitionId = 0
+         };
+      }
+
+      /// <summary>
       /// Helper method to build a done result
       /// </summary>
       public static TickResult Done()

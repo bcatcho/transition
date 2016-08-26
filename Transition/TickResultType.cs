@@ -9,6 +9,7 @@ namespace Transition
       Yield,
       Transition,
       Done,
+      YieldDone,
       Loop
    }
 }

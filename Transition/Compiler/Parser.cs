@@ -12,10 +12,10 @@ namespace Transition.Compiler
    public class Parser
    {
       private MachineAstNode _machine;
-      private bool _exitEarly;
       private int _index;
       private IList<Token> _tokens;
       private string _data;
+      private Token[] _t;
 
       public Parser()
       {
@@ -32,11 +32,11 @@ namespace Transition.Compiler
       {
          _machine = null;
          _index = 0;
-         _exitEarly = false;
          _data = data;
          _tokens = tokens;
+         _t = new Token[3];
 
-         ParseBlanklines();
+         Advance(0);
 
          ParseMachine();
 
@@ -46,78 +46,107 @@ namespace Transition.Compiler
             if (state != null) {
                _machine.States.Add(state);
             }
-         } while (state != null && ShouldContinueParsing());
+         } while (state != null);
 
          _tokens = null;
          _data = null;
          return _machine;
       }
 
-      private void ParseBlanklines()
+      private bool Exists(int i)
       {
-         Token t;
-         var tokenAvailable = Current(out t);
-         while (tokenAvailable && t.TokenType == TokenType.NewLine) {
-            tokenAvailable = Next(out t);
+         return _index + i < _tokens.Count;
+      }
+
+      private void Advance()
+      {
+         Advance(1);
+      }
+
+      private void Advance(int count)
+      {
+         _index += count;
+         for (int i = 0; i < 3 && _index + i < _tokens.Count; ++i) {
+            _t[i] = _tokens[_index + i];
+         }
+      }
+
+      private void AdvanceNewLine()
+      {
+         if (Exists(0) && _t[0].TokenType == TokenType.NewLine) {
+            Advance();
          }
       }
 
       private void ParseMachine()
       {
-         var t = _tokens[_index];
-         if (t.TokenType == TokenType.Keyword && t.Keyword == TokenKeyword.Machine) {
+         AdvanceNewLine();
+         if (_t[0].TokenType == TokenType.Keyword && _t[0].Keyword == TokenKeyword.Machine) {
             _machine = new MachineAstNode();
 
-            Next(out t);
-            if (t.TokenType == TokenType.Identifier) {
-               _machine.Identifier = GetDataSubstring(t);
+
+            if (Exists(1) && _t[1].TokenType == TokenType.Identifier) {
+               _machine.Identifier = GetDataSubstring(_t[1]);
             } else {
-               HandleError("@machine missing name", t);
+               HandleError("@machine missing name", _t[1]);
                return;
             }
 
             // build action for initial transition
-            Advance();
+            Advance(2);
             var action = ParseAction(false);
             if (action == null) {
-               HandleError("@machine missing default transition", _tokens[_index]);
+               HandleError("@machine missing default transition", _t[0]);
                return;
             }
 
             _machine.Action = action;
+
+            // token 0 should be a newline
+            if (Exists(1) && _t[1].TokenType == TokenType.Keyword && _t[1].Keyword == TokenKeyword.On) {
+               _machine.On = new SectionAstNode();
+               // move past @on keyword
+               Advance(2);
+               ActionAstNode actionNode;
+               while (Exists(0)) {
+                  actionNode = ParseAction(true);
+                  if (actionNode == null)
+                     break;
+                  _machine.On.Actions.Add(actionNode);
+               }
+            }
          }
       }
 
       private StateAstNode ParseState()
       {
-         ParseBlanklines();
-         Token t;
-         if (!Current(out t)) {
+         AdvanceNewLine();
+         if (!Exists(0)) {
             return null;
          }
 
-         if (t.TokenType != TokenType.Keyword || t.Keyword != TokenKeyword.State) {
-            HandleError("Expected @state.", t);
+         if (_t[0].TokenType != TokenType.Keyword || _t[0].Keyword != TokenKeyword.State) {
+            HandleError("Expected @state.", _t[0]);
             return null;
          }
 
          var state = new StateAstNode
          {
-            LineNumber = t.LineNumber,
+            LineNumber = _t[0].LineNumber,
          };
 
-         if (!Next(out t)) {
-            HandleError("Expected @state identifier, reached end of input.", t);
+         if (!Exists(1)) {
+            HandleError("Expected @state identifier, reached end of input.", _t[0]);
             return null;
-         } else if (t.TokenType != TokenType.Identifier) {
-            HandleError("Expected @state identifier.", t);
+         } else if (_t[1].TokenType != TokenType.Identifier) {
+            HandleError("Expected @state identifier.", _t[1]);
             return null;
          }
 
-         state.Identifier = GetDataSubstring(t);
-         Advance(); // move past identifier
+         state.Identifier = GetDataSubstring(_t[1]);
+         Advance(2); // move past identifier
 
-         while (TryParseStateSection(state) && ShouldContinueParsing()) {
+         while (TryParseStateSection(state) && Exists(0)) {
             // loop until no more sections
          }
 
@@ -126,20 +155,19 @@ namespace Transition.Compiler
 
       private bool TryParseStateSection(StateAstNode state)
       {
-         ParseBlanklines();
-         Token t;
-         if (!Current(out t)) {
+         AdvanceNewLine();
+         if (!Exists(0)) {
             return false;
-         } else if (t.TokenType != TokenType.Keyword) {
-            HandleError("Expected keyword.", t);
+         } else if (_t[0].TokenType != TokenType.Keyword) {
+            HandleError("Expected keyword.", _t[0]);
             return false;
-         } else if (t.Keyword == TokenKeyword.Enter || t.Keyword == TokenKeyword.Exit ||
-                    t.Keyword == TokenKeyword.Run || t.Keyword == TokenKeyword.On) {
+         } else if (_t[0].Keyword == TokenKeyword.Enter || _t[0].Keyword == TokenKeyword.Exit ||
+                    _t[0].Keyword == TokenKeyword.Run || _t[0].Keyword == TokenKeyword.On) {
             var section = new SectionAstNode
             {
-               LineNumber = t.LineNumber,
+               LineNumber = _t[0].LineNumber,
             };
-            switch (t.Keyword) {
+            switch (_t[0].Keyword) {
                case TokenKeyword.Enter:
                   state.Enter = section;
                   break;
@@ -153,11 +181,11 @@ namespace Transition.Compiler
                   state.On = section;
                   break;
             }
-            // move past keyword
+            var isOnSection = _t[0].Keyword == TokenKeyword.On;
             Advance();
             ActionAstNode actionNode;
-            while (ShouldContinueParsing()) {
-               actionNode = ParseAction(t.Keyword == TokenKeyword.On);
+            while (Exists(0)) {
+               actionNode = ParseAction(isOnSection);
                if (actionNode == null)
                   break;
                section.Actions.Add(actionNode);
@@ -170,63 +198,64 @@ namespace Transition.Compiler
 
       private ActionAstNode ParseAction(bool lookForMessage)
       {
-         ParseBlanklines();
-         Token t;
-         if (!Current(out t)) {
+         AdvanceNewLine();
+         if (!Exists(0)) {
             return null;
          }
 
          // if a keyword is found we must be in a new section or state
-         if (t.TokenType == TokenType.Keyword) {
+         if (_t[0].TokenType == TokenType.Keyword) {
             return null;
          }
 
          // transition operator found. This is syntatic sugar. handle first.
-         if (t.TokenType == TokenType.Operator && t.Operator == TokenOperator.Transition) {
+         if (_t[0].TokenType == TokenType.Operator && _t[0].Operator == TokenOperator.Transition) {
             return ParseTransitionAction(null);
          } else {
 
             ActionAstNode action = null;
 
             if (lookForMessage) {
-               if (t.TokenType != TokenType.Value) {
-                  HandleError("Action missing message.", t);
+               if (_t[0].TokenType != TokenType.Value) {
+                  HandleError("Action missing message.", _t[0]);
                   return null;
                }
 
                action = new ActionAstNode
                {
-                  LineNumber = t.LineNumber,
-                  Message = GetDataSubstring(t)
+                  LineNumber = _t[0].LineNumber,
+                  Message = GetDataSubstring(_t[0])
                };
                // advance past assign operator after message
-               if (!Advance()) {
-                  HandleError("Unexpected end of input in action. Expected [:]", t);
+               if (!Exists(1)) {
+                  HandleError("Unexpected end of input in action. Expected [:]", _t[1]);
                   return action;
                }
                // advance to identifier
-               if (!Next(out t)) {
-                  HandleError("Unexpected end of input in action. Expected action identifier", t);
+               if (!Exists(2)) {
+                  HandleError("Unexpected end of input in action. Expected action identifier", _t[2]);
                   return action;
                }
+               // make the current token the start of the action
+               Advance(2);
             }
 
-            if (t.TokenType == TokenType.Operator && t.Operator == TokenOperator.Transition) {
+            if (_t[0].TokenType == TokenType.Operator && _t[0].Operator == TokenOperator.Transition) {
                return ParseTransitionAction(action);
-            } else if (t.TokenType == TokenType.Identifier) {
+            } else if (_t[0].TokenType == TokenType.Identifier) {
                if (action == null) {
                   action = new ActionAstNode
                   {
-                     LineNumber = t.LineNumber,
+                     LineNumber = _t[0].LineNumber,
                   };
                }
-               action.Identifier = GetDataSubstring(t);
+               action.Identifier = GetDataSubstring(_t[0]);
 
                // advance to params
                Advance();
 
                ParamAstNode paramNode;
-               while (ShouldContinueParsing()) {
+               while (Exists(0)) {
                   paramNode = ParseParam();
                   if (paramNode == null)
                      break;
@@ -242,8 +271,7 @@ namespace Transition.Compiler
 
       private ActionAstNode ParseTransitionAction(ActionAstNode action)
       {  
-         Token t;
-         if (!Current(out t)) {
+         if (!Exists(0)) {
             return null;
          }
 
@@ -252,115 +280,112 @@ namespace Transition.Compiler
          }
 
          action.Identifier = ParserConstants.TransitionAction;
-         action.LineNumber = t.LineNumber;
+         action.LineNumber = _t[0].LineNumber;
 
          var param = new ParamAstNode
          {
-            LineNumber = t.LineNumber,
+            LineNumber = _t[0].LineNumber,
             Op = ParamOperation.Transition
          };
          // aquire the value
-         Next(out t);
-         if (t.TokenType != TokenType.Identifier) {
-            HandleError("transition missing value", _tokens[_index - 1]);
+         if (!Exists(1)) {
+            HandleError("Expected a transition value. Reached end of input.", _t[0]);
+            return null;
+         } 
+         if (_t[1].TokenType != TokenType.Identifier) {
+            HandleError("transition missing value", _tokens[1]);
             return null;
          }
          param.Identifier = ParserConstants.DefaultParameterIdentifier;
-         param.Val = GetDataSubstring(t);
+         param.Val = GetDataSubstring(_t[1]);
          action.Params.Add(param);
 
-         Advance();
+         Advance(2);
          return action;
       }
 
       private ParamAstNode ParseParam()
       {
-         Token t;
          // look for identifier
-         if (!Current(out t)) {
+         if (!Exists(0)) {
             return null;
-         } else if (t.TokenType == TokenType.NewLine) {
+         } else if (_t[0].TokenType == TokenType.NewLine) {
             return null;
-         } else if (t.TokenType == TokenType.Operator && t.Operator == TokenOperator.Transition) {
+         } else if (_t[0].TokenType == TokenType.Operator && _t[0].Operator == TokenOperator.Transition) {
             // Syntatic sugar: found a transition operator without an identifier, must be a default parameter
             var defaultParam = new ParamAstNode
             {
-               LineNumber = t.LineNumber,
+               LineNumber = _t[0].LineNumber,
                Identifier = ParserConstants.DefaultParameterIdentifier,
                Op = ParamOperation.Transition
             };
 
-            if (!Next(out t)) {
-               HandleError("Expected a transition value. Reached end of input.", _tokens[_index - 1]);
+            if (!Exists(1)) {
+               HandleError("Expected a transition value. Reached end of input.", _t[0]);
                return defaultParam;
-            } else if (t.TokenType != TokenType.Identifier) {
-               HandleError("Expected a transition destination.", t);
+            } else if (_t[1].TokenType != TokenType.Identifier) {
+               HandleError("Expected a transition destination.", _t[1]);
                return defaultParam;
             }
 
-            defaultParam.Val = GetDataSubstring(t);
+            defaultParam.Val = GetDataSubstring(_t[1]);
 
-            // move off val token
-            Advance();
+            // move off identifier token
+            Advance(2);
             return defaultParam;
-         } else if (t.TokenType == TokenType.Value) {
+         } else if (_t[0].TokenType == TokenType.Value) {
             // Syntatic sugar: found a value without an identifier, must be a default parameter
             var defaultParam = new ParamAstNode
             {
-               LineNumber = t.LineNumber,
+               LineNumber = _t[0].LineNumber,
                Identifier = ParserConstants.DefaultParameterIdentifier,
                Op = ParamOperation.Assign,
-               Val = GetDataSubstring(t)
+               Val = GetDataSubstring(_t[0])
             };
 
             // move off val token
             Advance();
             return defaultParam;
-         } else if (t.TokenType != TokenType.Identifier) {
-            HandleError("Parameter missing identifier.", t);
+         } else if (_t[0].TokenType != TokenType.Identifier) {
+            HandleError("Parameter missing identifier.", _t[0]);
             return null;
          }
 
          var param = new ParamAstNode
          {
-            LineNumber = t.LineNumber,
-            Identifier = GetDataSubstring(t)
+            LineNumber = _t[0].LineNumber,
+            Identifier = GetDataSubstring(_t[0])
          };
 
          // look for operator
-         if (!Next(out t)) {
-            HandleError("Parameter missing operator and value. Reached end of input.", _tokens[_index - 1]);
+         if (!Exists(1)) {
+            HandleError("Parameter missing operator and value. Reached end of input.", _t[0]);
             return param;
-         } else if (t.TokenType != TokenType.Operator) {
-            HandleError("Parameter missing operator and value.", t);
+         } else if (_t[1].TokenType != TokenType.Operator) {
+            HandleError("Parameter missing operator and value.", _t[1]);
             return param;
          }
 
-         param.Op = t.Operator == TokenOperator.Assign ? ParamOperation.Assign : ParamOperation.Transition;
+         param.Op = _t[1].Operator == TokenOperator.Assign ? ParamOperation.Assign : ParamOperation.Transition;
 
          // look for value
-         if (!Next(out t)) {
-            HandleError("Parameter missing value. Reached end of input.", _tokens[_index - 1]);
+         if (!Exists(2)) {
+            HandleError("Parameter missing value. Reached end of input.", _t[1]);
             return param;
-         } else if (param.Op == ParamOperation.Assign && t.TokenType != TokenType.Value) {
-            HandleError("Parameter missing value.", t);
+         } else if (param.Op == ParamOperation.Assign && _t[2].TokenType != TokenType.Value) {
+            HandleError("Parameter missing value.", _t[2]);
             return param;
-         } else if (param.Op == ParamOperation.Transition && t.TokenType != TokenType.Identifier) {
-            HandleError("Parameter missing transition destination.", t);
+         } else if (param.Op == ParamOperation.Transition && _t[2].TokenType != TokenType.Identifier) {
+            HandleError("Parameter missing transition destination.", _t[2]);
             return param;
          }
 
-         param.Val = GetDataSubstring(t);
+         param.Val = GetDataSubstring(_t[2]);
 
          // move off val token
-         Advance();
+         Advance(3);
 
          return param;
-      }
-
-      private bool ShouldContinueParsing()
-      {
-         return !(_exitEarly || _index >= _tokens.Count);
       }
 
       private string GetDataSubstring(Token t)
@@ -368,38 +393,8 @@ namespace Transition.Compiler
          return _data.Substring(t.StartIndex, t.Length);
       }
 
-      private bool Current(out Token t)
-      {
-         if (_index >= _tokens.Count) {
-            t = new Token();
-            return false;
-         }
-
-         t = _tokens[_index];
-         return true;
-      }
-
-      private bool Next(out Token t)
-      {
-         _index++;
-         if (_index >= _tokens.Count) {
-            t = new Token();
-            return false;
-         }
-
-         t = _tokens[_index];
-         return true;
-      }
-
-      private bool Advance()
-      {
-         _index++;
-         return _index < _tokens.Count;
-      }
-
       private void HandleError(string message, Token error)
       {
-         _exitEarly = true;
          // in the future errors should be handled more gracefully
          throw new System.Exception(string.Format("[Parsing error on Line {0}] {1}", error.LineNumber, message));
       }

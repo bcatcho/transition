@@ -88,6 +88,10 @@ namespace Transition
                   // if the last action finished, advance
                   action = AdvanceAction(context);
                   break;
+               case TickResultType.YieldDone:
+                  // yield but advance the action
+                  AdvanceAction(context);
+                  return TickResult.Yield();
                case TickResultType.Loop:
                   // reset and yield to avoid infinite loops
                   ResetForLooping(context);
@@ -166,6 +170,11 @@ namespace Transition
          }
 
          return TickResult.Done();
+      }
+
+      public bool CanHandleMessage(MessageEnvelope message)
+      {
+         return OnActions.ContainsKey(message.Key);
       }
 
       private Action<T> GetMessageHandler(MessageEnvelope message)

@@ -84,8 +84,6 @@ namespace Tests.Compiler
          var tokens = new List<Token>
          {
             NLTkn(1),
-            NLTkn(1),
-            NLTkn(1),
             KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 11, 1), OpTkn(TokenOperator.Transition, 1), IdTkn(28, 4, 1)
          };
          var parser = new Parser();
@@ -110,6 +108,25 @@ namespace Tests.Compiler
 
          Assert.AreEqual(ParamOperation.Transition, param.Op);
          Assert.AreEqual("State1", param.Val);
+      }
+
+      [Test]
+      public void Parse_MachineWithMessages_HasMessages()
+      {
+         var input = "@machine mach -> State1\n@on\n'msg': dothing";
+         var tokens = new List<Token>
+         {
+            KeyTkn(TokenKeyword.Machine, 1), IdTkn(13, 4, 1), OpTkn(TokenOperator.Transition, 1), IdTkn(17, 6, 1), NLTkn(1),
+            KeyTkn(TokenKeyword.On, 2), NLTkn(2),
+            ValTkn(29,3,3), OpTkn(TokenOperator.Assign,3), IdTkn(35,7,3)
+         };
+         var parser = new Parser();
+
+         var ast = parser.Parse(tokens, input);
+         var action = ast.On.Actions[0];
+
+         Assert.AreEqual("dothing", action.Identifier);
+         Assert.AreEqual("msg", action.Message);
       }
 
       [Test]

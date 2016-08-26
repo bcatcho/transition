@@ -30,5 +30,10 @@ namespace Transition.Compiler.AstNodes
       /// A list of all the states in the Machine. Must not be empty.
       /// </summary>
       public List<StateAstNode> States = new List<StateAstNode>();
+
+      /// <summary>
+      /// Represents an unordered list of messages and actions to take.
+      /// </summary>
+      public SectionAstNode On;
    }
 }

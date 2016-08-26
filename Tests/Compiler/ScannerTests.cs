@@ -90,13 +90,13 @@ namespace Tests.Compiler
       }
 
       [Test]
-      public void Scan_MultipleNewLines_ProduceMultipleNewLineTokens()
+      public void Scan_MultipleNewLines_ProduceSingleNewLineToken()
       {
          var input = "@machine blah -> yar\n\n\n";
 
          var tokens = Scan(input);
 
-         Assert.AreEqual(7, tokens.Count);
+         Assert.AreEqual(5, tokens.Count);
          Assert.AreEqual(TokenType.NewLine, tokens[4].TokenType);
       }
 
@@ -223,11 +223,10 @@ namespace Tests.Compiler
 
          var tokens = Scan(input);
 
-         Assert.AreEqual(4, tokens.Count);
+         Assert.AreEqual(3, tokens.Count);
          Assert.AreEqual(TokenType.Identifier, tokens[0].TokenType);
          Assert.AreEqual(TokenType.NewLine, tokens[1].TokenType);
-         Assert.AreEqual(TokenType.NewLine, tokens[2].TokenType);
-         Assert.AreEqual(TokenType.Identifier, tokens[3].TokenType);
+         Assert.AreEqual(TokenType.Identifier, tokens[2].TokenType);
       }
 
       [Test]

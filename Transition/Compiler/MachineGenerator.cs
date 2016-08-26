@@ -26,7 +26,7 @@ namespace Transition.Compiler
 
          // load built-in types
          LoadValueConverters(typeof(FloatValueConverter), typeof(IntValueConverter), typeof(StringValueConverter));
-         LoadActions(typeof(TransitionAction<>));
+         LoadActions(typeof(TransitionAction<>),typeof(Loop<>), typeof(Yield<>));
       }
 
       /// <summary>
@@ -40,6 +40,11 @@ namespace Transition.Compiler
             Identifier = machineAst.Identifier,
          };
          machine.EnterAction = GenerateAction(machineAst.Action);
+         if (machineAst.On != null) {
+            for (int i = 0; i < machineAst.On.Actions.Count; ++i) {
+               machine.AddOnAction(machineAst.On.Actions[i].Message, GenerateAction(machineAst.On.Actions[i]));
+            }
+         }
 
          for (int i = 0; i < machineAst.States.Count; ++i) {
             machine.AddState(GenerateState(machineAst.States[i]));

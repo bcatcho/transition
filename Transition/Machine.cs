@@ -19,6 +19,11 @@ namespace Transition
       public List<State<T>> States { get; private set; }
 
       /// <summary>
+      /// A lookup table of actions to run when a message is recieved
+      /// </summary>
+      public Dictionary<string, Action<T>> OnActions { get; private set; }
+
+      /// <summary>
       /// The first action that the state takes on it's first tick before any state is executed.
       /// It MUST transition to the first state.
       /// </summary>
@@ -30,6 +35,7 @@ namespace Transition
       public Machine()
       {
          States = new List<State<T>>();
+         OnActions = new Dictionary<string, Action<T>>(0);
       }
 
       /// <summary>
@@ -64,13 +70,28 @@ namespace Transition
       /// </summary>
       public void SendMessage(T context, MessageEnvelope message)
       {
-         var currentState = CurrentState(context);
-         if (currentState == null)
-            return;
 
-         var result = currentState.SendMessage(context, message);
+         TickResult result;
+         // see if the current state can handle it first
+         var currentState = CurrentState(context);
+         if (currentState != null && currentState.CanHandleMessage(message)) {
+            result = currentState.SendMessage(context, message);
+         } else {
+            // otherwise handle it ourselves
+            Action<T> handler;
+            if (OnActions.TryGetValue(message.Key, out handler)) {
+               context.Message = message;
+               result = handler.Tick(context);
+               context.Message = null;
+            } else {
+               // no one can handle the message so exit early
+               return;
+            }
+         } 
          if (result.ResultType == TickResultType.Transition) {
             Transition(context, result.TransitionId);
+         } else {
+            context.RaiseError(ErrorCode.Exec_State_SendMessage_MessageHandlerDidNotReturnTransitionOrDone);
          }
       }
 
@@ -105,6 +126,14 @@ namespace Transition
             return null;
 
          return States[stateId];
+      }
+
+      /// <summary>
+      /// Adds an action to the OnActions collection
+      /// </summary>
+      public void AddOnAction(string key, Action<T> action)
+      {
+         OnActions.Add(key, action);
       }
    }
 }

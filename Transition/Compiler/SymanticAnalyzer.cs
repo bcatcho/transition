@@ -42,6 +42,10 @@ namespace Transition.Compiler
       private bool HydrateTransitionParameters(MachineAstNode machineNode, out ErrorCode errorCode)
       {
          errorCode = ErrorCode.None;
+
+         if (!HydrateTransitionParametersInSection(machineNode.On, out errorCode))
+            return false;
+         
          StateAstNode state;
          for (int i = 0; i < machineNode.States.Count; ++i) {
             state = machineNode.States[i];

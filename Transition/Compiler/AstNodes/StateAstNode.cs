@@ -42,7 +42,6 @@ namespace Transition.Compiler.AstNodes
       /// </summary>
       public SectionAstNode Run;
 
-
       /// <summary>
       /// Represents an unordered list of messages and actions to take.
       /// </summary>
