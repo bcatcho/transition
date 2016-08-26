@@ -6,16 +6,16 @@ namespace Transition.Compiler.AstNodes
    /// </summary>
    public class ParamAstNode : AstNode
    {
-      private string _identifier;
+      private string _name;
 
       /// <summary>
       /// The unique name (within an action) of the parameter
       /// </summary>
-      public string Identifier
+      public string Name
       { 
-         get { return _identifier; }
-         // lowercase the identifier to reduce equality issues
-         set { _identifier = value.ToLower(); }
+         get { return _name; }
+         // lowercase to reduce equality issues
+         set { _name = value.ToLower(); }
       }
 
       /// <summary>

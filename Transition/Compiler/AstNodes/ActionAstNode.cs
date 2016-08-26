@@ -13,16 +13,16 @@ namespace Transition.Compiler.AstNodes
       /// </summary>
       public string Message { get; set; }
 
-      private string _identifier;
+      private string _name;
 
       /// <summary>
-      /// The unique ID (within a machine) of the state
+      /// The name of the action
       /// </summary>
-      public string Identifier
+      public string Name
       { 
-         get { return _identifier; }
-         // lowercase the identifier to reduce equality issues
-         set { _identifier = value.ToLower(); }
+         get { return _name; }
+         // lowercase the name to reduce equality issues
+         set { _name = value.ToLower(); }
       }
 
 

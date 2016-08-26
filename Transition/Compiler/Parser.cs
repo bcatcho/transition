@@ -86,7 +86,7 @@ namespace Transition.Compiler
 
 
             if (Exists(1) && _t[1].TokenType == TokenType.Identifier) {
-               _machine.Identifier = GetDataSubstring(_t[1]);
+               _machine.Name = GetDataSubstring(_t[1]);
             } else {
                HandleError("@machine missing name", _t[1]);
                return;
@@ -136,15 +136,15 @@ namespace Transition.Compiler
          };
 
          if (!Exists(1)) {
-            HandleError("Expected @state identifier, reached end of input.", _t[0]);
+            HandleError("Expected @state name, reached end of input.", _t[0]);
             return null;
          } else if (_t[1].TokenType != TokenType.Identifier) {
-            HandleError("Expected @state identifier.", _t[1]);
+            HandleError("Expected @state name.", _t[1]);
             return null;
          }
 
-         state.Identifier = GetDataSubstring(_t[1]);
-         Advance(2); // move past identifier
+         state.Name = GetDataSubstring(_t[1]);
+         Advance(2); // move past name
 
          while (TryParseStateSection(state) && Exists(0)) {
             // loop until no more sections
@@ -231,9 +231,9 @@ namespace Transition.Compiler
                   HandleError("Unexpected end of input in action. Expected [:]", _t[1]);
                   return action;
                }
-               // advance to identifier
+               // advance to name
                if (!Exists(2)) {
-                  HandleError("Unexpected end of input in action. Expected action identifier", _t[2]);
+                  HandleError("Unexpected end of input in action. Expected action name", _t[2]);
                   return action;
                }
                // make the current token the start of the action
@@ -249,7 +249,7 @@ namespace Transition.Compiler
                      LineNumber = _t[0].LineNumber,
                   };
                }
-               action.Identifier = GetDataSubstring(_t[0]);
+               action.Name = GetDataSubstring(_t[0]);
 
                // advance to params
                Advance();
@@ -279,7 +279,7 @@ namespace Transition.Compiler
             action = new ActionAstNode();
          }
 
-         action.Identifier = ParserConstants.TransitionAction;
+         action.Name = ParserConstants.TransitionAction;
          action.LineNumber = _t[0].LineNumber;
 
          var param = new ParamAstNode
@@ -296,7 +296,7 @@ namespace Transition.Compiler
             HandleError("transition missing value", _tokens[1]);
             return null;
          }
-         param.Identifier = ParserConstants.DefaultParameterIdentifier;
+         param.Name = ParserConstants.DefaultParameterName;
          param.Val = GetDataSubstring(_t[1]);
          action.Params.Add(param);
 
@@ -312,11 +312,11 @@ namespace Transition.Compiler
          } else if (_t[0].TokenType == TokenType.NewLine) {
             return null;
          } else if (_t[0].TokenType == TokenType.Operator && _t[0].Operator == TokenOperator.Transition) {
-            // Syntatic sugar: found a transition operator without an identifier, must be a default parameter
+            // Syntatic sugar: found a transition operator without an state name, must be a default parameter
             var defaultParam = new ParamAstNode
             {
                LineNumber = _t[0].LineNumber,
-               Identifier = ParserConstants.DefaultParameterIdentifier,
+               Name = ParserConstants.DefaultParameterName,
                Op = ParamOperation.Transition
             };
 
@@ -330,15 +330,15 @@ namespace Transition.Compiler
 
             defaultParam.Val = GetDataSubstring(_t[1]);
 
-            // move off identifier token
+            // move off name token
             Advance(2);
             return defaultParam;
          } else if (_t[0].TokenType == TokenType.Value) {
-            // Syntatic sugar: found a value without an identifier, must be a default parameter
+            // Syntatic sugar: found a value without an name, must be a default parameter
             var defaultParam = new ParamAstNode
             {
                LineNumber = _t[0].LineNumber,
-               Identifier = ParserConstants.DefaultParameterIdentifier,
+               Name = ParserConstants.DefaultParameterName,
                Op = ParamOperation.Assign,
                Val = GetDataSubstring(_t[0])
             };
@@ -347,14 +347,14 @@ namespace Transition.Compiler
             Advance();
             return defaultParam;
          } else if (_t[0].TokenType != TokenType.Identifier) {
-            HandleError("Parameter missing identifier.", _t[0]);
+            HandleError("Parameter missing name.", _t[0]);
             return null;
          }
 
          var param = new ParamAstNode
          {
             LineNumber = _t[0].LineNumber,
-            Identifier = GetDataSubstring(_t[0])
+            Name = GetDataSubstring(_t[0])
          };
 
          // look for operator

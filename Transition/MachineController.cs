@@ -67,14 +67,14 @@ namespace Transition
       }
 
       /// <summary>
-      /// Compiles a string into an executable Machine and stores that machine by it's Identifier.
-      /// Use this Identifier to assign the machine to a context.
+      /// Compiles a string into an executable Machine and stores that machine by it's Name.
+      /// Use this Name to assign the machine to a context.
       /// </summary>
       public void Compile(string input)
       {
          var machine = _compiler.Compile(input);
          _machines[_machineCount] = machine;
-         _machineIdMap.Add(machine.Identifier, _machineCount);
+         _machineIdMap.Add(machine.Name, _machineCount);
          _machineCount++;
       }
 
@@ -83,14 +83,14 @@ namespace Transition
       /// Machine with that Id. 
       /// The Context is returned for further customization by the caller. 
       /// </summary>
-      public T AddMachineInstance(string machineIdentifier)
+      public T AddMachineInstance(string machineName)
       {
-         if (!_machineIdMap.ContainsKey(machineIdentifier)) {
-            throw new KeyNotFoundException("A Machine not found for name " + machineIdentifier);
+         if (!_machineIdMap.ContainsKey(machineName)) {
+            throw new KeyNotFoundException("A Machine not found for name " + machineName);
          }
          var context = BuildContext();
          context.MessageBus = MessageBus;
-         context.MachineId = _machineIdMap[machineIdentifier];
+         context.MachineId = _machineIdMap[machineName];
          context.ContextId = _nextContextId;
          _contextIdToArrayPosMap.Add(context.ContextId, _contextCount);
          _contexts[_contextCount] = context;

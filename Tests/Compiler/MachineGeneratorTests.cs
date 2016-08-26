@@ -15,8 +15,8 @@ namespace Tests.Compiler
       public void SetUp()
       {
          _machineNode = new MachineAstNode();
-         _machineNode.Identifier = "mach";
-         _machineNode.Action = new ActionAstNode() { Identifier = ParserConstants.TransitionAction };
+         _machineNode.Name = "mach";
+         _machineNode.Action = new ActionAstNode() { Name = ParserConstants.TransitionAction };
          _generator = new MachineGenerator<TestMachineContext>();
          _generator.LoadActions(typeof(TestAction));
       }
@@ -24,17 +24,17 @@ namespace Tests.Compiler
       [TestCase]
       public void Generate_MachineWithId_IdIsSet()
       {
-         _machineNode.Identifier = "mach2";
+         _machineNode.Name = "mach2";
 
          var result = _generator.Generate(_machineNode);
 
-         Assert.AreEqual("mach2", result.Identifier);
+         Assert.AreEqual("mach2", result.Name);
       }
 
       [TestCase]
       public void Generate_MachineWithAction_ActionIsTransition()
       {
-         _machineNode.Action = new ActionAstNode() { Identifier = ParserConstants.TransitionAction };
+         _machineNode.Action = new ActionAstNode() { Name = ParserConstants.TransitionAction };
 
          var result = _generator.Generate(_machineNode);
 
@@ -46,13 +46,13 @@ namespace Tests.Compiler
       {
          var state = new StateAstNode
          {
-            Identifier = "state1"
+            Name = "state1"
          };
          _machineNode.States.Add(state);
 
          var result = _generator.Generate(_machineNode);
 
-         Assert.AreEqual("state1", result.States[0].Identifier);
+         Assert.AreEqual("state1", result.States[0].Name);
       }
 
       [TestCase]
@@ -60,12 +60,12 @@ namespace Tests.Compiler
       {
          var state = new StateAstNode
          {
-            Identifier = "state1"
+            Name = "state1"
          };
          state.Run = new SectionAstNode();
          state.Run.Actions.Add(new ActionAstNode
          {
-            Identifier = "testaction",
+            Name = "testaction",
          });
          _machineNode.States.Add(state);
 
@@ -79,16 +79,16 @@ namespace Tests.Compiler
       {
          var state = new StateAstNode
          {
-            Identifier = "state1"
+            Name = "state1"
          };
          state.Run = new SectionAstNode();
          state.Run.Actions.Add(new ActionAstNode
          {
-            Identifier = ParserConstants.TransitionAction,
+            Name = ParserConstants.TransitionAction,
          });
          state.Run.Actions.Add(new ActionAstNode
          {
-            Identifier = "testaction",
+            Name = "testaction",
          });
          _machineNode.States.Add(state);
 
@@ -102,12 +102,12 @@ namespace Tests.Compiler
       {
          var state = new StateAstNode
          {
-            Identifier = "state1"
+            Name = "state1"
          };
          state.Enter = new SectionAstNode();
          state.Enter.Actions.Add(new ActionAstNode
          {
-            Identifier = "testaction",
+            Name = "testaction",
          });
          _machineNode.States.Add(state);
 
@@ -121,12 +121,12 @@ namespace Tests.Compiler
       {
          var state = new StateAstNode
          {
-            Identifier = "state1"
+            Name = "state1"
          };
          state.Exit = new SectionAstNode();
          state.Exit.Actions.Add(new ActionAstNode
          {
-            Identifier = "testaction",
+            Name = "testaction",
          });
          _machineNode.States.Add(state);
 
@@ -140,13 +140,13 @@ namespace Tests.Compiler
       {
          var state = new StateAstNode
          {
-            Identifier = "state1"
+            Name = "state1"
          };
          state.On = new SectionAstNode();
          state.On.Actions.Add(new ActionAstNode
          {
             Message = "blah",
-            Identifier = "testaction"
+            Name = "testaction"
          });
          _machineNode.States.Add(state);
 
@@ -160,17 +160,17 @@ namespace Tests.Compiler
       {
          var state = new StateAstNode
          {
-            Identifier = "state1"
+            Name = "state1"
          };
          state.On = new SectionAstNode();
          var action = new ActionAstNode
          {
             Message = "blah",
-            Identifier = "testaction"
+            Name = "testaction"
          };
          action.Params.Add(new ParamAstNode
          {
-            Identifier = "TestProperty1",
+            Name = "TestProperty1",
             Op = ParamOperation.Assign,
             Val = "1234"
          });
@@ -189,17 +189,17 @@ namespace Tests.Compiler
       {
          var state = new StateAstNode
          {
-            Identifier = "state1"
+            Name = "state1"
          };
          state.On = new SectionAstNode();
          var action = new ActionAstNode
          {
             Message = "blah",
-            Identifier = "testaction"
+            Name = "testaction"
          };
          action.Params.Add(new ParamAstNode
          {
-            Identifier = "DestinationProp",
+            Name = "DestinationProp",
             Op = ParamOperation.Transition,
             Val = "state2",
             StateIdVal = 1
@@ -209,7 +209,7 @@ namespace Tests.Compiler
          // add another state to transition to
          _machineNode.States.Add(new StateAstNode
          {
-            Identifier = "state2"
+            Name = "state2"
          });
 
          var result = _generator.Generate(_machineNode);
@@ -224,24 +224,24 @@ namespace Tests.Compiler
       {
          var state = new StateAstNode
          {
-            Identifier = "state1"
+            Name = "state1"
          };
          state.On = new SectionAstNode();
          var action = new ActionAstNode
          {
             Message = "blah",
-            Identifier = "testaction"
+            Name = "testaction"
          };
          action.Params.Add(new ParamAstNode
          {
-            Identifier = "TestProperty1",
+            Name = "TestProperty1",
             Op = ParamOperation.Assign,
             Val = "1234"
          });
 
          action.Params.Add(new ParamAstNode
          {
-            Identifier = "TestProperty2",
+            Name = "TestProperty2",
             Op = ParamOperation.Assign,
             Val = "hello"
          });
@@ -261,17 +261,17 @@ namespace Tests.Compiler
       {
          var state = new StateAstNode
          {
-            Identifier = "state1"
+            Name = "state1"
          };
          state.On = new SectionAstNode();
          var action = new ActionAstNode
          {
             Message = "blah",
-            Identifier = "testaction"
+            Name = "TestAction"
          };
          action.Params.Add(new ParamAstNode
          {
-            Identifier = ParserConstants.DefaultParameterIdentifier,
+            Name = ParserConstants.DefaultParameterName,
             Op = ParamOperation.Assign,
             Val = "1234"
          });

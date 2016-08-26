@@ -103,14 +103,14 @@ namespace Tests.Compiler
       [Test]
       public void Scan_State_KeywordTokenIsProducedWithId()
       {
-         var input = "@state StateIdentifier";
+         var input = "@state StateName";
 
          var tokens = Scan(input);
 
          Assert.AreEqual(2, tokens.Count);
          Assert.AreEqual(TokenType.Keyword, tokens[0].TokenType);
          Assert.AreEqual(TokenType.Identifier, tokens[1].TokenType);
-         AssertTokenValue("StateIdentifier", tokens[1], input);
+         AssertTokenValue("StateName", tokens[1], input);
       }
 
       [Test]

@@ -8,9 +8,9 @@ namespace Transition
    public class Machine<T> where T : Context
    {
       /// <summary>
-      /// The unique Id (or name) of the machine
+      /// The unique Name of the machine
       /// </summary>
-      public string Identifier { get; set; }
+      public string Name { get; set; }
 
       /// <summary>
       /// All of the states that make up the machine. States are indexed

@@ -7,7 +7,7 @@ namespace Transition
    {
       None,
       /// <summary>
-      /// A transition value in a parameter contained an identifier that did not match any known state.
+      /// A transition value in a parameter contained a name that did not match any known state.
       /// </summary>
       Validate_TransitionParams_StateNotFoundForTransition,
       /// <summary>

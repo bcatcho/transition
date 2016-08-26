@@ -23,9 +23,9 @@ namespace Tests.Compiler
 
          var result = _compiler.Compile(input);
 
-         Assert.AreEqual("m", result.Identifier);
+         Assert.AreEqual("m", result.Name);
          Assert.AreEqual(0, ((TransitionAction<TestMachineContext>)result.EnterAction).Destination.StateId);
-         Assert.AreEqual("state1", result.States[0].Identifier);
+         Assert.AreEqual("state1", result.States[0].Name);
          Assert.IsInstanceOf<TestAction>(result.States[0].OnActions["msg"]);
       }
    }

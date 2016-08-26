@@ -73,7 +73,7 @@ namespace Tests.Compiler
 
          var ast = parser.Parse(tokens, input);
 
-         Assert.AreEqual(ast.Identifier, "machinename");
+         Assert.AreEqual(ast.Name, "machinename");
       }
 
 
@@ -90,7 +90,7 @@ namespace Tests.Compiler
 
          var ast = parser.Parse(tokens, input);
 
-         Assert.AreEqual("machinename", ast.Identifier);
+         Assert.AreEqual("machinename", ast.Name);
       }
 
       [Test]
@@ -125,7 +125,7 @@ namespace Tests.Compiler
          var ast = parser.Parse(tokens, input);
          var action = ast.On.Actions[0];
 
-         Assert.AreEqual("dothing", action.Identifier);
+         Assert.AreEqual("dothing", action.Name);
          Assert.AreEqual("msg", action.Message);
       }
 
@@ -143,7 +143,7 @@ namespace Tests.Compiler
          var ast = parser.Parse(tokens, input);
          var state = ast.States[0];
 
-         Assert.AreEqual("state1", state.Identifier);
+         Assert.AreEqual("state1", state.Name);
       }
 
       [Test]
@@ -160,8 +160,8 @@ namespace Tests.Compiler
 
          var ast = parser.Parse(tokens, input);
 
-         Assert.AreEqual("state1", ast.States[0].Identifier);
-         Assert.AreEqual("state2", ast.States[1].Identifier);
+         Assert.AreEqual("state1", ast.States[0].Name);
+         Assert.AreEqual("state2", ast.States[1].Name);
       }
 
       [Test]
@@ -210,7 +210,7 @@ namespace Tests.Compiler
          var ast = parser.Parse(tokens, input);
          var state = ast.States[0];
 
-         Assert.AreEqual("act1", state.Run.Actions[0].Identifier);
+         Assert.AreEqual("act1", state.Run.Actions[0].Name);
       }
 
       [Test]
@@ -230,8 +230,8 @@ namespace Tests.Compiler
          var ast = parser.Parse(tokens, input);
          var state = ast.States[0];
 
-         Assert.AreEqual("act1", state.Run.Actions[0].Identifier);
-         Assert.AreEqual("act2", state.Run.Actions[1].Identifier);
+         Assert.AreEqual("act1", state.Run.Actions[0].Name);
+         Assert.AreEqual("act2", state.Run.Actions[1].Name);
       }
 
       [Test]
@@ -250,7 +250,7 @@ namespace Tests.Compiler
          var ast = parser.Parse(tokens, input);
          var param = ast.States[0].Run.Actions[0].Params[0];
 
-         Assert.AreEqual("param", param.Identifier);
+         Assert.AreEqual("param", param.Name);
          Assert.AreEqual(ParamOperation.Assign, param.Op);
          Assert.AreEqual("val", param.Val);
       }
@@ -271,7 +271,7 @@ namespace Tests.Compiler
          var ast = parser.Parse(tokens, input);
          var param = ast.States[0].Run.Actions[0].Params[0];
 
-         Assert.AreEqual(ParserConstants.DefaultParameterIdentifier, param.Identifier);
+         Assert.AreEqual(ParserConstants.DefaultParameterName, param.Name);
          Assert.AreEqual(ParamOperation.Assign, param.Op);
          Assert.AreEqual("val", param.Val);
       }
@@ -292,7 +292,7 @@ namespace Tests.Compiler
          var ast = parser.Parse(tokens, input);
          var param = ast.States[0].Run.Actions[0].Params[0];
 
-         Assert.AreEqual(ParserConstants.DefaultParameterIdentifier, param.Identifier);
+         Assert.AreEqual(ParserConstants.DefaultParameterName, param.Name);
          Assert.AreEqual(ParamOperation.Transition, param.Op);
          Assert.AreEqual("val", param.Val);
       }
@@ -313,7 +313,7 @@ namespace Tests.Compiler
          var ast = parser.Parse(tokens, input);
          var param = ast.States[0].Run.Actions[0].Params[0];
 
-         Assert.AreEqual("param", param.Identifier);
+         Assert.AreEqual("param", param.Name);
          Assert.AreEqual(ParamOperation.Transition, param.Op);
          Assert.AreEqual("val", param.Val);
       }
@@ -334,7 +334,7 @@ namespace Tests.Compiler
          var ast = parser.Parse(tokens, input);
          var param = ast.States[0].Run.Actions[0].Params[1];
 
-         Assert.AreEqual("p2", param.Identifier);
+         Assert.AreEqual("p2", param.Name);
          Assert.AreEqual(ParamOperation.Assign, param.Op);
          Assert.AreEqual("v2", param.Val);
       }
@@ -355,7 +355,7 @@ namespace Tests.Compiler
          var ast = parser.Parse(tokens, input);
          var action = ast.States[0].Run.Actions[0];
 
-         Assert.AreEqual(ParserConstants.TransitionAction, action.Identifier);
+         Assert.AreEqual(ParserConstants.TransitionAction, action.Name);
          Assert.AreEqual(ParamOperation.Transition, action.Params[0].Op);
          Assert.AreEqual("blah", action.Params[0].Val);
       }
@@ -378,7 +378,7 @@ namespace Tests.Compiler
          var ast = parser.Parse(tokens, input);
          var state2 = ast.States[1];
 
-         Assert.AreEqual("state2", state2.Identifier);
+         Assert.AreEqual("state2", state2.Name);
       }
 
       [Test]
@@ -397,7 +397,7 @@ namespace Tests.Compiler
          var ast = parser.Parse(tokens, input);
          var act = ast.States[0].On.Actions[0];
 
-         Assert.AreEqual("act", act.Identifier);
+         Assert.AreEqual("act", act.Name);
          Assert.AreEqual("msg", act.Message);
       }
 
@@ -439,8 +439,8 @@ namespace Tests.Compiler
          var ast = parser.Parse(tokens, input);
          var act = ast.States[0].On.Actions[0];
 
-         Assert.AreEqual(ParserConstants.TransitionAction, act.Identifier);
-         Assert.AreEqual(ParserConstants.DefaultParameterIdentifier, act.Params[0].Identifier);
+         Assert.AreEqual(ParserConstants.TransitionAction, act.Name);
+         Assert.AreEqual(ParserConstants.DefaultParameterName, act.Params[0].Name);
       }
    }
 }

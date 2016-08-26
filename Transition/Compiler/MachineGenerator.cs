@@ -37,7 +37,7 @@ namespace Transition.Compiler
       {
          var machine = new Machine<T>
          {
-            Identifier = machineAst.Identifier,
+            Name = machineAst.Name,
          };
          machine.EnterAction = GenerateAction(machineAst.Action);
          if (machineAst.On != null) {
@@ -57,7 +57,7 @@ namespace Transition.Compiler
       {
          var state = new State<T>
          {
-            Identifier = stateNode.Identifier,
+            Name = stateNode.Name,
          };
          if (stateNode.Run != null) {
             for (int i = 0; i < stateNode.Run.Actions.Count; ++i) {
@@ -84,14 +84,14 @@ namespace Transition.Compiler
 
       private Action<T> GenerateAction(ActionAstNode actionNode)
       {
-         var action = CreateInstance(actionNode.Identifier);
+         var action = CreateInstance(actionNode.Name);
 
-         CachePropertyInfos(actionNode.Identifier, action);
+         CachePropertyInfos(actionNode.Name, action);
          PropertyInfo propInfo;
          ParamAstNode param;
          for (int i = 0; i < actionNode.Params.Count; ++i) {
             param = actionNode.Params[i];
-            propInfo = GetPropertyInfo(actionNode.Identifier, param.Identifier);
+            propInfo = GetPropertyInfo(actionNode.Name, param.Name);
             if (param.Op == ParamOperation.Transition) {
                propInfo.SetValue(action, new TransitionDestination(param.StateIdVal), null);
             } else {
@@ -102,12 +102,12 @@ namespace Transition.Compiler
          return action;
       }
 
-      private Action<T> CreateInstance(string actionIdentifier)
+      private Action<T> CreateInstance(string actionName)
       {
-         if (!_actionLookupTable.ContainsKey(actionIdentifier)) {
-            throw new KeyNotFoundException(string.Format("Could not find action for name [{0}]", actionIdentifier));
+         if (!_actionLookupTable.ContainsKey(actionName)) {
+            throw new KeyNotFoundException(string.Format("Could not find action for name [{0}]", actionName));
          }
-         var type = _actionLookupTable[actionIdentifier];
+         var type = _actionLookupTable[actionName];
          if (type.IsGenericType) {
             type = type.MakeGenericType(typeof(T));
          }
@@ -198,7 +198,7 @@ namespace Transition.Compiler
 
       private PropertyInfo GetPropertyInfo(string objectName, string paramName)
       {
-         if (paramName == ParserConstants.DefaultParameterIdentifier) {
+         if (paramName == ParserConstants.DefaultParameterName) {
             return _defaultPropertyInfoCache[objectName];
          }
 

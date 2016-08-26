@@ -14,7 +14,7 @@ namespace Tests.Compiler
       {
          var machine = new MachineAstNode();
          var state1 = new StateAstNode() {
-            Identifier = "state1"
+            Name = "state1"
          };
          var action1 = new ActionAstNode();
          action1.Params.Add( new ParamAstNode {
@@ -37,10 +37,10 @@ namespace Tests.Compiler
       {
          var machine = new MachineAstNode();
          var state1 = new StateAstNode() {
-            Identifier = "state1"
+            Name = "state1"
          };
          var state2 = new StateAstNode() {
-            Identifier = "state2"
+            Name = "state2"
          };
          var action1 = new ActionAstNode();
          action1.Params.Add( new ParamAstNode {
@@ -64,7 +64,7 @@ namespace Tests.Compiler
       {
          var machine = new MachineAstNode();
          var state1 = new StateAstNode() {
-            Identifier = "state1"
+            Name = "state1"
          };
          var action1 = new ActionAstNode();
          action1.Params.Add( new ParamAstNode {

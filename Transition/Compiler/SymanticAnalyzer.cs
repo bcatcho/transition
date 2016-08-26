@@ -28,7 +28,7 @@ namespace Transition.Compiler
          _statesIds.Clear();
 
          for (int i = 0; i < machineNode.States.Count; ++i) {
-            _statesIds.Add(machineNode.States[i].IdentifierLower, i);
+            _statesIds.Add(machineNode.States[i].Name, i);
          }
       }
 
@@ -70,7 +70,7 @@ namespace Transition.Compiler
                for (int p = 0; p < sectionNode.Actions[j].Params.Count; ++p) {
                   param = sectionNode.Actions[j].Params[p];
                   if (param.Op == ParamOperation.Transition) {
-                     paramVal = param.Val.ToLower();
+                     paramVal = param.Val;
                      if (!_statesIds.ContainsKey(paramVal)) {
                         errorCode = ErrorCode.Validate_TransitionParams_StateNotFoundForTransition;
                         return false;

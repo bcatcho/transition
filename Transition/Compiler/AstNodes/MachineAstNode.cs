@@ -9,17 +9,10 @@ namespace Transition.Compiler.AstNodes
    /// </summary>
    public class MachineAstNode : AstNode
    {
-      private string _identifier;
-
       /// <summary>
       /// The unique ID (or name) of the Machine
       /// </summary>
-      public string Identifier
-      { 
-         get { return _identifier; }
-         // lowercase the identifier to reduce equality issues
-         set { _identifier = value.ToLower(); }
-      }
+      public string Name { get; set; }
 
       /// <summary>
       /// An action that must transition the Machine to the initial state.

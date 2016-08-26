@@ -13,9 +13,9 @@ namespace Transition
    public class State<T> where T: Context
    {
       /// <summary>
-      /// The unique identifier (name) of a state within a machine
+      /// The unique name of a state within a machine
       /// </summary>
-      public string Identifier { get; set; }
+      public string Name { get; set; }
 
       /// <summary>
       /// An ordered list of actions to be run every tick
