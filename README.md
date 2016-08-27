@@ -2,6 +2,10 @@
 
 A light-weight state machine language, parser and interpreter built for run-time compilation and execution. It's designed to create simple state machine's out of reusable components instead of custom coded states.
 
+Though Transition was designed for Unity development it has _no_ dependencies other than `System` (and a few child namespaces) and will work for any C# based project.
+
+This library is fully compatible with iOS/Android Unity development.
+
 
 <a href="https://travis-ci.org/bcatcho/transition"><img src="https://travis-ci.org/bcatcho/transition.svg?branch=master" alt="Build Status"></a>
 <a href="https://twitter.com/catchco"><img src="https://img.shields.io/badge/twitter-follow%20%40catchco-blue.svg" alt="Twitter Follow Me"></a>
