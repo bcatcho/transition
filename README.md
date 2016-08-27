@@ -82,18 +82,20 @@ A Machine (state machine) in Transition looks like this:
 
 ```
 @machine MachineName ->FirstState
+  @on
+    'sing': say 'lalalala'
 
 @state FirstState
   @enter
     DoSomethingOnEnter
   @run
-    say message:'hi'
-    DoSomethingElse
+    say 'hi'
+    moveRight speed:'3' distance:'2'
     ->StateTwo
   @exit
     say message:'bye'
   @on
-    'poke': say:'ouch!'
+    'poke': say 'ouch!'
 ```
 
 ### @machine
@@ -102,6 +104,10 @@ A Machine (state machine) in Transition looks like this:
 ```
 The first line in a machine describes the name of the machine and the first state
 to transition toward. This line is required in all machines.
+
+A Machine can have global message handlers. These are placed in an optional `@on` section beneath the
+`@machine` line. See the [@on](#on) section for more details.
+
 
 ### @state
 
