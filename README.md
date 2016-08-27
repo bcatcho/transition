@@ -82,6 +82,8 @@ While it is recommended to read through the documentation, you can check out a n
 
 [Unity Transition Examples](https://github.com/bcatcho/transition-unity-examples)
 
+Check out the wiki for [another Unity tutorial](https://github.com/bcatcho/transition/wiki/Tutorial:-Setting-up-in-Unity)
+
 ## Language concepts
 
 A Machine (state machine) in Transition looks like this:
