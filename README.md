@@ -6,9 +6,6 @@ Though Transition was designed for Unity development it has _no_ dependencies ot
 
 This library is fully compatible with iOS/Android Unity development.
 
-Checkout the **WIKI** for a getting-started guide!
-
-
 <a href="https://travis-ci.org/bcatcho/transition"><img src="https://travis-ci.org/bcatcho/transition.svg?branch=master" alt="Build Status"></a>
 <a href="https://twitter.com/catchco"><img src="https://img.shields.io/badge/twitter-follow%20%40catchco-blue.svg" alt="Twitter Follow Me"></a>
 
@@ -31,10 +28,25 @@ Describe and execute state machines like this:
     -><em>Closed</em>
 </pre>
 
+
+## Start Here
+### [Get the Latest Release](https://github.com/bcatcho/transition/releases)
+### [Unity Transition Examples](https://github.com/bcatcho/transition-unity-examples)
+An example project in Unity.
+### [Tutorial: Setting up in Unity](https://github.com/bcatcho/transition/wiki/Tutorial:-Setting-up-in-Unity)
+A guide for all the basic components needed to get up and running in Unity.
+### Watch an introduction video
+[![Introduction Video](http://img.youtube.com/vi/HBU4DjntMxQ/hqdefault.jpg)](https://www.youtube.com/watch?v=HBU4DjntMxQ)
+
+
 ---
 <!-- TOC depthFrom:2 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
 
-- [Unity Examples](#unity-examples)
+- [Start Here](#start-here)
+	- [[Get the Latest Release](https://github.com/bcatcho/transition/releases)](#get-the-latest-releasehttpsgithubcombcatchotransitionreleases)
+	- [[Unity Transition Examples](https://github.com/bcatcho/transition-unity-examples)](#unity-transition-exampleshttpsgithubcombcatchotransition-unity-examples)
+	- [[Tutorial: Setting up in Unity](https://github.com/bcatcho/transition/wiki/Tutorial:-Setting-up-in-Unity)](#tutorial-setting-up-in-unityhttpsgithubcombcatchotransitionwikitutorial-setting-up-in-unity)
+	- [Watch an introduction video](#watch-an-introduction-video)
 - [Language concepts](#language-concepts)
 	- [@machine](#machine)
 	- [@state](#state)
@@ -74,18 +86,7 @@ Describe and execute state machines like this:
 
 <!-- /TOC -->
 
-
-
-## Unity Examples
-
-While it is recommended to read through the documentation, you can check out a number of examples implemented in Unity here:
-
-[Unity Transition Examples](https://github.com/bcatcho/transition-unity-examples)
-
-Check out the wiki for [another Unity tutorial](https://github.com/bcatcho/transition/wiki/Tutorial:-Setting-up-in-Unity)
-
 ## Language concepts
-
 A Machine (state machine) in Transition looks like this:
 
 ```
