@@ -37,7 +37,11 @@ An example project in Unity.
 A guide for all the basic components needed to get up and running in Unity.
 ### Watch an introduction video
 [![Introduction Video](http://img.youtube.com/vi/HBU4DjntMxQ/hqdefault.jpg)](https://www.youtube.com/watch?v=HBU4DjntMxQ)
+### Get the atom syntax highlighting package
+In atom, install the package 'transition-grammar'. To make it work save your files with a .tx extension or choose
+the 'transition' language when manually selecting your grammar.
 
+[transition-grammar atom package](https://atom.io/packages/transition-grammar)
 
 ---
 <!-- TOC depthFrom:2 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
@@ -47,6 +51,7 @@ A guide for all the basic components needed to get up and running in Unity.
 	- [[Unity Transition Examples](https://github.com/bcatcho/transition-unity-examples)](#unity-transition-exampleshttpsgithubcombcatchotransition-unity-examples)
 	- [[Tutorial: Setting up in Unity](https://github.com/bcatcho/transition/wiki/Tutorial:-Setting-up-in-Unity)](#tutorial-setting-up-in-unityhttpsgithubcombcatchotransitionwikitutorial-setting-up-in-unity)
 	- [Watch an introduction video](#watch-an-introduction-video)
+	- [Get the atom syntax highlighting package](#get-the-atom-syntax-highlighting-package)
 - [Language concepts](#language-concepts)
 	- [@machine](#machine)
 	- [@state](#state)
