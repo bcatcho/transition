@@ -1,5 +1,7 @@
 # transition
 
+[![Join the chat at https://gitter.im/transition-lang/Lobby](https://badges.gitter.im/transition-lang/Lobby.svg)](https://gitter.im/transition-lang/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 A light-weight state machine language, parser and interpreter built for run-time compilation and execution. It's designed to create simple state machine's out of reusable components instead of custom coded states.
 
 Though Transition was designed for Unity development it has _no_ dependencies other than `System` (and a few child namespaces) and will work for any C# based project.
