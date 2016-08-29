@@ -8,6 +8,7 @@ This library is fully compatible with iOS/Android Unity development.
 
 <a href="https://travis-ci.org/bcatcho/transition"><img src="https://travis-ci.org/bcatcho/transition.svg?branch=master" alt="Build Status"></a>
 <a href="https://twitter.com/catchco"><img src="https://img.shields.io/badge/twitter-follow%20%40catchco-blue.svg" alt="Twitter Follow Me"></a>
+[![Join the chat at https://gitter.im/transition-lang/Lobby](https://badges.gitter.im/transition-lang/Lobby.svg)](https://gitter.im/transition-lang/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Describe and execute state machines like this:
 <pre class="code">
